@@ -1,0 +1,44 @@
+---
+name: Reconcile DocoCD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reconcile:
+    name: Trigger DocoCD reconcile
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST signed push payload to DocoCD webhook
+        env:
+          WEBHOOK_SECRET: ${{ secrets.DOCOCD_WEBHOOK_SECRET }}
+          DOCOCD_URL: https://doco-cd.dynabase.nl/v1/webhook?wait=true
+          REPO: ${{ github.repository }}
+          SERVER_URL: ${{ github.server_url }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          repo_name="${REPO##*/}"
+          body=$(jq -nc \
+            --arg ref "refs/heads/main" \
+            --arg after "${SHA}" \
+            --arg full_name "${REPO}" \
+            --arg name "${repo_name}" \
+            --arg clone_url "${SERVER_URL}/${REPO}.git" \
+            --arg html_url "${SERVER_URL}/${REPO}" \
+            --arg ssh_url "git@github.com:${REPO}.git" \
+            '{ref: $ref, after: $after,
+              repository: {name: $name, full_name: $full_name,
+                           clone_url: $clone_url, html_url: $html_url,
+                           ssh_url: $ssh_url, private: false}}')
+
+          sig=$(printf '%s' "${body}" \
+            | openssl dgst -sha256 -hmac "${WEBHOOK_SECRET}" -hex \
+            | awk '{print $2}')
+
+          printf '%s' "${body}" | curl -sS --fail-with-body \
+            -X POST "${DOCOCD_URL}" \
+            -H "Content-Type: application/json" \
+            -H "X-Hub-Signature-256: sha256=${sig}" \
+            --data-binary @-
