@@ -20,15 +20,17 @@ jobs:
           set -euo pipefail
 
           repo_name="${REPO##*/}"
+          null_sha="0000000000000000000000000000000000000000"
           body=$(jq -nc \
             --arg ref "refs/heads/main" \
+            --arg before "${null_sha}" \
             --arg after "${SHA}" \
             --arg full_name "${REPO}" \
             --arg name "${repo_name}" \
             --arg clone_url "${SERVER_URL}/${REPO}.git" \
             --arg html_url "${SERVER_URL}/${REPO}" \
             --arg ssh_url "git@github.com:${REPO}.git" \
-            '{ref: $ref, after: $after,
+            '{ref: $ref, before: $before, after: $after,
               repository: {name: $name, full_name: $full_name,
                            clone_url: $clone_url, html_url: $html_url,
                            ssh_url: $ssh_url, private: false}}')
