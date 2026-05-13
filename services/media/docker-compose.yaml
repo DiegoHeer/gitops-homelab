@@ -190,29 +190,6 @@ services:
       retries: 3
       start_period: 20s
 
-  profilarr:
-    container_name: profilarr
-    image: santiagosayshey/profilarr:v1.1.4@sha256:8a514f8429cd33885166facc9eb6504fa9ded056c737609e5e8ef32ae0afb350
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.profilarr.rule=Host(`profilarr.local.dynabase.nl`)"
-      - "traefik.http.routers.profilarr.entrypoints=https"
-      - "traefik.http.routers.profilarr.tls=true"
-      - "traefik.http.services.profilarr.loadbalancer.server.port=6868"
-    volumes:
-      - /home/diego/services_data/media/profilarr/config:/config
-    environment:
-      - TZ=Europe/Amsterdam
-    ports:
-      - 6868:6868
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "--no-verbose", "http://localhost:6868"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
   sabnzbd:
     container_name: sabnzbd
     image: lscr.io/linuxserver/sabnzbd:4.5.5@sha256:374051b90f64d107f8658dcd9b9065c28826afe14562647214f45057e119fc04
