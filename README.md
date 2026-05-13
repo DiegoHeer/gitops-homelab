@@ -34,7 +34,7 @@ molecule/           # Ansible role testing (one scenario per role)
 | Category | Services |
 |---|---|
 | **Home Assistant** | Home Assistant, Mosquitto (MQTT), OpenThread Border Router, Matter Server, Doorbell Samba |
-| **Media** | Jellyfin, Seerr, Gluetun (VPN), qBittorrent, Prowlarr, Sonarr, Radarr, Profilarr, SABnzbd, Navidrome, Audiobookshelf, Grimmory + MariaDB |
+| **Media** | Jellyfin, Seerr, Gluetun (VPN), qBittorrent, Prowlarr, Sonarr, Radarr, SABnzbd, Navidrome, Audiobookshelf, Grimmory + MariaDB |
 | **Networking** | Traefik, Cloudflare Tunnel, Traefik–Pi-hole DNS sync |
 | **Monitoring** | Beszel (+ agent), Dozzle, Portracker |
 | **Storage** | Filebrowser, Nextcloud + MariaDB, Rustfs |
