@@ -1,0 +1,60 @@
+services:
+
+  mattermost:
+    container_name: mattermost
+    image: mattermost/mattermost-team-edition:11.7.1@sha256:bd5c9ba5235ac49448f85cd5a27ac34a5f3b3c1dca0840c18d305c01f5c320d9
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - TZ=Europe/Amsterdam
+      - MM_SQLSETTINGS_DRIVERNAME=postgres
+      - MM_SERVICESETTINGS_SITEURL=https://mattermost.local.dynabase.nl
+      - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mattermost.rule=Host(`mattermost.local.dynabase.nl`)"
+      - "traefik.http.routers.mattermost.entrypoints=https"
+      - "traefik.http.routers.mattermost.tls=true"
+      - "traefik.http.services.mattermost.loadbalancer.server.port=8065"
+    volumes:
+      - /home/diego/services_data/collaboration/mattermost/config:/mattermost/config
+      - /home/diego/services_data/collaboration/mattermost/data:/mattermost/data
+      - /home/diego/services_data/collaboration/mattermost/logs:/mattermost/logs
+      - /home/diego/services_data/collaboration/mattermost/plugins:/mattermost/plugins
+      - /home/diego/services_data/collaboration/mattermost/client_plugins:/mattermost/client/plugins
+      - /home/diego/services_data/collaboration/mattermost/bleve_indexes:/mattermost/bleve-indexes
+    depends_on:
+      mattermost_postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8065/api/v4/system/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  mattermost_postgres:
+    container_name: mattermost_postgres
+    image: postgres:16.14-alpine@sha256:16bc17c64a573ef34162af9298258d1aec548232985b33ed7b1eac33ba35c229
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - POSTGRES_USER=mmuser
+      - POSTGRES_DB=mattermost
+    volumes:
+      - /home/diego/services_data/collaboration/mattermost_postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mmuser -d mattermost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+networks:
+  default:
+    external: true
+    name: home_server_network
