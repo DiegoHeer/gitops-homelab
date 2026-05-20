@@ -10,6 +10,9 @@ services:
       - MM_SQLSETTINGS_DRIVERNAME=postgres
       - MM_SERVICESETTINGS_SITEURL=https://mattermost.dynabase.nl
       - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
+      - MM_EMAILSETTINGS_SENDPUSHNOTIFICATIONS=true
+      - MM_EMAILSETTINGS_PUSHNOTIFICATIONSERVER=https://push-test.mattermost.com
+      - MM_EMAILSETTINGS_PUSHNOTIFICATIONCONTENTS=full
     volumes:
       - /home/diego/services_data/collaboration/mattermost/config:/mattermost/config
       - /home/diego/services_data/collaboration/mattermost/data:/mattermost/data
