@@ -55,3 +55,7 @@ webhook_filter: "^refs/heads/main$"
 name: media
 working_dir: services/media
 webhook_filter: "^refs/heads/main$"
+---
+name: collaboration
+working_dir: services/collaboration
+webhook_filter: "^refs/heads/main$"
