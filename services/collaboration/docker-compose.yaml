@@ -8,14 +8,8 @@ services:
     environment:
       - TZ=Europe/Amsterdam
       - MM_SQLSETTINGS_DRIVERNAME=postgres
-      - MM_SERVICESETTINGS_SITEURL=https://mattermost.local.dynabase.nl
+      - MM_SERVICESETTINGS_SITEURL=https://mattermost.dynabase.nl
       - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mattermost.rule=Host(`mattermost.local.dynabase.nl`)"
-      - "traefik.http.routers.mattermost.entrypoints=https"
-      - "traefik.http.routers.mattermost.tls=true"
-      - "traefik.http.services.mattermost.loadbalancer.server.port=8065"
     volumes:
       - /home/diego/services_data/collaboration/mattermost/config:/mattermost/config
       - /home/diego/services_data/collaboration/mattermost/data:/mattermost/data
