@@ -61,6 +61,62 @@ services:
       retries: 5
       start_period: 10s
 
+  # Prerequisite: run the interactive setup wizard once on the server before first deploy:
+  #   docker run -it --rm -v /home/diego/services_data/ai/hermes:/opt/data nousresearch/hermes-agent setup
+  hermes_agent:
+    container_name: hermes_agent
+    image: nousresearch/hermes-agent:latest@sha256:02475b70b176b92f046120301de05afe63434971426c9feeb7a91ac4e73fd54a
+    restart: unless-stopped
+    command: gateway run
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hermes-agent.rule=Host(`hermes.local.dynabase.nl`)"
+      - "traefik.http.routers.hermes-agent.entrypoints=https"
+      - "traefik.http.routers.hermes-agent.tls=true"
+      - "traefik.http.services.hermes-agent.loadbalancer.server.port=8642"
+    environment:
+      - HERMES_DASHBOARD=1
+      - HERMES_UID=1000
+      - HERMES_GID=1000
+    volumes:
+      - /home/diego/services_data/ai/hermes:/opt/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: wget --spider http://localhost:8642/ > /dev/null 2>&1 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  hermes_webui:
+    container_name: hermes_webui
+    image: ghcr.io/nesquena/hermes-webui:latest@sha256:c5e4daa77a69c383ac01842867cfac0168e4144aa47a7d2b15dc1f563a0a64ea
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hermes-webui.rule=Host(`hermes-webui.local.dynabase.nl`)"
+      - "traefik.http.routers.hermes-webui.entrypoints=https"
+      - "traefik.http.routers.hermes-webui.tls=true"
+      - "traefik.http.services.hermes-webui.loadbalancer.server.port=8787"
+    volumes:
+      - /home/diego/services_data/ai/hermes:/opt/data
+    depends_on:
+      hermes_agent:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: wget --spider http://localhost:8787/ > /dev/null 2>&1 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
 
 networks:
   default:
