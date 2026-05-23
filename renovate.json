@@ -2,8 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    ":dependencyDashboard",
-    "docker:pinDigests"
+    ":dependencyDashboard"
   ],
   "enabledManagers": ["docker-compose"],
   "docker-compose": {
@@ -13,6 +12,7 @@
     ]
   },
   "labels": ["renovate"],
+  "schedule": ["before 7am on Monday"],
   "packageRules": [
     {
       "description": "Group updates per compose stack: ai",
@@ -91,16 +91,17 @@
       "allowedVersions": "<17"
     },
     {
-      "description": "Auto-merge patch, digest, and pin-digest updates once CI passes",
-      "matchUpdateTypes": ["patch", "digest", "pinDigest"],
+      "description": "Auto-merge patch and minor updates once CI passes",
+      "matchUpdateTypes": ["patch", "minor"],
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": true
     },
     {
-      "description": "Manual review required for minor and major updates",
-      "matchUpdateTypes": ["minor", "major"],
-      "automerge": false
+      "description": "Major updates: separate PR per package, no auto-merge, manual review required",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "groupName": null
     }
   ]
 }
