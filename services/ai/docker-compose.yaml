@@ -101,6 +101,8 @@ services:
     restart: unless-stopped
     environment:
       - HERMES_WEBUI_STATE_DIR=/opt/data/webui
+      - UID=1000
+      - GID=1000
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.hermes-webui.rule=Host(`hermes-webui.local.dynabase.nl`)"
