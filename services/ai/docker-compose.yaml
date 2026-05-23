@@ -94,6 +94,31 @@ services:
       retries: 3
       start_period: 30s
 
+  # Prerequisite: after first deploy, generate the OAuth token:
+  #   docker exec -it claudebox claudebox setup-token
+  # Then update claudebox.enc.env with the token, re-encrypt, commit, and push.
+  claudebox:
+    container_name: claudebox
+    image: psyb0t/claudebox:v1.14.0-minimal
+    command: api
+    restart: unless-stopped
+    env_file: claudebox.enc.env
+    environment:
+      - CLAUDEBOX_MODE_API_PORT=8080
+    volumes:
+      - /home/diego/Projects:/workspaces:rw
+      - /home/diego/services_data/ai/claudebox:/home/user/.claude
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    healthcheck:
+      test: curl -sf http://localhost:8080/health > /dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
 networks:
   default:
     external: true
