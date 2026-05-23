@@ -1,7 +1,7 @@
 services:
   homeassistant:
     container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:2026.4.4
+    image: ghcr.io/home-assistant/home-assistant:2026.5.4
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/home_assistant/homeassistant/config:/config
