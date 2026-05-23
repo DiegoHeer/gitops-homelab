@@ -1,59 +1,5 @@
 services:
 
-  paperclip:
-    container_name: paperclip
-    image: reeoss/paperclipai-paperclip@sha256:677649a2ea0571cc83ab8cff2e1d29343c0641684113b464853c4fde16809e46
-    restart: unless-stopped
-    env_file: paperclip.enc.env
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.paperclip.rule=Host(`paperclip.local.dynabase.nl`)"
-      - "traefik.http.routers.paperclip.entrypoints=https"
-      - "traefik.http.routers.paperclip.tls=true"
-      - "traefik.http.services.paperclip.loadbalancer.server.port=3100"
-    environment:
-      - HOST=0.0.0.0
-      - PORT=3100
-      - PAPERCLIP_HOME=/paperclip
-      - PAPERCLIP_INSTANCE_ID=default
-      - PAPERCLIP_DEPLOYMENT_MODE=authenticated
-      - PAPERCLIP_DEPLOYMENT_EXPOSURE=private
-      - PAPERCLIP_PUBLIC_URL=https://paperclip.local.dynabase.nl
-      - NODE_ENV=production
-      - SERVE_UI=true
-    volumes:
-      - /home/diego/services_data/ai/paperclip/data:/paperclip
-    depends_on:
-      paperclip_postgres:
-        condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3100"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  paperclip_postgres:
-    container_name: paperclip_postgres
-    restart: unless-stopped
-    image: postgres:18.3-alpine@sha256:52098013b4b64a746626437d38afc03cabff6cdeb4d3d92e2342aa95f0ce56ea
-    env_file: paperclip.enc.env
-    volumes:
-      - /home/diego/services_data/ai/paperclip/postgresql:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=paperclip
-      - POSTGRES_DB=paperclip
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U paperclip -d paperclip"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   n8n:
     container_name: n8n
     image: docker.n8n.io/n8nio/n8n:2.17.2@sha256:4e5be628f9eb05e3fde3cd242c84f6000165c95d2048d5076fcc569421ada4f3
