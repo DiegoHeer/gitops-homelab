@@ -51,7 +51,7 @@ Config|Update: updated multiple services to latest versions
 - Docker Compose: container names snake_case matching the service key; all services on external `home_server_network`; healthcheck + `restart: unless-stopped` on every service.
 - Runtime state → absolute bind mounts under `/home/diego/services_data/<category>/<service>/`. Static config → relative bind mounts from the compose file's dir.
 - Put **final container env var names** directly into `secrets.enc.env`. Compose's `${VAR}` interpolation does not read `env_file` contents.
-- Per-service split `.enc.env` files are allowed only when two services in the same stack need the same env var name with different values (see `services/ai/{paperclip,n8n}.enc.env`).
+- Per-service split `.enc.env` files are allowed only when two services in the same stack need the same env var name with different values (see `services/ai/n8n.enc.env`).
 - Never commit plaintext `.env` or vault passwords.
 
 ## Architectural Decision Records
