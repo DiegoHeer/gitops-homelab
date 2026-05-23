@@ -1,7 +1,7 @@
 services:
   traefik:
     container_name: traefik
-    image: traefik:v3.6.15
+    image: traefik:v3.7.1
     restart: unless-stopped
     env_file: secrets.enc.env
     ports:
@@ -48,7 +48,7 @@ services:
 
   cloudflare_tunnel:
     container_name: cloudflare_tunnel
-    image: cloudflare/cloudflared:2026.3.0
+    image: cloudflare/cloudflared:2026.5.0
     restart: unless-stopped
     env_file: secrets.enc.env
     # cloudflared's TUNNEL_TOKEN env var is silently rejected by v2026.3.0;
