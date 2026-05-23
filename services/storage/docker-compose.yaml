@@ -1,7 +1,7 @@
 services:
   filebrowser:
     container_name: filebrowser
-    image: gtstef/filebrowser:1.2.4-stable@sha256:1cc63ad4b8558314320bdd8a5aad086d068ec94b78fc4e3dd9d1c47935738893
+    image: gtstef/filebrowser:1.2.4-stable
     restart: unless-stopped
     environment:
       TZ: "Europe/Amsterdam"
@@ -30,7 +30,7 @@ services:
       start_period: 10s
 
   nextcloud:
-    image: linuxserver/nextcloud:33.0.2@sha256:cc73f7219452bb96b318af66603056f7465819508ac51d7fa47f59248ef39594
+    image: linuxserver/nextcloud:33.0.2
     container_name: nextcloud
     restart: unless-stopped
     env_file: secrets.enc.env
@@ -61,7 +61,7 @@ services:
       start_period: 20s
 
   nextcloud_mariadb:
-    image: mariadb:12.2.2@sha256:e0236fc6386e7eacd9359e59d0a078bd7aa0d18280d36d13061121bedeaee903
+    image: mariadb:12.2.2
     container_name: nextcloud_mariadb
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
@@ -81,7 +81,7 @@ services:
 
   rustfs:
     container_name: rustfs
-    image: rustfs/rustfs:1.0.0-alpha.94@sha256:7d49faa88c045af618a9ca6e1a9dc5b6cb87ea6fb407a682d825478e4001b40c
+    image: rustfs/rustfs:1.0.0-alpha.94
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:

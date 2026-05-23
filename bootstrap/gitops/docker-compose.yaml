@@ -1,7 +1,7 @@
 services:
   doco-cd:
     container_name: doco-cd
-    image: ghcr.io/kimdre/doco-cd:latest@sha256:b977240ff3fb54061b68b6eafa80b3caf98559f0b17413aa2d5f6898f8c81360
+    image: ghcr.io/kimdre/doco-cd:0.88.0
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -34,7 +34,7 @@ services:
 
   apprise:
     container_name: apprise
-    image: caronc/apprise:latest@sha256:25e0577915c2f06233ae1dce077f05c0fc9ba4f0ea89de5aee18a32b2ee9a75c
+    image: caronc/apprise:v1.4.1
     restart: unless-stopped
     environment:
       TZ: Europe/Amsterdam

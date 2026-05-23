@@ -1,7 +1,7 @@
 services:
   romm:
     container_name: romm
-    image: rommapp/romm:4.8.1@sha256:2b7a1714b287f69b081ad2a63bb8c2fa673666a17b2f21322b580b0cd51cb266
+    image: rommapp/romm:4.8.1
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
@@ -36,7 +36,7 @@ services:
 
   romm_mariadb:
     container_name: romm_mariadb
-    image: mariadb:12.2.2@sha256:e0236fc6386e7eacd9359e59d0a078bd7aa0d18280d36d13061121bedeaee903
+    image: mariadb:12.2.2
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
