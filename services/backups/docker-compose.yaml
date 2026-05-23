@@ -1,7 +1,7 @@
 services:
   zerobyte:
     container_name: zerobyte
-    image: ghcr.io/nicotsx/zerobyte:v0.34.0@sha256:a69a2cfeb0f2fcb073992863c4bc8c301c8e00f89e34765f05cf40c404ea1c01
+    image: ghcr.io/nicotsx/zerobyte:v0.34.0
     restart: unless-stopped
     cap_add:
       - SYS_ADMIN
@@ -30,7 +30,7 @@ services:
 
   databasus:
     container_name: databasus
-    image: databasus/databasus:v3.32.2@sha256:baf5f0fa09ac0af836654d51853e4b32ea7b12e390b2f17cee1400c33ab4de5e
+    image: databasus/databasus:v3.32.2
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/backups/databasus:/databasus-data

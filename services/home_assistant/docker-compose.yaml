@@ -1,7 +1,7 @@
 services:
   homeassistant:
     container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:2026.4.4@sha256:c1e5f0147f4cb51ccb05bb30b62a1269cc1bd48a6274792d3b38a77ab274dfd2
+    image: ghcr.io/home-assistant/home-assistant:2026.4.4
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/home_assistant/homeassistant/config:/config
@@ -21,7 +21,7 @@ services:
 
   mosquitto:
     container_name: mosquitto
-    image: eclipse-mosquitto:2.1.2-alpine@sha256:a908c65cc8e67ec9d292ef27c2c0360dbaaee7eb1b935cdd194e67697f15dea1
+    image: eclipse-mosquitto:2.1.2-alpine
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/home_assistant/mosquitto/log:/mosquitto/log
@@ -38,7 +38,7 @@ services:
 
   openthread_border_router:
     container_name: openthread_border_router
-    image: ghcr.io/ownbee/hass-otbr-docker:v0.3.0@sha256:5ca7008462e94d4c937aca8c1c9a60e709d6d300625363c161b946683032d5b1
+    image: ghcr.io/ownbee/hass-otbr-docker:v0.3.0
     restart: unless-stopped
     privileged: true
     network_mode: host
@@ -70,7 +70,7 @@ services:
       start_period: 120s
 
   matter_server:
-    image: ghcr.io/home-assistant-libs/python-matter-server:8.1.0@sha256:170aa093ce91c76cde4cc390918307590f0f5558fcec93f913af3cb019e6562a
+    image: ghcr.io/home-assistant-libs/python-matter-server:8.1.0
     container_name: matter_server
     restart: unless-stopped
     network_mode: host
@@ -85,7 +85,7 @@ services:
 
   # TODO: check if this properly works
   doorbell_samba:
-    image: ghcr.io/servercontainers/samba:a3.22.1-s4.21.4-r4@sha256:b9328676c330608a92f1c84cbfc89372d7e2de2478d93601cee35f2c6cfa4276
+    image: ghcr.io/servercontainers/samba:a3.22.1-s4.21.4-r4
     container_name: doorbell_samba
     network_mode: host
     restart: unless-stopped

@@ -2,7 +2,7 @@ services:
 
   it-tools:
     container_name: it-tools
-    image: corentinth/it-tools:2024.10.22-7ca5933@sha256:8b8128748339583ca951af03dfe02a9a4d7363f61a216226fc28030731a5a61f
+    image: corentinth/it-tools:2024.10.22-7ca5933
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -18,7 +18,7 @@ services:
 
   bentopdf:
     container_name: bentopdf
-    image: ghcr.io/alam00000/bentopdf:2.8.3@sha256:69c188fd267da4df693dac205a4fc585e1fb7005a0db758612ee439eda989ee2
+    image: ghcr.io/alam00000/bentopdf:2.8.3
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -35,7 +35,7 @@ services:
 
   grist:
     container_name: grist
-    image: gristlabs/grist:1.7.12@sha256:e536e991fb1bd9a48db5262ca180bd978b8ffa2a34050fce80be9318ea3ad95c
+    image: gristlabs/grist:1.7.12
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
@@ -58,7 +58,7 @@ services:
 
   docuseal:
     container_name: docuseal
-    image: docuseal/docuseal:2.4.4@sha256:be48b0737379e55edcbf203d80cd7d0ed1b12b42fb66f44b8a7bf951f6e14577
+    image: docuseal/docuseal:2.4.4
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -77,7 +77,7 @@ services:
 
   changedetection:
     container_name: changedetection
-    image: ghcr.io/dgtlmoon/changedetection.io:0.54.9@sha256:2a7a8325b560e3cb6834c31f2a86b9ef7fac13c63cf0d3bdf5a14bdd3f0fbe77
+    image: ghcr.io/dgtlmoon/changedetection.io:0.54.9
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -95,7 +95,7 @@ services:
 
   tandoor:
     container_name: tandoor
-    image: vabene1111/recipes:2.6.9@sha256:969c5b3552ffbf18a6f82b3ad5babbae89bfbd30ab6e3195fd3c158bcf3062ed
+    image: vabene1111/recipes:2.6.9
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
@@ -132,7 +132,7 @@ services:
   tandoor_postgres:
     container_name: tandoor_postgres
     restart: unless-stopped
-    image: postgres:16.13-alpine@sha256:93d55776e04376e19adb2733e3ccebb4392ee7dd86d8ff238503b30fe719c84f
+    image: postgres:16.13-alpine
     env_file: secrets.enc.env
     volumes:
       - /home/diego/services_data/tools/tandoor/postgresql:/var/lib/postgresql/data

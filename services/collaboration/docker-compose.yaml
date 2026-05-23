@@ -2,7 +2,7 @@ services:
 
   mattermost:
     container_name: mattermost
-    image: mattermost/mattermost-team-edition:11.7.1@sha256:bd5c9ba5235ac49448f85cd5a27ac34a5f3b3c1dca0840c18d305c01f5c320d9
+    image: mattermost/mattermost-team-edition:11.7.1
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
@@ -36,7 +36,7 @@ services:
 
   mattermost_postgres:
     container_name: mattermost_postgres
-    image: postgres:16.14-alpine@sha256:16bc17c64a573ef34162af9298258d1aec548232985b33ed7b1eac33ba35c229
+    image: postgres:16.14-alpine
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:

@@ -1,7 +1,7 @@
 services:
   traefik:
     container_name: traefik
-    image: traefik:v3.6.15@sha256:8cb20d16e01a53d8d7f7696ac2f1af7d200d5c9984d226ce2299731d9eab6d6c
+    image: traefik:v3.6.15
     restart: unless-stopped
     env_file: secrets.enc.env
     ports:
@@ -38,7 +38,7 @@ services:
       retries: 3
 
   traefik-pihole-dns-sync:
-    image: ghcr.io/rpressiani/traefik-pihole-dns-sync:v0.1.0@sha256:827b6d2d8586eb027f69be7de8f116fe50c02afc6ade6792ebaca8d478076835
+    image: ghcr.io/rpressiani/traefik-pihole-dns-sync:v0.1.0
     container_name: traefik-pihole-dns-sync
     restart: unless-stopped
     env_file: secrets.enc.env
@@ -48,7 +48,7 @@ services:
 
   cloudflare_tunnel:
     container_name: cloudflare_tunnel
-    image: cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0
+    image: cloudflare/cloudflared:2026.3.0
     restart: unless-stopped
     env_file: secrets.enc.env
     # cloudflared's TUNNEL_TOKEN env var is silently rejected by v2026.3.0;

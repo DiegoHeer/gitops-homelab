@@ -2,7 +2,7 @@ services:
   homarr:
     container_name: homarr
     restart: unless-stopped
-    image: ghcr.io/homarr-labs/homarr:v1.59.3@sha256:4ffa0d4b24e390fd0050a18103ecfcb009357f6b3a25409fd4dd8cb0b9f3443e
+    image: ghcr.io/homarr-labs/homarr:v1.59.3
     env_file: secrets.enc.env
     volumes:
       - /home/diego/services_data/dashboards/homarr/appdata:/appdata
@@ -21,7 +21,7 @@ services:
 
   glance:
     container_name: glance
-    image: glanceapp/glance:v0.8.4@sha256:6df86a7e8868d1eda21f35205134b1962c422957e42a0c44d4717c8e8f741b1a
+    image: glanceapp/glance:v0.8.4
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/dashboards/glance/config:/app/config
@@ -41,7 +41,7 @@ services:
 
   dash:
     container_name: dash
-    image: mauricenino/dashdot:6.3.4@sha256:434a54d2937411a06b09c50e55709cc7d3b092c0fe173a9e5c986f9b5a33c7c6
+    image: mauricenino/dashdot:6.3.4
     restart: unless-stopped
     privileged: true
     environment:
@@ -63,7 +63,7 @@ services:
 
   homepage:
     container_name: homepage
-    image: ghcr.io/gethomepage/homepage:v1.12.3@sha256:cc84f2f5eb3c7734353701ccbaa24ed02dacb0d119114e50e4251e2005f3990a
+    image: ghcr.io/gethomepage/homepage:v1.12.3
     restart: unless-stopped
     ports:
       - 3000:3000
