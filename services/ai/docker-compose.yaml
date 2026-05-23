@@ -83,6 +83,7 @@ services:
       - API_SERVER_HOST=0.0.0.0
     volumes:
       - /home/diego/services_data/ai/hermes:/opt/data
+      - hermes_agent_src:/opt/hermes
     deploy:
       resources:
         limits:
@@ -108,20 +109,24 @@ services:
       - "traefik.http.services.hermes-webui.loadbalancer.server.port=8787"
     volumes:
       - /home/diego/services_data/ai/hermes:/opt/data
+      - hermes_agent_src:/home/hermeswebui/.hermes/hermes-agent:ro
     depends_on:
       hermes_agent:
         condition: service_healthy
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 512M
     healthcheck:
       test: curl -sf http://localhost:8787/ > /dev/null || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 120s
 
+
+volumes:
+  hermes_agent_src:
 
 networks:
   default:
