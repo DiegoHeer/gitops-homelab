@@ -98,6 +98,8 @@ services:
     container_name: hermes_webui
     image: ghcr.io/nesquena/hermes-webui:v0.51.115
     restart: unless-stopped
+    environment:
+      - HERMES_WEBUI_STATE_DIR=/opt/data/webui
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.hermes-webui.rule=Host(`hermes-webui.local.dynabase.nl`)"
