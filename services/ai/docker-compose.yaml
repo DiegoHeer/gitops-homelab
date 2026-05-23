@@ -50,7 +50,7 @@ services:
     image: postgres:18.4-alpine
     env_file: n8n.enc.env
     volumes:
-      - /home/diego/services_data/ai/n8n/postgresql:/var/lib/postgresql/data
+      - /home/diego/services_data/ai/n8n/postgresql:/var/lib/postgresql
     environment:
       - POSTGRES_USER=n8n
       - POSTGRES_DB=n8n
