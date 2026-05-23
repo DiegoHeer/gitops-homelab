@@ -106,7 +106,7 @@ services:
       - CLAUDEBOX_MODE_API=1
       - CLAUDEBOX_MODE_API_PORT=8080
     volumes:
-      - /home/diego/Projects:/workspaces:rw
+      - /home/diego/projects:/workspaces:rw
       - /home/diego/services_data/ai/claudebox:/home/claude/.claude
     deploy:
       resources:
