@@ -1,7 +1,7 @@
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:10.11.8
+    image: linuxserver/jellyfin:10.11.9
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -103,7 +103,7 @@ services:
 
   qbittorrent:
     container_name: qbittorrent
-    image: lscr.io/linuxserver/qbittorrent:5.1.4
+    image: lscr.io/linuxserver/qbittorrent:5.2.0
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
@@ -233,7 +233,7 @@ services:
 
   audiobookshelf:
     container_name: audiobookshelf
-    image: ghcr.io/advplyr/audiobookshelf:2.33.2
+    image: ghcr.io/advplyr/audiobookshelf:2.35.0
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
