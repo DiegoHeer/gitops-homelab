@@ -2,7 +2,7 @@ services:
   homarr:
     container_name: homarr
     restart: unless-stopped
-    image: ghcr.io/homarr-labs/homarr:v1.59.3@sha256:4ffa0d4b24e390fd0050a18103ecfcb009357f6b3a25409fd4dd8cb0b9f3443e
+    image: ghcr.io/homarr-labs/homarr:v1.62.0@sha256:fc96436bf80000bed8989d6606fc1ac0929bf4809bb4594168ad4b327e8f2c5f
     env_file: secrets.enc.env
     volumes:
       - /home/diego/services_data/dashboards/homarr/appdata:/appdata
@@ -63,7 +63,7 @@ services:
 
   homepage:
     container_name: homepage
-    image: ghcr.io/gethomepage/homepage:v1.12.3@sha256:cc84f2f5eb3c7734353701ccbaa24ed02dacb0d119114e50e4251e2005f3990a
+    image: ghcr.io/gethomepage/homepage:v1.13.1@sha256:d8d784e5090111b6e4c56dfd90e272d2953a2094e87349f647165df0fa6c4401
     restart: unless-stopped
     ports:
       - 3000:3000
