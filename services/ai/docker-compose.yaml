@@ -2,7 +2,7 @@ services:
 
   n8n:
     container_name: n8n
-    image: docker.n8n.io/n8nio/n8n:2.17.2
+    image: docker.n8n.io/n8nio/n8n:2.22.2
     restart: unless-stopped
     env_file: n8n.enc.env
     labels:
@@ -47,7 +47,7 @@ services:
   n8n_postgres:
     container_name: n8n_postgres
     restart: unless-stopped
-    image: postgres:18.3-alpine
+    image: postgres:18.4-alpine
     env_file: n8n.enc.env
     volumes:
       - /home/diego/services_data/ai/n8n/postgresql:/var/lib/postgresql/data
