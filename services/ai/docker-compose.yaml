@@ -2,7 +2,7 @@ services:
 
   n8n:
     container_name: n8n
-    image: docker.n8n.io/n8nio/n8n:2.17.2@sha256:4e5be628f9eb05e3fde3cd242c84f6000165c95d2048d5076fcc569421ada4f3
+    image: docker.n8n.io/n8nio/n8n:2.22.2@sha256:bf26d48e2be3d8a2bda50c5494dc603f495c2d98bd186793773b0204f3e7e0c3
     restart: unless-stopped
     env_file: n8n.enc.env
     labels:
@@ -47,7 +47,7 @@ services:
   n8n_postgres:
     container_name: n8n_postgres
     restart: unless-stopped
-    image: postgres:18.3-alpine@sha256:52098013b4b64a746626437d38afc03cabff6cdeb4d3d92e2342aa95f0ce56ea
+    image: postgres:18.4-alpine@sha256:96d56f7f57c6aacd1fcb908bc83b345ec5f83231ee486dd66a1baadce274db88
     env_file: n8n.enc.env
     volumes:
       - /home/diego/services_data/ai/n8n/postgresql:/var/lib/postgresql/data
