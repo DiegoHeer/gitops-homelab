@@ -1,0 +1,151 @@
+services:
+
+  penpot_frontend:
+    container_name: penpot_frontend
+    image: penpotapp/frontend:2.15
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.penpot.rule=Host(`penpot.local.dynabase.nl`)"
+      - "traefik.http.routers.penpot.entrypoints=https"
+      - "traefik.http.routers.penpot.tls=true"
+      - "traefik.http.services.penpot.loadbalancer.server.port=8080"
+    environment:
+      - PENPOT_PUBLIC_URI=https://penpot.local.dynabase.nl
+      - PENPOT_FLAGS=enable-login-with-password disable-email-verification enable-mcp
+      - PENPOT_HTTP_SERVER_MAX_BODY_SIZE=367001600
+    volumes:
+      - /home/diego/services_data/design/penpot/assets:/opt/data/assets
+    depends_on:
+      penpot_backend:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  penpot_backend:
+    container_name: penpot_backend
+    image: penpotapp/backend:2.15
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - PENPOT_PUBLIC_URI=https://penpot.local.dynabase.nl
+      - PENPOT_FLAGS=enable-login-with-password disable-email-verification enable-mcp
+      - PENPOT_DATABASE_URI=postgresql://penpot_postgres/penpot
+      - PENPOT_DATABASE_USERNAME=penpot
+      - PENPOT_REDIS_URI=redis://penpot_valkey/0
+      - PENPOT_OBJECTS_STORAGE_BACKEND=fs
+      - PENPOT_OBJECTS_STORAGE_FS_DIRECTORY=/opt/data/assets
+      - PENPOT_HTTP_SERVER_MAX_BODY_SIZE=367001600
+      - PENPOT_TELEMETRY_ENABLED=false
+    volumes:
+      - /home/diego/services_data/design/penpot/assets:/opt/data/assets
+    depends_on:
+      penpot_postgres:
+        condition: service_healthy
+      penpot_valkey:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6060/readyz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  penpot_exporter:
+    container_name: penpot_exporter
+    image: penpotapp/exporter:2.15
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - PENPOT_PUBLIC_URI=http://penpot_frontend:8080
+      - PENPOT_REDIS_URI=redis://penpot_valkey/0
+    depends_on:
+      penpot_frontend:
+        condition: service_healthy
+      penpot_valkey:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6061/readyz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  penpot_mcp:
+    container_name: penpot_mcp
+    image: penpotapp/mcp:2.15
+    restart: unless-stopped
+    environment:
+      - PENPOT_BACKEND_URI=http://penpot_backend:6060
+    depends_on:
+      penpot_backend:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  penpot_postgres:
+    container_name: penpot_postgres
+    image: postgres:15-alpine
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - POSTGRES_USER=penpot
+      - POSTGRES_DB=penpot
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    volumes:
+      - /home/diego/services_data/design/penpot/postgresql:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U penpot -d penpot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  penpot_valkey:
+    container_name: penpot_valkey
+    image: valkey/valkey:8.1
+    restart: unless-stopped
+    command: valkey-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+networks:
+  default:
+    external: true
+    name: home_server_network
