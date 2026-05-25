@@ -1,7 +1,7 @@
 services:
   doco-cd:
     container_name: doco-cd
-    image: ghcr.io/kimdre/doco-cd:0.88.0
+    image: ghcr.io/kimdre/doco-cd:0.89.0
     restart: unless-stopped
     cap_drop:
       - ALL
