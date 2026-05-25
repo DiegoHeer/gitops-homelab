@@ -2,6 +2,7 @@ services:
 
   penpot_frontend:
     container_name: penpot_frontend
+    hostname: penpot-frontend
     image: penpotapp/frontend:2.15
     restart: unless-stopped
     labels:
@@ -32,15 +33,16 @@ services:
 
   penpot_backend:
     container_name: penpot_backend
+    hostname: penpot-backend
     image: penpotapp/backend:2.15
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
       - PENPOT_PUBLIC_URI=https://penpot.local.dynabase.nl
       - PENPOT_FLAGS=enable-login-with-password disable-email-verification enable-mcp
-      - PENPOT_DATABASE_URI=postgresql://penpot_postgres/penpot
+      - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
       - PENPOT_DATABASE_USERNAME=penpot
-      - PENPOT_REDIS_URI=redis://penpot_valkey/0
+      - PENPOT_REDIS_URI=redis://penpot-valkey/0
       - PENPOT_OBJECTS_STORAGE_BACKEND=fs
       - PENPOT_OBJECTS_STORAGE_FS_DIRECTORY=/opt/data/assets
       - PENPOT_HTTP_SERVER_MAX_BODY_SIZE=367001600
@@ -65,12 +67,13 @@ services:
 
   penpot_exporter:
     container_name: penpot_exporter
+    hostname: penpot-exporter
     image: penpotapp/exporter:2.15
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
-      - PENPOT_PUBLIC_URI=http://penpot_frontend:8080
-      - PENPOT_REDIS_URI=redis://penpot_valkey/0
+      - PENPOT_PUBLIC_URI=http://penpot-frontend:8080
+      - PENPOT_REDIS_URI=redis://penpot-valkey/0
     depends_on:
       penpot_frontend:
         condition: service_healthy
@@ -92,7 +95,7 @@ services:
     image: penpotapp/mcp:2.15
     restart: unless-stopped
     environment:
-      - PENPOT_BACKEND_URI=http://penpot_backend:6060
+      - PENPOT_BACKEND_URI=http://penpot-backend:6060
     depends_on:
       penpot_backend:
         condition: service_healthy
@@ -109,6 +112,7 @@ services:
 
   penpot_postgres:
     container_name: penpot_postgres
+    hostname: penpot-postgres
     image: postgres:15-alpine
     restart: unless-stopped
     env_file: secrets.enc.env
@@ -131,6 +135,7 @@ services:
 
   penpot_valkey:
     container_name: penpot_valkey
+    hostname: penpot-valkey
     image: valkey/valkey:8.1
     restart: unless-stopped
     command: valkey-server --maxmemory 128mb --maxmemory-policy allkeys-lru
