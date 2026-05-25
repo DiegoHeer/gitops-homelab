@@ -59,3 +59,7 @@ webhook_filter: "^refs/heads/main$"
 name: collaboration
 working_dir: services/collaboration
 webhook_filter: "^refs/heads/main$"
+---
+name: design
+working_dir: services/design
+webhook_filter: "^refs/heads/main$"

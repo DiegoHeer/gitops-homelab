@@ -30,6 +30,11 @@
       "groupName": "dashboards stack"
     },
     {
+      "description": "Group updates per compose stack: design",
+      "matchFileNames": ["services/design/**"],
+      "groupName": "design stack"
+    },
+    {
       "description": "Group updates per compose stack: games",
       "matchFileNames": ["services/games/**"],
       "groupName": "games stack"
