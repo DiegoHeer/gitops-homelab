@@ -25,6 +25,8 @@ services:
         condition: service_healthy
       penpot_exporter:
         condition: service_started
+      penpot_mcp:
+        condition: service_started
     deploy:
       resources:
         limits:
@@ -107,6 +109,10 @@ services:
     restart: unless-stopped
     environment:
       - PENPOT_BACKEND_URI=http://penpot-backend:6060
+    networks:
+      default:
+        aliases:
+          - penpot-mcp
     depends_on:
       penpot_backend:
         condition: service_healthy
@@ -115,7 +121,7 @@ services:
         limits:
           memory: 256M
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:4401/mcp || exit 1"]
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/4401'"]
       interval: 30s
       timeout: 10s
       retries: 3
