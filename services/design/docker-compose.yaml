@@ -2,7 +2,6 @@ services:
 
   penpot_frontend:
     container_name: penpot_frontend
-    hostname: penpot-frontend
     image: penpotapp/frontend:2.15
     restart: unless-stopped
     labels:
@@ -17,6 +16,10 @@ services:
       - PENPOT_HTTP_SERVER_MAX_BODY_SIZE=367001600
     volumes:
       - /home/diego/services_data/design/penpot/assets:/opt/data/assets
+    networks:
+      default:
+        aliases:
+          - penpot-frontend
     depends_on:
       penpot_backend:
         condition: service_healthy
@@ -35,7 +38,6 @@ services:
 
   penpot_backend:
     container_name: penpot_backend
-    hostname: penpot-backend
     image: penpotapp/backend:2.15
     restart: unless-stopped
     env_file: secrets.enc.env
@@ -51,6 +53,10 @@ services:
       - PENPOT_TELEMETRY_ENABLED=false
     volumes:
       - /home/diego/services_data/design/penpot/assets:/opt/data/assets
+    networks:
+      default:
+        aliases:
+          - penpot-backend
     depends_on:
       penpot_postgres:
         condition: service_healthy
@@ -69,13 +75,16 @@ services:
 
   penpot_exporter:
     container_name: penpot_exporter
-    hostname: penpot-exporter
     image: penpotapp/exporter:2.15
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
       - PENPOT_PUBLIC_URI=http://penpot-frontend:8080
       - PENPOT_REDIS_URI=redis://penpot-valkey/0
+    networks:
+      default:
+        aliases:
+          - penpot-exporter
     depends_on:
       penpot_backend:
         condition: service_healthy
@@ -114,7 +123,6 @@ services:
 
   penpot_postgres:
     container_name: penpot_postgres
-    hostname: penpot-postgres
     image: postgres:15-alpine
     restart: unless-stopped
     env_file: secrets.enc.env
@@ -124,6 +132,10 @@ services:
       - POSTGRES_INITDB_ARGS=--data-checksums
     volumes:
       - /home/diego/services_data/design/penpot/postgresql:/var/lib/postgresql/data
+    networks:
+      default:
+        aliases:
+          - penpot-postgres
     deploy:
       resources:
         limits:
@@ -137,10 +149,13 @@ services:
 
   penpot_valkey:
     container_name: penpot_valkey
-    hostname: penpot-valkey
     image: valkey/valkey:8.1
     restart: unless-stopped
     command: valkey-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    networks:
+      default:
+        aliases:
+          - penpot-valkey
     deploy:
       resources:
         limits:
