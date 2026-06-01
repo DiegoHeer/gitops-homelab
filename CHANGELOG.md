@@ -3,6 +3,52 @@
 All notable changes to this homelab are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning uses CalVer (`YYYY.MM.N`).
+## [2026.06.0] - 2026-05-25
+
+### Added
+
+- Config|Add: included manual workflow to trigger DocoCD reconcile
+- Services|Add: included mattermost for team communication
+- Services|Add: enabled push notifications for mattermost mobile apps
+- Services|Add: included hermes agent and webui for AI assistant
+- Services|Add: included claudebox sidecar for Claude Code access via MCP
+- Services|Add: included penpot for collaborative design
+
+### Changed
+
+- Config|Update: regenerate CHANGELOG for 2026.05.0
+- Services|Update: switched mattermost to external access via Cloudflare Tunnel
+- Config|Update: reduced Renovate frequency, disabled digests, isolated major PRs
+- Config|Update: pinned latest-only images to versioned tags
+- Config|Update: trigger doco-cd redeploy after n8n_postgres fix
+- Services|Update: activated claudebox OAuth token for Claude subscription
+- Config|Update: registered design stack in DocoCD and Renovate
+
+### Fixed
+
+- Config|Fix: added missing X-GitHub-Event header to DocoCD reconcile workflow
+- Config|Fix: set before to null SHA so DocoCD skips commit diff on reconcile
+- Services|Fix: use mmctl for mattermost healthcheck instead of curl
+- Services|Fix: fixed hermes healthcheck and enabled gateway API server
+- Services|Fix: added missing HERMES_WEBUI_STATE_DIR env var
+- Config|Fix: corrected hermes-agent and hermes-webui version tags
+- Services|Fix: updated n8n_postgres mount path for postgres 18+ layout
+- Services|Fix: shared hermes-agent source with webui via named volume
+- Services|Fix: added agent source volume for hermes webui connectivity
+- Services|Fix: corrected claudebox API mode activation and volume path
+- Services|Fix: corrected claudebox projects volume path to lowercase
+- Services|Fix: added hostnames for penpot internal DNS resolution
+- Services|Fix: resolved penpot startup dependency cycle and MCP healthcheck port
+- Services|Fix: switched penpot from hostname to network aliases for DNS resolution
+- Services|Fix: added MCP network alias, TCP healthcheck, and frontend dependency
+
+### Removed
+
+- Services|Remove: removed profilarr from media stack
+- Services|Remove: removed paperclip from ai stack
+- Config|Remove: stripped stale digest pins from all compose files
+- Services|Remove: removed hermes webui service
+
 ## [2026.05.0] - 2026-04-30
 
 ### Added
