@@ -48,7 +48,7 @@ services:
 
   cloudflare_tunnel:
     container_name: cloudflare_tunnel
-    image: cloudflare/cloudflared:2026.5.0
+    image: cloudflare/cloudflared:2026.5.2
     restart: unless-stopped
     env_file: secrets.enc.env
     # cloudflared's TUNNEL_TOKEN env var is silently rejected by v2026.3.0;
