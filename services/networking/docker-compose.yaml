@@ -1,7 +1,7 @@
 services:
   traefik:
     container_name: traefik
-    image: traefik:v3.7.1
+    image: traefik:v3.7.4
     restart: unless-stopped
     env_file: secrets.enc.env
     ports:
