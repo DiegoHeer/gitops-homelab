@@ -47,7 +47,7 @@ services:
 
   dozzle:
     container_name: dozzle
-    image: amir20/dozzle:v10.6.1
+    image: amir20/dozzle:v10.6.5
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -92,7 +92,7 @@ services:
       start_period: 20s
 
   uptime-kuma:
-    image: louislam/uptime-kuma:2.3.2
+    image: louislam/uptime-kuma:2.4.0
     container_name: uptime-kuma
     restart: unless-stopped
     volumes:
