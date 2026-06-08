@@ -2,7 +2,7 @@ services:
 
   mattermost:
     container_name: mattermost
-    image: mattermost/mattermost-team-edition:11.7.1
+    image: mattermost/mattermost-team-edition:11.7.2
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
