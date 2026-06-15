@@ -30,7 +30,7 @@ services:
       start_period: 10s
 
   nextcloud:
-    image: linuxserver/nextcloud:33.0.3
+    image: linuxserver/nextcloud:33.0.5
     container_name: nextcloud
     restart: unless-stopped
     env_file: secrets.enc.env
@@ -61,7 +61,7 @@ services:
       start_period: 20s
 
   nextcloud_mariadb:
-    image: mariadb:12.2.2
+    image: mariadb:12.3.2
     container_name: nextcloud_mariadb
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
