@@ -95,7 +95,7 @@ services:
 
   tandoor:
     container_name: tandoor
-    image: vabene1111/recipes:2.6.9
+    image: vabene1111/recipes:2.6.11
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
