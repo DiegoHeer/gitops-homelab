@@ -2,7 +2,7 @@ services:
 
   n8n:
     container_name: n8n
-    image: docker.n8n.io/n8nio/n8n:2.26.4
+    image: docker.n8n.io/n8nio/n8n:2.27.3
     restart: unless-stopped
     env_file: n8n.enc.env
     labels:
@@ -65,7 +65,7 @@ services:
   #   docker run -it --rm -v /home/diego/services_data/ai/hermes:/opt/data nousresearch/hermes-agent setup
   hermes_agent:
     container_name: hermes_agent
-    image: nousresearch/hermes-agent:v2026.6.5
+    image: nousresearch/hermes-agent:v2026.6.19
     restart: unless-stopped
     command: gateway run
     env_file: hermes.enc.env
