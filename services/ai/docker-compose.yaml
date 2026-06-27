@@ -63,36 +63,36 @@ services:
 
   # Prerequisite: run the interactive setup wizard once on the server before first deploy:
   #   docker run -it --rm -v /home/diego/services_data/ai/hermes:/opt/data nousresearch/hermes-agent setup
-  hermes_agent:
-    container_name: hermes_agent
-    image: nousresearch/hermes-agent:v2026.6.19
-    restart: unless-stopped
-    command: gateway run
-    env_file: hermes.enc.env
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.hermes-agent.rule=Host(`hermes.local.dynabase.nl`)"
-      - "traefik.http.routers.hermes-agent.entrypoints=https"
-      - "traefik.http.routers.hermes-agent.tls=true"
-      - "traefik.http.services.hermes-agent.loadbalancer.server.port=8642"
-    environment:
-      - HERMES_DASHBOARD=1
-      - HERMES_UID=1000
-      - HERMES_GID=1000
-      - API_SERVER_ENABLED=true
-      - API_SERVER_HOST=0.0.0.0
-    volumes:
-      - /home/diego/services_data/ai/hermes:/opt/data
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-    healthcheck:
-      test: curl -sf http://localhost:9119/ > /dev/null || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
+  # hermes_agent:
+  #   container_name: hermes_agent
+  #   image: nousresearch/hermes-agent:v2026.6.19
+  #   restart: unless-stopped
+  #   command: gateway run
+  #   env_file: hermes.enc.env
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.hermes-agent.rule=Host(`hermes.local.dynabase.nl`)"
+  #     - "traefik.http.routers.hermes-agent.entrypoints=https"
+  #     - "traefik.http.routers.hermes-agent.tls=true"
+  #     - "traefik.http.services.hermes-agent.loadbalancer.server.port=8642"
+  #   environment:
+  #     - HERMES_DASHBOARD=1
+  #     - HERMES_UID=1000
+  #     - HERMES_GID=1000
+  #     - API_SERVER_ENABLED=true
+  #     - API_SERVER_HOST=0.0.0.0
+  #   volumes:
+  #     - /home/diego/services_data/ai/hermes:/opt/data
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512M
+  #   healthcheck:
+  #     test: curl -sf http://localhost:9119/ > /dev/null || exit 1
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 30s
 
   # Prerequisite: after first deploy, generate the OAuth token:
   #   docker exec -it claudebox claudebox setup-token
