@@ -30,7 +30,7 @@ services:
 
   databasus:
     container_name: databasus
-    image: databasus/databasus:v3.47.0
+    image: databasus/databasus:v3.47.1
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/backups/databasus:/databasus-data
