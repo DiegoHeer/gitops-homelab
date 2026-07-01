@@ -3,6 +3,16 @@
 All notable changes to this homelab are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning uses CalVer (`YYYY.MM.N`).
+## [2026.07.0] - 2026-06-29
+
+### Changed
+
+- Config|Update: regenerate CHANGELOG for 2026.06.0
+
+### Removed
+
+- Services|Remove: temporarily disabled hermes_agent to free resources
+
 ## [2026.06.0] - 2026-05-25
 
 ### Added
