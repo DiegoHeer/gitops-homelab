@@ -35,7 +35,7 @@ services:
 
   grist:
     container_name: grist
-    image: gristlabs/grist:1.7.15
+    image: gristlabs/grist:1.7.16
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
@@ -77,7 +77,7 @@ services:
 
   changedetection:
     container_name: changedetection
-    image: ghcr.io/dgtlmoon/changedetection.io:0.55.7
+    image: ghcr.io/dgtlmoon/changedetection.io:0.55.8
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -95,7 +95,7 @@ services:
 
   tandoor:
     container_name: tandoor
-    image: vabene1111/recipes:2.6.11
+    image: vabene1111/recipes:2.6.13
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
