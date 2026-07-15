@@ -42,10 +42,6 @@ services:
       - ./authelia/users_database.yml:/config/users_database.yml:ro
       - /home/diego/services_data/security/authelia/secrets/oidc-jwks.yml:/config/oidc-jwks.yml:ro
       - /home/diego/services_data/security/authelia/data:/data
-    # No Traefik labels: Authelia is reached only via the Cloudflare Tunnel at
-    # auth.dynabase.nl. A LAN route (auth.local.dynabase.nl) would break login —
-    # the session cookie is scoped to dynabase.nl and the WebAuthn RP is
-    # auth.dynabase.nl. cloudflared reaches this container as http://authelia:9091.
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9091/api/health"]
       interval: 30s
