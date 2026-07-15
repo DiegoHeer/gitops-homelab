@@ -16,7 +16,7 @@ users:
     password: '$argon2id$v=19$m=65536,t=3,p=4$LZnR0TZYx0iX1mBNebJVqw$Lb7HpyLnQJW3nUh22uUubUc9hRMPTsi0Q1IJKJ+kXMw'
     email: 'diegojonathanheer@gmail.com'
     groups:
-      - 'users'
+      - 'admins'
   super:
     disabled: false
     displayname: 'Super'
