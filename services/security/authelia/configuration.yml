@@ -1,5 +1,5 @@
 # Authelia OIDC provider for tunnel-exposed services. See ADR 0018.
-# Secrets (session, storage, hmac, reset-password JWT) come from env_file
+# Secrets (session, storage, hmac, reset-password JWT, SMTP password) come from env_file
 # (secrets.enc.env, SOPS). The OIDC issuer signing key (a list-of-objects
 # section env cannot set) lives in a second, non-git config file loaded
 # alongside this one: oidc-jwks.yml, mounted from services_data on the host.
@@ -31,8 +31,12 @@ storage:
     path: '/data/db.sqlite3'
 
 notifier:
-  filesystem:
-    filename: '/data/notification.txt'
+  smtp:
+    address: 'submission://smtp.gmail.com:587'
+    username: 'diegojonathanheer@gmail.com'
+    sender: 'Authelia <diegojonathanheer@gmail.com>'
+    subject: '[Authelia] {title}'
+    startup_check_address: 'diegojonathanheer@gmail.com'
 
 webauthn:
   disable: false
