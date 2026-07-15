@@ -10,3 +10,17 @@ users:
     email: 'diego.heer@odido.nl'
     groups:
       - 'admins'
+  diegoheer:
+    disabled: false
+    displayname: 'Diego Heer'
+    password: '$argon2id$v=19$m=65536,t=3,p=4$LZnR0TZYx0iX1mBNebJVqw$Lb7HpyLnQJW3nUh22uUubUc9hRMPTsi0Q1IJKJ+kXMw'
+    email: 'diegojonathanheer@gmail.com'
+    groups:
+      - 'users'
+  super:
+    disabled: false
+    displayname: 'Super'
+    password: '$argon2id$v=19$m=65536,t=3,p=4$9YXLNbubPLLUy5EOaVcfRA$WPY3IdYqFozc2tw59/LnfjMnu3Z/HnfPGij/YlqYACk'
+    email: 'super@fastvibes.nl'
+    groups:
+      - 'users'
