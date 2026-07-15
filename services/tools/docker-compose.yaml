@@ -45,6 +45,8 @@ services:
       - GRIST_OIDC_IDP_CLIENT_ID=grist
       - GRIST_OIDC_SP_HOST=https://grist.dynabase.nl
       - GRIST_OIDC_IDP_SCOPES=openid email profile
+      # Authelia's discovery omits end_session_endpoint; Grist won't start without this.
+      - GRIST_OIDC_IDP_SKIP_END_SESSION_ENDPOINT=true
     volumes:
       - /home/diego/services_data/tools/grist/persist:/persist
     healthcheck:
