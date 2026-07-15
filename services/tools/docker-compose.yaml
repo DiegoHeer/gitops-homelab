@@ -38,14 +38,13 @@ services:
     image: gristlabs/grist:1.7.16
     restart: unless-stopped
     env_file: secrets.enc.env
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.grist.rule=Host(`grist.local.dynabase.nl`)"
-      - "traefik.http.routers.grist.entrypoints=https"
-      - "traefik.http.routers.grist.tls=true"
-      - "traefik.http.services.grist.loadbalancer.server.port=9999"
     environment:
       - PORT=9999
+      - GRIST_FORCE_LOGIN=true
+      - GRIST_OIDC_IDP_ISSUER=https://auth.dynabase.nl
+      - GRIST_OIDC_IDP_CLIENT_ID=grist
+      - GRIST_OIDC_SP_HOST=https://grist.dynabase.nl
+      - GRIST_OIDC_IDP_SCOPES=openid email profile
     volumes:
       - /home/diego/services_data/tools/grist/persist:/persist
     healthcheck:
