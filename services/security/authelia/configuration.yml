@@ -19,7 +19,10 @@ session:
   cookies:
     - domain: 'dynabase.nl'
       authelia_url: 'https://auth.dynabase.nl'
-      default_redirection_url: 'https://dynabase.nl'
+      # No default_redirection_url: the apex (https://dynabase.nl) has no tunnel
+      # origin and returns Cloudflare 525. Omitting it lands a direct portal
+      # login back on the Authelia portal. Per-app OIDC logins redirect to the
+      # app's own callback, so this only affects direct visits to the portal.
       expiration: '1 hour'
       inactivity: '15 minutes'
 
