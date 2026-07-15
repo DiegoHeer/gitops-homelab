@@ -1,0 +1,61 @@
+# Authelia OIDC provider for tunnel-exposed services. See ADR 0018.
+# Secrets (session, storage, hmac, reset-password JWT) come from env_file
+# (secrets.enc.env, SOPS). The OIDC issuer signing key (a list-of-objects
+# section env cannot set) lives in a second, non-git config file loaded
+# alongside this one: oidc-jwks.yml, mounted from services_data on the host.
+theme: 'auto'
+
+server:
+  address: 'tcp://0.0.0.0:9091'
+
+log:
+  level: 'info'
+
+authentication_backend:
+  file:
+    path: '/config/users_database.yml'
+
+session:
+  cookies:
+    - domain: 'dynabase.nl'
+      authelia_url: 'https://auth.dynabase.nl'
+      default_redirection_url: 'https://dynabase.nl'
+      expiration: '1 hour'
+      inactivity: '15 minutes'
+
+storage:
+  local:
+    path: '/data/db.sqlite3'
+
+notifier:
+  filesystem:
+    filename: '/data/notification.txt'
+
+webauthn:
+  disable: false
+  enable_passkey_login: true
+  display_name: 'Dynabase Homelab'
+
+access_control:
+  default_policy: 'one_factor'
+
+identity_providers:
+  oidc:
+    # The issuer signing key (jwks) is a list-of-objects section, which Authelia
+    # cannot populate from env/secrets — so it is supplied by a second, non-git
+    # config file (oidc-jwks.yml) mounted from services_data. See ADR 0018.
+    clients:
+      - client_id: 'grist'
+        client_name: 'Grist'
+        client_secret: '$pbkdf2-sha512$310000$ux0.xbvr.jjkYuHtIaP7rw$xYtpzUe57yQ.fAtwWCtqG5nDfq9vNAo0.lkc26VwW/WTN0S3jfc0tIZ1RJmFhe86Fb4Yx/EPT5ORdUKLdnN.kA'
+        public: false
+        consent_mode: 'implicit'
+        authorization_policy: 'one_factor'
+        require_pkce: true
+        pkce_challenge_method: 'S256'
+        redirect_uris:
+          - 'https://grist.dynabase.nl/oauth2/callback'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
