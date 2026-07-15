@@ -1,15 +1,6 @@
-# Authelia file auth backend. Argon2id hash only (irreversible); the one-time
-# bootstrap password is stored server-side at
-# /home/diego/services_data/security/authelia/secrets/bootstrap_password.txt —
-# use it once to log in, enrol a passkey, then rely on passwordless login.
+# Authelia file auth backend (argon2id hashes only). Each user logs in once with
+# a bootstrap password, enrols a passkey, then uses passwordless login.
 users:
-  diego:
-    disabled: false
-    displayname: 'Diego Heer'
-    password: '$argon2id$v=19$m=65536,t=3,p=4$vYhIydWErAIKEmeMLSdJhg$uOriLgcprG/xxZkfmRropOg4LU2l80OBijxdniZEoE8'
-    email: 'diego.heer@odido.nl'
-    groups:
-      - 'admins'
   diegoheer:
     disabled: false
     displayname: 'Diego Heer'
