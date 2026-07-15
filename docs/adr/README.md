@@ -24,7 +24,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0015](0015-restic-zerobyte-backup-strategy.md) | Restic + Zerobyte for 3-2-1 backups | Accepted |
 | [0016](0016-tailscale-for-ci-access.md) | Tailscale for CI → homelab access | Accepted |
 | [0017](0017-lightweight-observability.md) | Lightweight observability over Prometheus stack | Accepted |
-| [0018](0018-authelia-oidc-for-exposed-services.md) | Authelia OIDC for authenticating exposed services | Proposed |
+| [0018](0018-authelia-oidc-for-exposed-services.md) | Authelia OIDC for authenticating exposed services | Accepted |
 
 ## Adding a new ADR
 

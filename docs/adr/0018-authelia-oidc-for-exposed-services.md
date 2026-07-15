@@ -1,6 +1,6 @@
 # 0018 — Authelia OIDC for authenticating exposed services
 
-- **Status**: Proposed
+- **Status**: Accepted
 - **Date**: 2026-07-15
 - **Deciders**: Diego
 
