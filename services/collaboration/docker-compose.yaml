@@ -13,6 +13,15 @@ services:
       - MM_EMAILSETTINGS_SENDPUSHNOTIFICATIONS=true
       - MM_EMAILSETTINGS_PUSHNOTIFICATIONSERVER=https://push-test.mattermost.com
       - MM_EMAILSETTINGS_PUSHNOTIFICATIONCONTENTS=full
+      - MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS=true
+      - MM_EMAILSETTINGS_ENABLESMTPAUTH=true
+      - MM_EMAILSETTINGS_SMTPSERVER=smtp.gmail.com
+      - MM_EMAILSETTINGS_SMTPPORT=587
+      - MM_EMAILSETTINGS_CONNECTIONSECURITY=STARTTLS
+      - MM_EMAILSETTINGS_SMTPUSERNAME=diegojonathanheer@gmail.com
+      - MM_EMAILSETTINGS_FEEDBACKNAME=Mattermost
+      - MM_EMAILSETTINGS_FEEDBACKEMAIL=diegojonathanheer@gmail.com
+      - MM_EMAILSETTINGS_REPLYTOADDRESS=diegojonathanheer@gmail.com
     volumes:
       - /home/diego/services_data/collaboration/mattermost/config:/mattermost/config
       - /home/diego/services_data/collaboration/mattermost/data:/mattermost/data
