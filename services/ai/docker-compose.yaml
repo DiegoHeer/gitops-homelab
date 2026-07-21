@@ -2,7 +2,7 @@ services:
 
   n8n:
     container_name: n8n
-    image: docker.n8n.io/n8nio/n8n:2.27.3
+    image: docker.n8n.io/n8nio/n8n:2.31.4
     restart: unless-stopped
     env_file: n8n.enc.env
     labels:
@@ -99,7 +99,7 @@ services:
   # Then update claudebox.enc.env with the token, re-encrypt, commit, and push.
   claudebox:
     container_name: claudebox
-    image: psyb0t/claudebox:v1.14.0-minimal
+    image: psyb0t/claudebox:v1.14.1-minimal
     restart: unless-stopped
     env_file: claudebox.enc.env
     environment:
