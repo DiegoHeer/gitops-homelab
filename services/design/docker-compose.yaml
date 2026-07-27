@@ -2,7 +2,7 @@ services:
 
   penpot_frontend:
     container_name: penpot_frontend
-    image: penpotapp/frontend:2.15
+    image: penpotapp/frontend:2.17
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -40,7 +40,7 @@ services:
 
   penpot_backend:
     container_name: penpot_backend
-    image: penpotapp/backend:2.15
+    image: penpotapp/backend:2.17
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
@@ -77,7 +77,7 @@ services:
 
   penpot_exporter:
     container_name: penpot_exporter
-    image: penpotapp/exporter:2.15
+    image: penpotapp/exporter:2.17
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
@@ -105,7 +105,7 @@ services:
 
   penpot_mcp:
     container_name: penpot_mcp
-    image: penpotapp/mcp:2.15
+    image: penpotapp/mcp:2.17
     restart: unless-stopped
     environment:
       - PENPOT_BACKEND_URI=http://penpot-backend:6060
