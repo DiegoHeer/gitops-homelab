@@ -89,7 +89,9 @@ hostname — no Cloudflare dashboard work (see [ADR 0019](docs/adr/0019-wildcard
   `svc.local.dynabase.nl`. Resolved by Pi-hole on the LAN; never traverses the tunnel.
 - **Public**: add a second router matching `svc.dynabase.nl` with
   `entrypoints=https` and `tls=true` (follow the `*-external` pattern, e.g. n8n).
-  The wildcard tunnel `*.dynabase.nl → Traefik` routes it automatically.
+  The tunnel's wildcard ingress routes it to Traefik, and `traefik_cloudflare_companion`
+  auto-creates the proxied Cloudflare DNS record (see [ADR 0020](docs/adr/0020-cloudflare-dns-companion.md))
+  — no dashboard, no manual DNS.
 
 Because `*.dynabase.nl` is a catch-all to Traefik, **any** bare-hostname router is
 immediately public — review exposure at PR time. Unmatched public hostnames 404.
