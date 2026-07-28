@@ -231,9 +231,9 @@ Insert after the add/remove-stack instructions:
 External access is controlled entirely in git by the service's Traefik router
 hostname — no Cloudflare dashboard work (see [ADR 0019](docs/adr/0019-wildcard-tunnel-via-traefik.md)):
 
-- **Local-only** (default): a router on `Host(`svc.local.dynabase.nl`)`. Resolved
-  by Pi-hole on the LAN; never traverses the tunnel.
-- **Public**: add a second router on `Host(`svc.dynabase.nl`)` with
+- **Local-only** (default): the service's Traefik router matches
+  `svc.local.dynabase.nl`. Resolved by Pi-hole on the LAN; never traverses the tunnel.
+- **Public**: add a second router matching `svc.dynabase.nl` with
   `entrypoints=https` and `tls=true` (follow the `*-external` pattern, e.g. n8n).
   The wildcard tunnel `*.dynabase.nl → Traefik` routes it automatically.
 
