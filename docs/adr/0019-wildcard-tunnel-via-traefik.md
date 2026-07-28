@@ -21,7 +21,7 @@ rule `*.dynabase.nl → https://traefik:443` (No TLS Verify), and Traefik routes
 by Host header.
 
 Whether a service is public is a git-declared decision: a service is public iff
-it has a `Host(\`svc.dynabase.nl\`)` Traefik router. DNS scoping enforces the
+it has a Traefik router matching `svc.dynabase.nl`. DNS scoping enforces the
 split — the public wildcard `*.dynabase.nl` matches only single-label
 subdomains, so `svc.local.dynabase.nl` never traverses the tunnel.
 
@@ -58,6 +58,6 @@ out of scope and deferred to a later ADR.
 ## Evidence
 
 - `docs/superpowers/specs/2026-07-28-cloudflare-wildcard-tunnel-design.md`
-- `services/networking/docker-compose.yaml` — wildcard cert + tunnel
-- `services/networking/traefik/config.yml` — home_assistant external route
+- `services/networking/docker-compose.yaml` — wildcard cert (this change); per-service routers and the tunnel wildcard land in follow-up PRs
+- `services/networking/traefik/config.yml` — home_assistant external route (follow-up PR)
 - Supersedes ADR 0007.
