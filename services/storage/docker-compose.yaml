@@ -50,6 +50,9 @@ services:
       - "traefik.http.routers.nextcloud.entrypoints=https"
       - "traefik.http.routers.nextcloud.tls=true"
       - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+      - "traefik.http.routers.nextcloud-external.rule=Host(`nextcloud.dynabase.nl`)"
+      - "traefik.http.routers.nextcloud-external.entrypoints=https"
+      - "traefik.http.routers.nextcloud-external.tls=true"
     depends_on:
       nextcloud_mariadb:
         condition: service_healthy
@@ -96,6 +99,10 @@ services:
       - "traefik.http.routers.rustfs-console.tls=true"
       - "traefik.http.routers.rustfs-console.service=rustfs-console"
       - "traefik.http.services.rustfs-console.loadbalancer.server.port=9001"
+      - "traefik.http.routers.rustfs-external.rule=Host(`rustfs.dynabase.nl`)"
+      - "traefik.http.routers.rustfs-external.entrypoints=https"
+      - "traefik.http.routers.rustfs-external.tls=true"
+      - "traefik.http.routers.rustfs-external.service=rustfs-api"
     environment:
       - RUSTFS_VOLUMES=/data/rustfs{0..3}
       - RUSTFS_ADDRESS=0.0.0.0:9000

@@ -35,6 +35,9 @@ services:
       - "traefik.http.routers.seerr.entrypoints=https"
       - "traefik.http.routers.seerr.tls=true"
       - "traefik.http.services.seerr.loadbalancer.server.port=5055"
+      - "traefik.http.routers.seerr-external.rule=Host(`seerr.dynabase.nl`)"
+      - "traefik.http.routers.seerr-external.entrypoints=https"
+      - "traefik.http.routers.seerr-external.tls=true"
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/Amsterdam
@@ -241,6 +244,9 @@ services:
       - "traefik.http.routers.audiobookshelf.entrypoints=https"
       - "traefik.http.routers.audiobookshelf.tls=true"
       - "traefik.http.services.audiobookshelf.loadbalancer.server.port=80"
+      - "traefik.http.routers.audiobookshelf-external.rule=Host(`audiobookshelf.dynabase.nl`)"
+      - "traefik.http.routers.audiobookshelf-external.entrypoints=https"
+      - "traefik.http.routers.audiobookshelf-external.tls=true"
     volumes:
       - /home/diego/services_data/media/audiobookshelf/config:/config
       - /home/diego/services_data/media/audiobookshelf/metadata:/metadata

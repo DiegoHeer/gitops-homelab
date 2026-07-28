@@ -21,6 +21,13 @@ http:
       service: homeassistant
       tls: {}
 
+    homeassistant-external:
+      rule: "Host(`homeassistant.dynabase.nl`)"
+      entryPoints:
+        - "https"
+      service: homeassistant
+      tls: {}
+
     proxmox:
       rule: "Host(`proxmox.local.dynabase.nl`)"
       entryPoints:
