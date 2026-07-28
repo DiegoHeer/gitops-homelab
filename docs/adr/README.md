@@ -13,7 +13,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0004](0004-ansible-bootstrap-only.md) | Ansible reduced to bootstrap-only | Accepted |
 | [0005](0005-sops-age-stack-secrets.md) | SOPS + age for stack secrets | Accepted |
 | [0006](0006-ansible-vault-bootstrap-secrets.md) | Ansible Vault for bootstrap secrets | Accepted |
-| [0007](0007-cloudflare-tunnel-external-exposure.md) | Cloudflare Tunnel over port-forward | Accepted |
+| [0007](0007-cloudflare-tunnel-external-exposure.md) | Cloudflare Tunnel over port-forward | Superseded by 0019 |
 | [0008](0008-uv-replaces-poetry.md) | uv replacing Poetry for Python deps | Accepted |
 | [0009](0009-molecule-for-role-testing.md) | Molecule for Ansible role testing | Accepted |
 | [0010](0010-precommit-hooks-as-lint-gate.md) | Pre-commit hooks as local lint gate | Accepted |
@@ -25,6 +25,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0016](0016-tailscale-for-ci-access.md) | Tailscale for CI → homelab access | Accepted |
 | [0017](0017-lightweight-observability.md) | Lightweight observability over Prometheus stack | Accepted |
 | [0018](0018-authelia-oidc-for-exposed-services.md) | Authelia OIDC for authenticating exposed services | Accepted |
+| [0019](0019-wildcard-tunnel-via-traefik.md) | Wildcard Cloudflare Tunnel via Traefik | Accepted |
 
 ## Adding a new ADR
 

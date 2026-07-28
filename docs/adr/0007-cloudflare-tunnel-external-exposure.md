@@ -1,6 +1,6 @@
 # 0007 — Cloudflare Tunnel over port-forward
 
-- **Status**: Accepted
+- **Status**: Superseded by 0019
 - **Date**: 2026-04-18
 - **Deciders**: Diego
 
