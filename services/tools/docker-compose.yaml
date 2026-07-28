@@ -33,30 +33,6 @@ services:
       retries: 5
       start_period: 10s
 
-  grist:
-    container_name: grist
-    image: gristlabs/grist:1.7.16
-    restart: unless-stopped
-    env_file: secrets.enc.env
-    environment:
-      - PORT=9999
-      - GRIST_FORCE_LOGIN=true
-      - GRIST_OIDC_IDP_ISSUER=https://auth.dynabase.nl
-      - GRIST_OIDC_IDP_CLIENT_ID=grist
-      - GRIST_OIDC_SP_HOST=https://grist.dynabase.nl
-      - GRIST_OIDC_IDP_SCOPES=openid email profile
-      # Authelia's discovery omits end_session_endpoint; Grist won't start without this.
-      - GRIST_OIDC_IDP_SKIP_END_SESSION_ENDPOINT=true
-    volumes:
-      - /home/diego/services_data/tools/grist/persist:/persist
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9999/status"]
-      interval: 30s
-      retries: 3
-      timeout: 5s
-      start_period: 10s
-      start_interval: 5s
-
   docuseal:
     container_name: docuseal
     image: docuseal/docuseal:3.1.6
