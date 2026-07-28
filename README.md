@@ -79,6 +79,20 @@ Runtime state (SQLite DBs, uploaded files, app config) lives at absolute host pa
 
 Delete the `---` block from `.doco-cd.yml` and the `services/<name>/` tree. Commit + push. DocoCD stops and removes the containers. Named volumes and absolute-path bind mounts are preserved by default.
 
+### Exposing a service publicly (Cloudflare Tunnel)
+
+External access is controlled entirely in git by the service's Traefik router
+hostname — no Cloudflare dashboard work (see [ADR 0019](docs/adr/0019-wildcard-tunnel-via-traefik.md)):
+
+- **Local-only** (default): the service's Traefik router matches
+  `svc.local.dynabase.nl`. Resolved by Pi-hole on the LAN; never traverses the tunnel.
+- **Public**: add a second router matching `svc.dynabase.nl` with
+  `entrypoints=https` and `tls=true` (follow the `*-external` pattern, e.g. n8n).
+  The wildcard tunnel `*.dynabase.nl → Traefik` routes it automatically.
+
+Because `*.dynabase.nl` is a catch-all to Traefik, **any** bare-hostname router is
+immediately public — review exposure at PR time. Unmatched public hostnames 404.
+
 ---
 
 ## Ansible

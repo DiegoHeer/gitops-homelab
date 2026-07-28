@@ -27,6 +27,8 @@ services:
       - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=local.dynabase.nl"
       - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.local.dynabase.nl"
+      - "traefik.http.routers.traefik-secure.tls.domains[1].main=dynabase.nl"
+      - "traefik.http.routers.traefik-secure.tls.domains[1].sans=*.dynabase.nl"
       - "traefik.http.routers.traefik-secure.service=api@internal"
       # Traefik auto-reloads traefik.yml/config.yml via its file provider — don't
       # recreate the container on edits to those static config files in the repo.
