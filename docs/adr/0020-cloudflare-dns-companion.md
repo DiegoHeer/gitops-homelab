@@ -22,13 +22,15 @@ toil ADR 0019 set out to remove.
 ## Decision
 
 Run [tiredofit/traefik-cloudflare-companion](https://github.com/tiredofit/docker-traefik-cloudflare-companion)
-as a sidecar in the `networking` stack, in **Traefik poll mode** (reads the
-Traefik API; no Docker socket). It auto-creates/refreshes a **proxied CNAME →
-the `home_server` tunnel** for every public `*.dynabase.nl` Traefik router,
-excluding the LAN-only `*.local.dynabase.nl` names (those stay Pi-hole's job via
-`traefik-pihole-dns-sync`). It authenticates with a **Zone:DNS:Edit-scoped**
-Cloudflare token stored in SOPS (`services/networking/secrets.enc.env` as
-`CF_TOKEN`).
+as a sidecar in the `networking` stack, in **Traefik poll mode only** (reads the
+Traefik API; `ENABLE_DOCKER_POLL` left empty so it never opens the Docker
+socket). It auto-creates/refreshes a **proxied CNAME → the `home_server` tunnel**
+for every public `*.dynabase.nl` Traefik router, excluding the LAN-only
+`*.local.dynabase.nl` names (those stay Pi-hole's job via
+`traefik-pihole-dns-sync`). It **reuses the existing cert-resolver token** rather
+than minting a new one — `CF_TOKEN` in `services/networking/secrets.enc.env` set
+to the same value as `CF_DNS_API_TOKEN` (both need the same **Zone:DNS:Edit**
+scope).
 
 This restores git-only exposure: add a `-external` Traefik router → the companion
 creates the DNS record → the wildcard tunnel ingress routes it to Traefik.
@@ -42,9 +44,11 @@ creates the DNS record → the wildcard tunnel ingress routes it to Traefik.
   to reject DockFlare does not apply here.
 - `+` Mirrors the existing `traefik-pihole-dns-sync` sidecar (LAN DNS); this is
   its public/Cloudflare analogue, same "read Traefik → write DNS" pattern.
-- `−` A stored Cloudflare token (bootstrap-tier secret) now lives in the
-  networking stack; compromise means DNS-record tampering on the zone, and
-  rotation is a manual SOPS edit.
+- `+` No new credential: reuses the cert-resolver's existing token (CF_TOKEN
+  mirrors CF_DNS_API_TOKEN), so there is nothing extra to rotate — the two share
+  one Zone:DNS:Edit token.
+- `−` That shared token is duplicated under two keys in SOPS; a rotation must
+  update both `CF_TOKEN` and `CF_DNS_API_TOKEN`.
 - `−` The companion does not delete a CNAME when a route is removed; a stale
   record just 404s at Traefik and must be pruned manually.
 - `−` The root cause is the Free-plan wildcard-proxy limit; on Enterprise a
@@ -60,4 +64,5 @@ record), which the Free plan does not allow.
 
 - `services/networking/docker-compose.yaml` — `traefik_cloudflare_companion`
   service (image `tiredofit/traefik-cloudflare-companion:7.4.0`, poll mode)
-- `services/networking/secrets.enc.env` — `CF_TOKEN` (Zone:DNS:Edit)
+- `services/networking/secrets.enc.env` — `CF_TOKEN` = same value as the existing
+  `CF_DNS_API_TOKEN` (reused cert-resolver token, Zone:DNS:Edit)
