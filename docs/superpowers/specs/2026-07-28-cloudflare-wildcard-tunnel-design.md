@@ -120,7 +120,13 @@ wildcard at the end.
 Per service:
 
 1. Add the `<svc>-external` Traefik router in the repo → `git push` → DocoCD
-   deploys it. Harmless until the tunnel sends bare-hostname traffic to Traefik.
+   deploys it. Inert on the **public/WAN** path until the tunnel is repointed,
+   but note the `traefik-pihole-dns-sync` sidecar syncs *all* Traefik router
+   hosts into Pi-hole with no filter — so the bare host becomes LAN-resolvable
+   to Traefik (and for internal container-to-container calls) at deploy time.
+   Because `auth.dynabase.nl` is consumed server-side by Grist's OIDC, the
+   `grist` + `authelia` routers are rolled out and verified separately from the
+   rest (see the implementation plan's PR 2a / PR 2b split).
 2. **Pre-flip test on the server** (no public DNS change):
    `curl -k -H "Host: svc.dynabase.nl" https://<server>/` — confirms Traefik
    resolves the router and the backend responds.
