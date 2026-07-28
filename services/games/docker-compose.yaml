@@ -23,6 +23,9 @@ services:
       - "traefik.http.routers.romm.entrypoints=https"
       - "traefik.http.routers.romm.tls=true"
       - "traefik.http.services.romm.loadbalancer.server.port=8080"
+      - "traefik.http.routers.romm-external.rule=Host(`romm.dynabase.nl`)"
+      - "traefik.http.routers.romm-external.entrypoints=https"
+      - "traefik.http.routers.romm-external.tls=true"
     depends_on:
       romm_mariadb:
         condition: service_healthy

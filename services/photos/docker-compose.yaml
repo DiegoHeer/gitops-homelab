@@ -20,6 +20,9 @@ services:
       - "traefik.http.routers.immich.entrypoints=https"
       - "traefik.http.routers.immich.tls=true"
       - "traefik.http.services.immich.loadbalancer.server.port=2283"
+      - "traefik.http.routers.immich-external.rule=Host(`immich.dynabase.nl`)"
+      - "traefik.http.routers.immich-external.entrypoints=https"
+      - "traefik.http.routers.immich-external.tls=true"
 
   immich-machine-learning:
     container_name: immich_machine_learning

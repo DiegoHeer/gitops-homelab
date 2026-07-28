@@ -105,6 +105,9 @@ services:
       - "traefik.http.routers.tandoor.entrypoints=https"
       - "traefik.http.routers.tandoor.tls=true"
       - "traefik.http.services.tandoor.loadbalancer.server.port=80"
+      - "traefik.http.routers.tandoor-external.rule=Host(`tandoor.dynabase.nl`)"
+      - "traefik.http.routers.tandoor-external.entrypoints=https"
+      - "traefik.http.routers.tandoor-external.tls=true"
     environment:
       - DB_ENGINE=django.db.backends.postgresql
       - POSTGRES_HOST=tandoor_postgres
