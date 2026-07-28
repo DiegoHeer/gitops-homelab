@@ -24,9 +24,9 @@ services:
       - MM_EMAILSETTINGS_REPLYTOADDRESS=diegojonathanheer@gmail.com
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mattermost.rule=Host(`mattermost.dynabase.nl`)"
-      - "traefik.http.routers.mattermost.entrypoints=https"
-      - "traefik.http.routers.mattermost.tls=true"
+      - "traefik.http.routers.mattermost-external.rule=Host(`mattermost.dynabase.nl`)"
+      - "traefik.http.routers.mattermost-external.entrypoints=https"
+      - "traefik.http.routers.mattermost-external.tls=true"
       - "traefik.http.services.mattermost.loadbalancer.server.port=8065"
     volumes:
       - /home/diego/services_data/collaboration/mattermost/config:/mattermost/config
