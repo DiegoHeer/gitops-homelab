@@ -48,6 +48,12 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia-external.rule=Host(`auth.dynabase.nl`)"
+      - "traefik.http.routers.authelia-external.entrypoints=https"
+      - "traefik.http.routers.authelia-external.tls=true"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
 
 networks:
   default:
