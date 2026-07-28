@@ -57,7 +57,6 @@ out of scope and deferred to a later ADR.
 
 ## Evidence
 
-- `docs/superpowers/specs/2026-07-28-cloudflare-wildcard-tunnel-design.md`
 - `services/networking/docker-compose.yaml` — wildcard cert (this change); per-service routers and the tunnel wildcard land in follow-up PRs
 - `services/networking/traefik/config.yml` — home_assistant external route (follow-up PR)
 - Supersedes ADR 0007.
