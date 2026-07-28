@@ -26,6 +26,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0017](0017-lightweight-observability.md) | Lightweight observability over Prometheus stack | Accepted |
 | [0018](0018-authelia-oidc-for-exposed-services.md) | Authelia OIDC for authenticating exposed services | Accepted |
 | [0019](0019-wildcard-tunnel-via-traefik.md) | Wildcard Cloudflare Tunnel via Traefik | Accepted |
+| [0020](0020-cloudflare-dns-companion.md) | Cloudflare DNS sync via traefik-cloudflare-companion | Accepted |
 
 ## Adding a new ADR
 
