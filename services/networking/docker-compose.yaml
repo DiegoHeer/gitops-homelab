@@ -50,23 +50,27 @@ services:
       - SYNC_INTERVAL=@every 1m
 
   # Auto-creates proxied Cloudflare CNAMEs (-> the home_server tunnel) for every public
-  # *.dynabase.nl Traefik router, so exposing a service needs no manual DNS. Poll mode
-  # reads Traefik's API (no Docker socket). No healthcheck by design: matches the
-  # traefik-pihole-dns-sync sidecar above (s6 supervises the process; restart covers the
-  # container). Needs CF_TOKEN (Cloudflare token, Zone:DNS:Edit on dynabase.nl) in secrets.enc.env.
+  # *.dynabase.nl Traefik router (excluding *.local, which is Pi-hole's job), so exposing
+  # a service needs no manual DNS. Traefik-poll only: ENABLE_DOCKER_POLL is left EMPTY on
+  # purpose -- the tool treats ANY non-empty string (even "FALSE") as truthy and would then
+  # open the Docker socket, which we don't mount. No healthcheck, matching the
+  # traefik-pihole-dns-sync sidecar above (s6 supervises; restart covers the container).
+  # Reuses the cert-resolver's token: add CF_TOKEN to secrets.enc.env with the SAME value
+  # as CF_DNS_API_TOKEN (both need Zone:DNS:Edit on dynabase.nl).
   traefik_cloudflare_companion:
     container_name: traefik_cloudflare_companion
     image: docker.io/tiredofit/traefik-cloudflare-companion:7.4.0
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
-      - TRAEFIK_VERSION=2
+      - ENABLE_DOCKER_POLL=
       - ENABLE_TRAEFIK_POLL=TRUE
+      - TRAEFIK_VERSION=2
       - TRAEFIK_POLL_URL=http://traefik:8080
       - TRAEFIK_POLL_SECONDS=60
+      - TARGET_DOMAIN=8b7293d9-91d4-4245-83ac-2bcf2aa57f1c.cfargotunnel.com
       - DOMAIN1=dynabase.nl
       - DOMAIN1_ZONE_ID=fd6e52b06c2f0fbe6c343ba00ad99c12
-      - DOMAIN1_TARGET_DOMAIN=8b7293d9-91d4-4245-83ac-2bcf2aa57f1c.cfargotunnel.com
       - DOMAIN1_PROXIED=TRUE
       - RC_TYPE=CNAME
       - REFRESH_ENTRIES=TRUE
