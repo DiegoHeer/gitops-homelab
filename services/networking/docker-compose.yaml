@@ -30,9 +30,10 @@ services:
       - "traefik.http.routers.traefik-secure.tls.domains[1].main=dynabase.nl"
       - "traefik.http.routers.traefik-secure.tls.domains[1].sans=*.dynabase.nl"
       - "traefik.http.routers.traefik-secure.service=api@internal"
-      # Traefik auto-reloads traefik.yml/config.yml via its file provider — don't
-      # recreate the container on edits to those static config files in the repo.
-      - "cd.doco.deployment.recreate.ignore={bindMounts: [/traefik.yml, /config.yml]}"
+      # Traefik's file provider hot-reloads config.yml (dynamic config) via watch:true,
+      # so config.yml edits don't need a container recreate. traefik.yml is STATIC config
+      # (applied only at startup), so it's intentionally NOT ignored — edits recreate.
+      - "cd.doco.deployment.recreate.ignore={bindMounts: [/config.yml]}"
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 30s
