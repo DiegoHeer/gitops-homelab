@@ -129,7 +129,7 @@ services:
 
   penpot_postgres:
     container_name: penpot_postgres
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:

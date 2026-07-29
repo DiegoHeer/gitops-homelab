@@ -51,7 +51,7 @@ services:
 
   mattermost_postgres:
     container_name: mattermost_postgres
-    image: postgres:16.14-alpine
+    image: postgres:18.4-alpine
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
