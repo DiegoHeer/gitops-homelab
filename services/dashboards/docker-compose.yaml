@@ -61,32 +61,6 @@ services:
       - "traefik.http.routers.dash.tls=true"
       - "traefik.http.services.dash.loadbalancer.server.port=3001"
 
-  homepage:
-    container_name: homepage
-    image: ghcr.io/gethomepage/homepage:v1.13.2
-    restart: unless-stopped
-    ports:
-      - 3000:3000
-    env_file: secrets.enc.env
-    environment:
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - /home/diego/services_data/dashboards/homepage/config:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homepage.rule=Host(`homepage.local.dynabase.nl`)"
-      - "traefik.http.routers.homepage.entrypoints=https"
-      - "traefik.http.routers.homepage.tls=true"
-      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
-
 networks:
   default:
     name: home_server_network
