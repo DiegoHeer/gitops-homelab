@@ -39,7 +39,7 @@ molecule/           # Ansible role testing (one scenario per role)
 | **Monitoring** | Beszel (+ agent), Dozzle, Portracker |
 | **Storage** | Filebrowser, Nextcloud + MariaDB, Rustfs |
 | **Photos** | Immich (server + ML), Redis, PostgreSQL (VectorChord) |
-| **Tools** | IT-Tools, BentoPDF, Docuseal, Changedetection, Tandoor + PostgreSQL |
+| **Tools** | IT-Tools, BentoPDF, Docuseal, Changedetection, Tandoor + PostgreSQL, Speedtest Tracker |
 | **Collaboration** | Mattermost + PostgreSQL, Grist |
 | **Dashboards** | Homarr, Glance |
 | **AI** | n8n + PostgreSQL |
