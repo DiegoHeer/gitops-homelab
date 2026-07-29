@@ -155,7 +155,7 @@ services:
 
   penpot_valkey:
     container_name: penpot_valkey
-    image: valkey/valkey:8.1
+    image: valkey/valkey:9.1
     restart: unless-stopped
     command: valkey-server --maxmemory 128mb --maxmemory-policy allkeys-lru
     networks:
