@@ -261,7 +261,7 @@ services:
 
   grimmory:
     container_name: grimmory
-    image: grimmory/grimmory:v2.3.1
+    image: grimmory/grimmory:v3.2.4
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
