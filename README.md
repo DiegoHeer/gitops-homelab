@@ -41,7 +41,7 @@ molecule/           # Ansible role testing (one scenario per role)
 | **Photos** | Immich (server + ML), Redis, PostgreSQL (VectorChord) |
 | **Tools** | IT-Tools, BentoPDF, Docuseal, Changedetection, Tandoor + PostgreSQL |
 | **Collaboration** | Mattermost + PostgreSQL, Grist |
-| **Dashboards** | Homarr, Glance, Dashdot, Homepage |
+| **Dashboards** | Homarr, Glance, Homepage |
 | **AI** | n8n + PostgreSQL |
 | **Security** | Frigate (NVR) |
 | **Games** | RomM + MariaDB |
