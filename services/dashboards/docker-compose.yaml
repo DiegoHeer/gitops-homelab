@@ -2,7 +2,7 @@ services:
   homarr:
     container_name: homarr
     restart: unless-stopped
-    image: ghcr.io/homarr-labs/homarr:v1.65.0
+    image: ghcr.io/homarr-labs/homarr:v1.72.0
     env_file: secrets.enc.env
     volumes:
       - /home/diego/services_data/dashboards/homarr/appdata:/appdata
