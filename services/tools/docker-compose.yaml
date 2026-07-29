@@ -126,6 +126,34 @@ services:
       retries: 5
       start_period: 10s
 
+  speedtest_tracker:
+    container_name: speedtest_tracker
+    image: lscr.io/linuxserver/speedtest-tracker:v1.14.6-ls164
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+      - APP_URL=https://speedtest.local.dynabase.nl
+      - DB_CONNECTION=sqlite
+      - SPEEDTEST_SCHEDULE=*/30 * * * *
+      - DISPLAY_TIMEZONE=Europe/Amsterdam
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.speedtest-tracker.rule=Host(`speedtest.local.dynabase.nl`)"
+      - "traefik.http.routers.speedtest-tracker.entrypoints=https"
+      - "traefik.http.routers.speedtest-tracker.tls=true"
+      - "traefik.http.services.speedtest-tracker.loadbalancer.server.port=80"
+    volumes:
+      - /home/diego/services_data/tools/speedtest_tracker:/config
+    healthcheck:
+      test: curl -fSs http://localhost:80/api/healthcheck | jq -r .message || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
 
 networks:
   default:
