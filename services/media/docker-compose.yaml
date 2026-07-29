@@ -195,7 +195,7 @@ services:
 
   sabnzbd:
     container_name: sabnzbd
-    image: lscr.io/linuxserver/sabnzbd:4.5.5
+    image: lscr.io/linuxserver/sabnzbd:5.0.4
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
