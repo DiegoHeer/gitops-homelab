@@ -28,25 +28,6 @@ services:
       timeout: 5s
       retries: 5
 
-  databasus:
-    container_name: databasus
-    image: databasus/databasus:v3.51.0
-    restart: unless-stopped
-    volumes:
-      - /home/diego/services_data/backups/databasus:/databasus-data
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.databasus.rule=Host(`databasus.local.dynabase.nl`)"
-      - "traefik.http.routers.databasus.entrypoints=https"
-      - "traefik.http.routers.databasus.tls=true"
-      - "traefik.http.services.databasus.loadbalancer.server.port=4005"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4005"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-
 networks:
   default:
     external: true

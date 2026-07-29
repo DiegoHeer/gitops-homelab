@@ -45,7 +45,7 @@ molecule/           # Ansible role testing (one scenario per role)
 | **AI** | n8n + PostgreSQL |
 | **Security** | Frigate (NVR) |
 | **Games** | RomM + MariaDB |
-| **Backups** | Zerobyte, Databasus |
+| **Backups** | Zerobyte |
 
 
 The DocoCD container itself lives at `bootstrap/gitops/` (not under `services/`) because DocoCD can't redeploy its own container — that stack is Ansible-managed.
