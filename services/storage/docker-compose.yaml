@@ -30,7 +30,7 @@ services:
       start_period: 10s
 
   nextcloud:
-    image: linuxserver/nextcloud:33.0.5
+    image: linuxserver/nextcloud:34.0.2
     container_name: nextcloud
     restart: unless-stopped
     env_file: secrets.enc.env
