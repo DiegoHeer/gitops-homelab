@@ -35,7 +35,7 @@ services:
 
   redis:
     container_name: immich_redis
-    image: redis:8.6.3-alpine
+    image: redis:8.8.1-alpine
     restart: unless-stopped
     healthcheck:
       test: redis-cli ping || exit 1
