@@ -3,6 +3,72 @@
 All notable changes to this homelab are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning uses CalVer (`YYYY.MM.N`).
+## [2026.08.0] - 2026-07-29
+
+### Added
+
+- Config|Add: ADR 0018 and implementation plan for Authelia OIDC
+- Services|Add: Authelia OIDC provider in security stack
+- Services|Add: Authelia users diegoheer and super
+- Services|Add: configured SMTP email for Mattermost via Gmail relay
+- Infrastructure|Add: cloudflare wildcard tunnel design spec
+- Infrastructure|Add: cloudflare wildcard tunnel implementation plan
+- Infrastructure|Add: request *.dynabase.nl wildcard cert on Traefik
+- Infrastructure|Add: ADR 0019 wildcard tunnel via Traefik, supersede 0007
+- Infrastructure|Add: document public-exposure convention in README
+- Config|Add: design spec for moving grist to collaboration stack
+- Config|Add: implementation plan for moving grist to collaboration stack
+- Services|Add: external Traefik routers for immich, seerr, audiobookshelf, nextcloud, rustfs, tandoor, romm
+- Services|Add: Traefik router labels to mattermost service
+- Services|Add: Home Assistant external Traefik route (homeassistant.dynabase.nl)
+- Services|Add: public Traefik routers for grist and authelia
+- Services|Add: traefik-cloudflare-companion for automatic Cloudflare DNS sync
+- Infrastructure|Add: ADR 0020 for Cloudflare DNS companion; document auto-DNS in README
+- Services|Add: CF_TOKEN (reuses cert-resolver token) for traefik-cloudflare-companion
+- Services|Add: added speedtest tracker to tools stack
+- Config|Add: added speedtest tracker design spec
+
+### Changed
+
+- Config|Update: regenerate CHANGELOG for 2026.07.0
+- Services|Migrate: Grist authentication to Authelia OIDC, tunnel-only
+- Services|Update: Authelia Gmail SMTP notifier replacing filesystem
+- Config|Update: mark ADR 0018 Accepted
+- Services|Refactor: drop stale comment from Authelia service
+- Services|Update: make Authelia user diegoheer an admin
+- Config|Update: bumped Mattermost to 11.9.0 for Boards plugin support
+- Services|Refactor: remove grist from tools stack ahead of collaboration move
+- Services|Migrate: move grist to collaboration stack
+- Config|Update: record grist under collaboration in services overview
+- Services|Refactor: rename mattermost router to mattermost-external for naming consistency
+- Infrastructure|Update: ADR 0020 — reuse cert-resolver token, poll-only detail
+- Config|Update: allowed ntfy.sh origin for zerobyte notification webhooks
+- Config|Update: added speedtest tracker to services overview
+
+### Fixed
+
+- Services|Fix: drop Authelia default_redirection_url causing post-login 525
+- Services|Fix: default_policy two_factor to expose Authelia passkey registration
+- Services|Fix: skip Grist OIDC end_session_endpoint (Authelia omits it), fixes startup crash
+- Infrastructure|Fix: address plan review — DNS-sync LAN caveat, PR 2a/2b split, verification fixes
+- Infrastructure|Fix: avoid nested-backtick markdown in plan README snippet
+- Infrastructure|Fix: clean ADR 0019 markdown span and clarify Evidence scope
+- Config|Fix: enable Traefik file-provider watch so config.yml routes hot-reload
+- Services|Fix: correct companion config — global TARGET_DOMAIN + poll-only (empty ENABLE_DOCKER_POLL)
+- Config|Fix: dropped stale homepage entry from dashboards README row
+
+### Removed
+
+- Config|Remove: drop implementation plan doc from repo
+- Services|Remove: Authelia user diego (diego.heer@odido.nl)
+- Infrastructure|Remove: exclude superpowers planning docs from repo
+- Config|Remove: drop grist migration planning docs from this PR (deferred to a later docs PR)
+- Services|Remove: dropped databasus from backups stack
+- Services|Remove: dropped hermes_agent and claudebox from ai stack
+- Services|Remove: dropped homepage from dashboards stack
+- Services|Remove: dropped dash from dashboards stack
+- Config|Remove: dropped speedtest tracker design spec
+
 ## [2026.07.0] - 2026-06-29
 
 ### Changed
