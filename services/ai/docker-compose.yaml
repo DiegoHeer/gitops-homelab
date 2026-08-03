@@ -2,7 +2,7 @@ services:
 
   n8n:
     container_name: n8n
-    image: docker.n8n.io/n8nio/n8n:2.33.0
+    image: docker.n8n.io/n8nio/n8n:2.33.3
     restart: unless-stopped
     env_file: n8n.enc.env
     labels:
