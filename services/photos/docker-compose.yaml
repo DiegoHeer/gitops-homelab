@@ -8,6 +8,7 @@ services:
       service: quicksync
     volumes:
       - /media/hd1/photo_library:/usr/src/app/upload
+      - /media/hd2/data/backups/photos:/external_libraries:ro
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - redis
