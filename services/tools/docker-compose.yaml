@@ -35,7 +35,7 @@ services:
 
   docuseal:
     container_name: docuseal
-    image: docuseal/docuseal:3.1.6
+    image: docuseal/docuseal:3.1.7
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
