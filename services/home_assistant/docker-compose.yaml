@@ -104,6 +104,35 @@ services:
       retries: 3
       start_period: 20s
 
+  # Network device discovery + presence detection. Host networking is required for
+  # its arp-scan of the LAN (L2 access to the subnet); it publishes each device to
+  # the mosquitto broker above via MQTT auto-discovery, giving Home Assistant
+  # device_tracker + "new device" entities with no HA-side YAML. MQTT settings
+  # (incl. the broker password) arrive as APP_CONF_OVERRIDE from secrets.enc.env.
+  # Reached at netalertx.local.dynabase.nl via the Traefik file provider (host-net
+  # containers aren't Docker-label discoverable), same pattern as Home Assistant.
+  netalertx:
+    container_name: netalertx
+    image: ghcr.io/jokob-sk/netalertx:26.8.5
+    restart: unless-stopped
+    network_mode: host
+    env_file: secrets.enc.env
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      TZ: Europe/Amsterdam
+      PORT: 20211
+    volumes:
+      - /home/diego/services_data/home_assistant/netalertx/data:/data
+      - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:20211"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
 
 networks:
   default:
