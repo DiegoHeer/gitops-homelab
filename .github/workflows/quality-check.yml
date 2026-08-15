@@ -34,11 +34,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      # shellcheck is preinstalled on ubuntu-latest runners. This job needs no
-      # vault password, unlike lint. Without it the shellcheck pre-commit hook
-      # (and the SC2016/SC2029 suppressions in doco.sh) would be local-only.
+      # Run the pinned pre-commit hook rather than the runner's own shellcheck:
+      # the two versions disagree (the runner's flags SC2015 in dockcheck.sh,
+      # v0.11.0.1 does not), and CI drifting from the local hook is worse than
+      # no CI check at all. No vault password needed, unlike lint.
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-ansible-deps
+
       - name: Run shellcheck
-        run: shellcheck scripts/*.sh
+        run: uv run pre-commit run shellcheck --all-files
 
   molecule:
     name: Molecule - ${{ matrix.scenario }}
