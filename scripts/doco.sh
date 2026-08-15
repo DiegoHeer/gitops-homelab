@@ -118,6 +118,32 @@ containers_of() {
     esac
 }
 
+do_lifecycle() {
+    local verb="$1" name="$2" kind containers count
+    kind="$(resolve_kind "$name")"
+
+    mapfile -t containers < <(containers_of "$kind" "$name")
+    count="${#containers[@]}"
+    if [ "$count" -eq 0 ]; then
+        die "'$name' resolved to $kind but has no containers"
+    fi
+
+    printf '%s%s%s → %s, %d container(s): %s\n' \
+        "$BOLD" "$name" "$RESET" "$kind" "$count" \
+        "$(printf '%s, ' "${containers[@]}" | sed 's/, $//')"
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+        printf 'dry-run: would %s %d container(s)\n' "$verb" "$count"
+        return 0
+    fi
+
+    if docker "$verb" "${containers[@]}" >/dev/null; then
+        printf '%s %d/%d\n' "${verb}ed" "$count" "$count"
+    else
+        die "docker $verb failed for '$name'" 2
+    fi
+}
+
 main() {
     local verb="" names=()
 
@@ -153,11 +179,12 @@ main() {
         die "verb '$verb' needs at least one name"
     fi
 
-    # Verb dispatch is filled in by later commits.
     local name
     for name in "${names[@]}"; do
-        printf '%s%s%s verb=%s dry_run=%s force_kind=%s\n' \
-            "$BOLD" "$name" "$RESET" "$verb" "$DRY_RUN" "$FORCE_KIND"
+        case "$verb" in
+            restart|stop|start) do_lifecycle "$verb" "$name" ;;
+            mounts) die "mounts is not implemented yet" ;;
+        esac
     done
 }
 
