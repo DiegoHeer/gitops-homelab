@@ -16,11 +16,14 @@ ARGS := $(filter-out $(VERBS),$(MAKECMDGOALS))
 # Make's own -n/--dry-run and would be swallowed silently, and --stack /
 # --container make Make abort with "unrecognized option". Expose them as
 # variables instead. Use ./scripts/doco.sh directly if you prefer the flags.
+# `ifdef` is true for any non-empty value, so a bare `ifdef DRY` would make
+# DRY=0 perform a dry run - which reads as "off" to everyone. Treat the usual
+# falsey spellings as off.
 DOCO_FLAGS :=
-ifdef DRY
+ifneq ($(filter-out 0 false no off,$(DRY)),)
 DOCO_FLAGS += --dry-run
 endif
-ifdef KIND
+ifneq ($(filter-out 0 false no off,$(KIND)),)
 DOCO_FLAGS += --$(KIND)
 endif
 
@@ -36,7 +39,7 @@ help:
 	@echo "  make restart media DRY=1         resolve only, change nothing"
 	@echo "  make restart media KIND=stack    force the stack reading of an ambiguous name"
 	@echo ""
-	@echo "Equivalent to ./scripts/doco.sh <verb> <name> [--dry-run] [--stack|--container]."
+	@echo "DRY=0 / KIND=0 count as off. Full options: ./scripts/doco.sh --help"
 
 $(VERBS):
 	@./scripts/doco.sh $@ $(ARGS) $(DOCO_FLAGS)
