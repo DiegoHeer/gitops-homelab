@@ -27,6 +27,19 @@ jobs:
       - name: Run ansible-lint
         run: uv run ansible-lint
 
+  shell:
+    name: Shell
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # shellcheck is preinstalled on ubuntu-latest runners. This job needs no
+      # vault password, unlike lint. Without it the shellcheck pre-commit hook
+      # (and the SC2016/SC2029 suppressions in doco.sh) would be local-only.
+      - name: Run shellcheck
+        run: shellcheck scripts/*.sh
+
   molecule:
     name: Molecule - ${{ matrix.scenario }}
     runs-on: ubuntu-latest
