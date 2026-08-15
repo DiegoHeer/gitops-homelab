@@ -33,6 +33,7 @@ disabled. Redeploys stay with the existing `Reconcile DocoCD` workflow.
 
 ## Evidence
 
-- `docs/superpowers/specs/2026-08-15-dococd-debug-tooling-design.md` — full analysis
+- PR #194 — the implementing change; its description carries the full analysis of
+  the rejected REST API option
 - `scripts/doco.sh`, `Makefile` — the implementation
 - ADR 0019 — establishes that bare `*.dynabase.nl` hosts are internet-facing
