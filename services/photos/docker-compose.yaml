@@ -7,7 +7,7 @@ services:
       file: ./immich/hwaccel.transcoding.yml
       service: quicksync
     volumes:
-      - /media/hd1/photo_library:/usr/src/app/upload
+      - /media/hd1/photo_library:/data
       - /media/hd2/data/backups/photos:/external_libraries:ro
       - /etc/localtime:/etc/localtime:ro
     depends_on:
