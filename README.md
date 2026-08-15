@@ -113,20 +113,67 @@ make restart media DRY=1    # resolve only, change nothing
 Names resolve automatically against live Docker state. If a name is both a stack
 and a container, pass `KIND=stack` or `KIND=container`.
 
-`DRY=1` and `KIND=` are Make variables rather than flags because `--dry-run`
+`DRY=` and `KIND=` are Make variables rather than flags because `--dry-run`
 collides with Make's own option of that name and `--stack` makes Make abort.
-Calling the script directly takes the real flags:
-`./scripts/doco.sh mounts media --dry-run`.
+`0`, `false`, `no` and `off` count as unset. Calling the script directly takes
+the real flags — `./scripts/doco.sh --help`.
 
 `mounts` flags bind sources that are **empty**, not just missing: Compose
 defaults to `create_host_path: true`, so a typo'd host path is silently created
 as an empty directory and the container starts up looking healthy with no data.
 An empty mount is not automatically a bug — it is a hint worth checking.
 
-**Caveat:** DocoCD reconciliation is enabled by default with `events: ["unhealthy"]`.
-A container that fails its healthcheck while you debug it gets auto-restarted, up
-to 5 times per 300 seconds. `stop` is not a reconciliation trigger and will not be
-reverted. Set `reconciliation: false` on the stack in `.doco-cd.yml` to debug in peace.
+#### Speed
+
+Every `docker` call over `DOCKER_HOST=ssh://` is its own SSH handshake, so the
+script is written to minimise them: the whole container inventory is fetched in
+one `docker ps`, mounts use one `docker inspect` for the entire stack, and all
+bind-path probing for a stack goes out in a single SSH round trip.
+
+What remains is dominated by handshake latency, and that dominates *everything* —
+a cold `ssh server true` has been measured at 30s+ from a laptop. Reuse the
+connection; add to `~/.ssh/config`:
+
+```
+Host server
+    ControlMaster auto
+    ControlPath ~/.ssh/cm-%r@%h:%p
+    ControlPersist 10m
+```
+
+Every call after the first then rides the existing connection — measured at ~32s
+cold versus ~1.5s multiplexed. If `doco.sh` feels slow, this is why, and this is
+the fix; there is nothing left to shave inside the script.
+
+#### Shared network namespaces
+
+Five services in `services/media/` run on `network_mode: service:gluetun`.
+Restarting gluetun gives it a fresh network sandbox; anything sharing the old one
+is left with no `eth0`, no routes and no DNS — and does **not** exit. Their
+healthchecks only probe `localhost`, which still succeeds, so `docker ps` reports
+every one of them healthy through a total outage. Never trust health status for
+those five.
+
+`restart`/`start` therefore run in two phases: the namespace provider first, then
+a wait until it is genuinely healthy, then everything else. If the provider does
+not come back within `HEALTH_TIMEOUT` (default 90s) the dependents are left
+untouched rather than orphaned. `stop` is a single flat call — `docker stop`
+parallelises across containers, so ordering it would be theatre, and orphaning is
+moot when everything is going down anyway.
+
+#### DocoCD reconciliation
+
+DocoCD reconciles on `events: ["unhealthy"]` by default, auto-restarting a
+container up to `restart_limit` (5) times per `restart_window` (300s) — see the
+[v0.103.0 deploy settings](https://doco.cd/v0.103/Deploy-Settings/#reconciliation-settings).
+None of our stacks set `reconciliation`, so this rests entirely on the upstream
+default; re-check it on a DocoCD upgrade.
+
+This is a known limitation of debugging here rather than something with a clean
+remedy: turning it off means setting `reconciliation: false` in `.doco-cd.yml`,
+which needs a commit to `main` — exactly the friction this tooling exists to
+avoid. For a short session, prefer `stop`, which is not a reconciliation trigger
+and will not be reverted.
 
 Redeploys are not part of this tooling — use the `Reconcile DocoCD` workflow
 (`workflow_dispatch`) to reconcile every stack from `main` without a new commit.
