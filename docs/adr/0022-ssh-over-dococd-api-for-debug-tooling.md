@@ -1,4 +1,4 @@
-# 0021 — SSH Over The DocoCD API For Debug Tooling
+# 0022 — SSH Over The DocoCD API For Debug Tooling
 
 - **Status**: Accepted
 - **Date**: 2026-08-15

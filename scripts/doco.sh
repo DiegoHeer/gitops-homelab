@@ -7,7 +7,7 @@ set -euo pipefail
 # already running on the server itself.
 #
 # DocoCD remains the source of truth for stack *definitions*; this only acts on
-# running state. See docs/adr/0021-ssh-over-dococd-api-for-debug-tooling.md.
+# running state. See docs/adr/0022-ssh-over-dococd-api-for-debug-tooling.md.
 
 SERVER_HOSTNAME="${SERVER_HOSTNAME:-home}"
 SERVER_SSH_ALIAS="${SERVER_SSH_ALIAS:-server}"

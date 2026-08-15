@@ -100,7 +100,7 @@ immediately public — review exposure at PR time. Unmatched public hostnames 40
 
 `scripts/doco.sh`, and the `Makefile` wrapping it, drive the home server over
 `DOCKER_HOST=ssh://server`. No DocoCD API involved — see
-[ADR 0021](docs/adr/0021-ssh-over-dococd-api-for-debug-tooling.md).
+[ADR 0022](docs/adr/0022-ssh-over-dococd-api-for-debug-tooling.md).
 
 ```bash
 make restart media          # restart a whole stack
