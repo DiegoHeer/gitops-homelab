@@ -56,6 +56,68 @@ Config via env: SERVER_HOSTNAME (default home), SERVER_SSH_ALIAS (default server
 EOF
 }
 
+stack_containers() {
+    docker ps -a --filter "label=com.docker.compose.project=$1" \
+        --format '{{.Names}}' 2>/dev/null || true
+}
+
+container_exists() {
+    local found
+    found="$(docker ps -a --filter "name=^$1\$" --format '{{.Names}}' 2>/dev/null || true)"
+    [ -n "$found" ]
+}
+
+all_names() {
+    {
+        docker ps -a --format '{{.Names}}' 2>/dev/null || true
+        docker ps -a --format '{{.Label "com.docker.compose.project"}}' 2>/dev/null || true
+    } | grep -v '^$' | sort -u
+}
+
+# Echoes "stack" or "container". Dies on ambiguity or no match.
+resolve_kind() {
+    local name="$1"
+
+    if [ -n "$FORCE_KIND" ]; then
+        printf '%s\n' "$FORCE_KIND"
+        return 0
+    fi
+
+    local is_stack=0 is_container=0
+    [ -n "$(stack_containers "$name")" ] && is_stack=1
+    container_exists "$name" && is_container=1
+
+    if [ "$is_stack" -eq 1 ] && [ "$is_container" -eq 1 ]; then
+        die "'$name' is ambiguous - it is both a stack and a container. Use --stack or --container."
+    fi
+
+    if [ "$is_stack" -eq 1 ]; then
+        printf 'stack\n'
+        return 0
+    fi
+
+    if [ "$is_container" -eq 1 ]; then
+        printf 'container\n'
+        return 0
+    fi
+
+    local near
+    near="$(all_names | grep -i -- "${name:0:4}" | head -5 | tr '\n' ' ' || true)"
+    if [ -n "$near" ]; then
+        die "no stack or container named '$name'. Did you mean: $near"
+    fi
+    die "no stack or container named '$name'"
+}
+
+containers_of() {
+    local kind="$1" name="$2"
+    case "$kind" in
+        stack) stack_containers "$name" ;;
+        container) printf '%s\n' "$name" ;;
+        *) die "internal error: unknown kind '$kind'" ;;
+    esac
+}
+
 main() {
     local verb="" names=()
 
