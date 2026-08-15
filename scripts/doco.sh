@@ -23,9 +23,9 @@ FORCE_KIND=""
 # Colour only when stdout is a terminal, so piped/CI output stays clean.
 # Same constants as scripts/dockcheck.sh.
 if [ -t 1 ]; then
-    RED=$'\033[31m'; BOLD=$'\033[1m'; RESET=$'\033[0m'
+    RED=$'\033[31m'; YELLOW=$'\033[33m'; BOLD=$'\033[1m'; RESET=$'\033[0m'
 else
-    RED=""; BOLD=""; RESET=""
+    RED=""; YELLOW=""; BOLD=""; RESET=""
 fi
 
 die() {
@@ -144,6 +144,89 @@ do_lifecycle() {
     fi
 }
 
+# Classify each path as missing / empty / ok, one line per input, in order.
+# One round trip: paths go in on stdin. Compose defaults to create_host_path:
+# true, so a typo'd bind source is silently created as an empty directory and
+# the container starts up healthy with no data - hence "empty" is flagged too.
+# shellcheck disable=SC2016  # single quotes are deliberate: $p must expand on
+# the remote side, not here. This string is script text, not a command.
+PROBE_BODY='while IFS= read -r p; do
+    if [ ! -e "$p" ]; then
+        echo missing
+    elif [ -d "$p" ] && [ -z "$(find "$p" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+        echo empty
+    else
+        echo ok
+    fi
+done'
+
+probe_paths() {
+    [ $# -eq 0 ] && return 0
+
+    # Test seam: force a single classification for every path.
+    if [ -n "${PROBE_OVERRIDE:-}" ]; then
+        local _p
+        for _p in "$@"; do printf '%s\n' "$PROBE_OVERRIDE"; done
+        return 0
+    fi
+
+    if [ -n "${DOCKER_HOST:-}" ]; then
+        # shellcheck disable=SC2029  # expanding PROBE_BODY client-side is the point:
+        # we are shipping the script text to the remote shell to run.
+        printf '%s\n' "$@" | ssh "$SERVER_SSH_ALIAS" "$PROBE_BODY" || die "ssh probe failed" 2
+    else
+        printf '%s\n' "$@" | bash -c "$PROBE_BODY"
+    fi
+}
+
+do_mounts() {
+    local name="$1" kind containers c
+    kind="$(resolve_kind "$name")"
+    mapfile -t containers < <(containers_of "$kind" "$name")
+
+    printf '%s%s%s → %s, %d container(s)\n' \
+        "$BOLD" "$name" "$RESET" "$kind" "${#containers[@]}"
+
+    for c in "${containers[@]}"; do
+        local rows=() types=() sources=() targets=() modes=() binds=() statuses=()
+        local t s d m
+        mapfile -t rows < <(docker inspect --format \
+            '{{range .Mounts}}{{.Type}}	{{.Source}}	{{.Destination}}	{{if .RW}}rw{{else}}ro{{end}}
+{{end}}' "$c" 2>/dev/null | grep -v '^$' || true)
+
+        if [ "${#rows[@]}" -eq 0 ]; then
+            printf '  %s: no mounts\n' "$c"
+            continue
+        fi
+
+        local r
+        for r in "${rows[@]}"; do
+            IFS=$'\t' read -r t s d m <<< "$r"
+            types+=("$t"); sources+=("$s"); targets+=("$d"); modes+=("$m")
+            [ "$t" = "bind" ] && binds+=("$s")
+        done
+
+        if [ "${#binds[@]}" -gt 0 ]; then
+            mapfile -t statuses < <(probe_paths "${binds[@]}")
+        fi
+
+        printf '  %s\n' "$c"
+        local i bi=0 flag
+        for i in "${!types[@]}"; do
+            flag=""
+            if [ "${types[$i]}" = "bind" ]; then
+                case "${statuses[$bi]:-ok}" in
+                    missing) flag="  ${YELLOW}⚠ missing${RESET}" ;;
+                    empty) flag="  ${YELLOW}⚠ empty${RESET}" ;;
+                esac
+                bi=$((bi + 1))
+            fi
+            printf '    %-7s %s → %s  %s%s\n' \
+                "${types[$i]}" "${sources[$i]}" "${targets[$i]}" "${modes[$i]}" "$flag"
+        done
+    done
+}
+
 main() {
     local verb="" names=()
 
@@ -183,7 +266,7 @@ main() {
     for name in "${names[@]}"; do
         case "$verb" in
             restart|stop|start) do_lifecycle "$verb" "$name" ;;
-            mounts) die "mounts is not implemented yet" ;;
+            mounts) do_mounts "$name" ;;
         esac
     done
 }
