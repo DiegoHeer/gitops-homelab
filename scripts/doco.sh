@@ -17,6 +17,10 @@ fi
 
 VERBS="restart stop start mounts"
 
+# How long to wait for a namespace provider to come back healthy before giving
+# up rather than orphaning its dependents.
+HEALTH_TIMEOUT="${HEALTH_TIMEOUT:-90}"
+
 DRY_RUN=0
 FORCE_KIND=""
 
@@ -56,36 +60,89 @@ Config via env: SERVER_HOSTNAME (default home), SERVER_SSH_ALIAS (default server
 EOF
 }
 
+# Every docker call over DOCKER_HOST=ssh:// is its own SSH handshake, which on a
+# slow link costs tens of seconds. So the whole container inventory - names and
+# their compose project - is fetched once, in one call, and answered from memory.
+INV_LOADED=0
+declare -a INV_NAMES=()
+declare -A INV_PROJECT=()
+
+load_inventory() {
+    [ "$INV_LOADED" -eq 1 ] && return 0
+    local n p
+    while IFS=$'\t' read -r n p; do
+        [ -n "$n" ] || continue
+        INV_NAMES+=("$n")
+        INV_PROJECT["$n"]="$p"
+    done < <(docker ps -a \
+        --format '{{.Names}}	{{.Label "com.docker.compose.project"}}' 2>/dev/null || true)
+    INV_LOADED=1
+    return 0
+}
+
 stack_containers() {
-    docker ps -a --filter "label=com.docker.compose.project=$1" \
-        --format '{{.Names}}' 2>/dev/null || true
+    local want="$1" n
+    load_inventory
+    for n in "${INV_NAMES[@]}"; do
+        [ "${INV_PROJECT[$n]:-}" = "$want" ] && printf '%s\n' "$n"
+    done
+    return 0
 }
 
 container_exists() {
-    local found
-    found="$(docker ps -a --filter "name=^$1\$" --format '{{.Names}}' 2>/dev/null || true)"
-    [ -n "$found" ]
+    local want="$1" n
+    load_inventory
+    for n in "${INV_NAMES[@]}"; do
+        [ "$n" = "$want" ] && return 0
+    done
+    return 1
 }
 
 all_names() {
+    local n
+    load_inventory
     {
-        docker ps -a --format '{{.Names}}' 2>/dev/null || true
-        docker ps -a --format '{{.Label "com.docker.compose.project"}}' 2>/dev/null || true
+        for n in "${INV_NAMES[@]}"; do
+            printf '%s\n' "$n"
+            [ -n "${INV_PROJECT[$n]:-}" ] && printf '%s\n' "${INV_PROJECT[$n]}"
+        done
     } | grep -v '^$' | sort -u
+    return 0
+}
+
+no_match_die() {
+    local name="$1" what="${2:-stack or container}" near
+    # -F: the needle is a literal name, not a pattern. A container called
+    # `foo.bar` would otherwise match far more than intended.
+    near="$(all_names | grep -iF -- "${name:0:4}" | head -5 | tr '\n' ' ' || true)"
+    if [ -n "$near" ]; then
+        die "no $what named '$name'. Did you mean: $near"
+    fi
+    die "no $what named '$name'"
 }
 
 # Echoes "stack" or "container". Dies on ambiguity or no match.
 resolve_kind() {
     local name="$1"
-
-    if [ -n "$FORCE_KIND" ]; then
-        printf '%s\n' "$FORCE_KIND"
-        return 0
-    fi
-
     local is_stack=0 is_container=0
     [ -n "$(stack_containers "$name")" ] && is_stack=1
     container_exists "$name" && is_container=1
+
+    # --stack/--container break ties; they do not bypass existence checking.
+    # Skipping the lookup meant a typo sailed through to `docker restart <typo>`
+    # and lost the near-match hint exactly when it is most useful.
+    case "$FORCE_KIND" in
+        stack)
+            [ "$is_stack" -eq 1 ] || no_match_die "$name" "stack"
+            printf 'stack\n'
+            return 0
+            ;;
+        container)
+            [ "$is_container" -eq 1 ] || no_match_die "$name" "container"
+            printf 'container\n'
+            return 0
+            ;;
+    esac
 
     if [ "$is_stack" -eq 1 ] && [ "$is_container" -eq 1 ]; then
         die "'$name' is ambiguous - it is both a stack and a container. Use --stack or --container."
@@ -101,12 +158,7 @@ resolve_kind() {
         return 0
     fi
 
-    local near
-    near="$(all_names | grep -i -- "${name:0:4}" | head -5 | tr '\n' ' ' || true)"
-    if [ -n "$near" ]; then
-        die "no stack or container named '$name'. Did you mean: $near"
-    fi
-    die "no stack or container named '$name'"
+    no_match_die "$name"
 }
 
 containers_of() {
@@ -118,8 +170,61 @@ containers_of() {
     esac
 }
 
+# Echoes the names among "$@" whose network namespace another of them shares.
+# One level of nesting, which is what `network_mode: service:X` produces here.
+namespace_providers() {
+    local -A id_of=() mode_of=() is_provider=()
+    local name id netmode
+
+    while IFS=$'\t' read -r name id netmode; do
+        [ -n "$name" ] || continue
+        id_of["$name"]="$id"
+        mode_of["$name"]="$netmode"
+    done < <(docker inspect \
+        --format '{{.Name}}	{{.Id}}	{{.HostConfig.NetworkMode}}' "$@" 2>/dev/null \
+        | sed 's|^/||' || true)
+
+    for name in "$@"; do
+        case "${mode_of[$name]:-}" in
+            container:*) is_provider["${mode_of[$name]#container:}"]=1 ;;
+        esac
+    done
+
+    for name in "$@"; do
+        [ -n "${is_provider[${id_of[$name]:-_none_}]:-}" ] && printf '%s\n' "$name"
+    done
+    return 0
+}
+
+# Block until every named container is running and, if it declares a
+# healthcheck, healthy. Bounded; returns non-zero on timeout.
+wait_healthy() {
+    local deadline=$(( SECONDS + HEALTH_TIMEOUT )) state health settled
+    while :; do
+        settled=1
+        # One inspect for every provider, both fields at once - two calls per
+        # poll turn into one, which matters when each is an SSH handshake.
+        while IFS=$'\t' read -r state health; do
+            [ -n "$state" ] || continue
+            if [ "$state" != "running" ] || \
+               { [ "$health" != "healthy" ] && [ "$health" != "none" ]; }; then
+                settled=0
+            fi
+        done < <(docker inspect \
+            --format '{{.State.Status}}	{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' \
+            "$@" 2>/dev/null || true)
+
+        [ "$settled" -eq 1 ] && return 0
+        [ "$SECONDS" -ge "$deadline" ] && return 1
+        sleep 2
+    done
+}
+
 do_lifecycle() {
     local verb="$1" name="$2" kind containers count
+    # Prime the inventory here, in the main shell: the command substitutions
+    # below run in subshells and would each pay for their own docker call.
+    load_inventory
     kind="$(resolve_kind "$name")"
 
     mapfile -t containers < <(containers_of "$kind" "$name")
@@ -132,16 +237,62 @@ do_lifecycle() {
         "$BOLD" "$name" "$RESET" "$kind" "$count" \
         "$(printf '%s, ' "${containers[@]}" | sed 's/, $//')"
 
+    # Split off namespace providers. Restarting one gives it a fresh network
+    # sandbox; anything on `network_mode: service:<it>` stays bound to the old,
+    # now-stripped namespace - no eth0, no DNS - without exiting. Worse, those
+    # containers' healthchecks only probe localhost, so docker keeps reporting
+    # them healthy through a total outage. So providers must be restarted first
+    # and be healthy again before their dependents rejoin.
+    local -a providers=() rest=()
+    if [ "$count" -gt 1 ] && [ "$verb" != "stop" ]; then
+        mapfile -t providers < <(namespace_providers "${containers[@]}")
+    fi
+
+    if [ "${#providers[@]}" -gt 0 ]; then
+        local c p keep
+        for c in "${containers[@]}"; do
+            keep=1
+            for p in "${providers[@]}"; do
+                [ "$c" = "$p" ] && { keep=0; break; }
+            done
+            [ "$keep" -eq 1 ] && rest+=("$c")
+        done
+    fi
+
     if [ "$DRY_RUN" -eq 1 ]; then
-        printf 'dry-run: would %s %d container(s)\n' "$verb" "$count"
+        if [ "${#providers[@]}" -gt 0 ]; then
+            printf 'dry-run: would %s %s first, wait for healthy, then %s the remaining %d\n' \
+                "$verb" "$(printf '%s, ' "${providers[@]}" | sed 's/, $//')" \
+                "$verb" "${#rest[@]}"
+        else
+            printf 'dry-run: would %s %d container(s)\n' "$verb" "$count"
+        fi
         return 0
     fi
 
-    if docker "$verb" "${containers[@]}" >/dev/null; then
-        printf '%s %d/%d\n' "${verb}ed" "$count" "$count"
-    else
-        die "docker $verb failed for '$name'" 2
+    if [ "${#providers[@]}" -eq 0 ]; then
+        if docker "$verb" "${containers[@]}" >/dev/null; then
+            printf '%s %d/%d\n' "${verb}ed" "$count" "$count"
+        else
+            die "docker $verb failed for '$name'" 2
+        fi
+        return 0
     fi
+
+    printf '  namespace provider(s) first: %s\n' \
+        "$(printf '%s, ' "${providers[@]}" | sed 's/, $//')"
+    docker "$verb" "${providers[@]}" >/dev/null \
+        || die "docker $verb failed for provider(s) of '$name'" 2
+
+    if ! wait_healthy "${providers[@]}"; then
+        die "provider(s) not healthy within ${HEALTH_TIMEOUT}s - dependents left alone to avoid orphaning them into a dead namespace" 2
+    fi
+
+    if [ "${#rest[@]}" -gt 0 ]; then
+        docker "$verb" "${rest[@]}" >/dev/null \
+            || die "docker $verb failed for dependents of '$name'" 2
+    fi
+    printf '%s %d/%d\n' "${verb}ed" "$count" "$count"
 }
 
 # Classify each path as missing / empty / ok, one line per input, in order.
@@ -170,84 +321,124 @@ probe_paths() {
         return 0
     fi
 
-    if [ -n "${DOCKER_HOST:-}" ]; then
-        # shellcheck disable=SC2029  # expanding PROBE_BODY client-side is the point:
-        # we are shipping the script text to the remote shell to run.
-        printf '%s\n' "$@" | ssh "$SERVER_SSH_ALIAS" "$PROBE_BODY" || die "ssh probe failed" 2
-    else
-        printf '%s\n' "$@" | bash -c "$PROBE_BODY"
-    fi
+    # The probe must run on the same host `docker` is talking to. DOCKER_HOST is
+    # deliberately respected if pre-set, so blindly ssh-ing to SERVER_SSH_ALIAS
+    # could classify paths on a different machine - and a confident but wrong
+    # missing/empty verdict is worse than no verdict at all. Refuse rather than
+    # guess when the target is not reachable over ssh.
+    case "${DOCKER_HOST:-}" in
+        "")
+            printf '%s\n' "$@" | bash -c "$PROBE_BODY"
+            ;;
+        ssh://*)
+            # shellcheck disable=SC2029  # expanding PROBE_BODY client-side is the point:
+            # we are shipping the script text to the remote shell to run.
+            printf '%s\n' "$@" | ssh "${DOCKER_HOST#ssh://}" "$PROBE_BODY" \
+                || die "ssh probe failed" 2
+            ;;
+        *)
+            die "cannot probe bind paths over non-ssh DOCKER_HOST '$DOCKER_HOST'" 2
+            ;;
+    esac
 }
 
 do_mounts() {
-    local name="$1" kind containers c
+    local name="$1" kind
+    load_inventory
     kind="$(resolve_kind "$name")"
+
+    local -a containers=()
     mapfile -t containers < <(containers_of "$kind" "$name")
+    if [ "${#containers[@]}" -eq 0 ]; then
+        die "'$name' resolved to $kind but has no containers"
+    fi
 
     printf '%s%s%s → %s, %d container(s)\n' \
         "$BOLD" "$name" "$RESET" "$kind" "${#containers[@]}"
 
+    # One inspect for the whole stack and one probe for every bind source in it.
+    # Over DOCKER_HOST=ssh:// each docker call is its own handshake, so doing
+    # this per container turned `mounts media` into ~24 round trips.
+    local -a rows=() owners=() types=() sources=() targets=() modes=() binds=() statuses=()
+    mapfile -t rows < <(docker inspect --format \
+        '{{range .Mounts}}{{$.Name}}	{{.Type}}	{{.Source}}	{{.Destination}}	{{if .RW}}rw{{else}}ro{{end}}
+{{end}}' "${containers[@]}" 2>/dev/null | grep -v '^$' || true)
+
+    local r o t s d m
+    for r in "${rows[@]}"; do
+        IFS=$'\t' read -r o t s d m <<< "$r"
+        owners+=("${o#/}"); types+=("$t"); sources+=("$s"); targets+=("$d"); modes+=("$m")
+        [ "$t" = "bind" ] && binds+=("$s")
+    done
+
+    if [ "${#binds[@]}" -gt 0 ]; then
+        mapfile -t statuses < <(probe_paths "${binds[@]}")
+    fi
+
+    # Pin each row's probe verdict to its row index, so printing order cannot
+    # desynchronise the flags from the paths they describe.
+    local -a row_status=()
+    local i k=0
+    for i in "${!types[@]}"; do
+        if [ "${types[$i]}" = "bind" ]; then
+            row_status[i]="${statuses[$k]:-ok}"
+            k=$((k + 1))
+        else
+            row_status[i]="none"
+        fi
+    done
+
+    local c flag printed
     for c in "${containers[@]}"; do
-        local rows=() types=() sources=() targets=() modes=() binds=() statuses=()
-        local t s d m
-        mapfile -t rows < <(docker inspect --format \
-            '{{range .Mounts}}{{.Type}}	{{.Source}}	{{.Destination}}	{{if .RW}}rw{{else}}ro{{end}}
-{{end}}' "$c" 2>/dev/null | grep -v '^$' || true)
-
-        if [ "${#rows[@]}" -eq 0 ]; then
-            printf '  %s: no mounts\n' "$c"
-            continue
-        fi
-
-        local r
-        for r in "${rows[@]}"; do
-            IFS=$'\t' read -r t s d m <<< "$r"
-            types+=("$t"); sources+=("$s"); targets+=("$d"); modes+=("$m")
-            [ "$t" = "bind" ] && binds+=("$s")
-        done
-
-        if [ "${#binds[@]}" -gt 0 ]; then
-            mapfile -t statuses < <(probe_paths "${binds[@]}")
-        fi
-
-        printf '  %s\n' "$c"
-        local i bi=0 flag
-        for i in "${!types[@]}"; do
-            flag=""
-            if [ "${types[$i]}" = "bind" ]; then
-                case "${statuses[$bi]:-ok}" in
-                    missing) flag="  ${YELLOW}⚠ missing${RESET}" ;;
-                    empty) flag="  ${YELLOW}⚠ empty${RESET}" ;;
-                esac
-                bi=$((bi + 1))
-            fi
+        printed=0
+        for i in "${!owners[@]}"; do
+            [ "${owners[$i]}" = "$c" ] || continue
+            [ "$printed" -eq 0 ] && { printf '  %s\n' "$c"; printed=1; }
+            case "${row_status[i]}" in
+                missing) flag="  ${YELLOW}⚠ missing${RESET}" ;;
+                empty) flag="  ${YELLOW}⚠ empty${RESET}" ;;
+                *) flag="" ;;
+            esac
             printf '    %-7s %s → %s  %s%s\n' \
                 "${types[$i]}" "${sources[$i]}" "${targets[$i]}" "${modes[$i]}" "$flag"
         done
+        [ "$printed" -eq 0 ] && printf '  %s: no mounts\n' "$c"
     done
+    return 0
 }
 
 main() {
     local verb="" names=()
 
     if [ $# -eq 0 ]; then
-        usage
+        usage >&2
         exit 1
     fi
 
     verb="$1"
     shift
 
+    # Asking for help is not an error: usage goes to stdout and exits 0. Every
+    # other path below prints it to stderr, so a failed invocation never splits
+    # its output across two streams.
+    case "$verb" in
+        -h|--help|help)
+            usage
+            exit 0
+            ;;
+    esac
+
     case " $VERBS " in
         *" $verb "*) ;;
         *)
-            usage
+            usage >&2
             die "unknown verb '$verb'"
             ;;
     esac
 
     while [ $# -gt 0 ]; do
         case "$1" in
+            -h|--help) usage; exit 0 ;;
             --dry-run) DRY_RUN=1 ;;
             --stack) FORCE_KIND="stack" ;;
             --container) FORCE_KIND="container" ;;
@@ -258,7 +449,7 @@ main() {
     done
 
     if [ "${#names[@]}" -eq 0 ]; then
-        usage
+        usage >&2
         die "verb '$verb' needs at least one name"
     fi
 
