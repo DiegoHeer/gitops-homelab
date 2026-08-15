@@ -51,14 +51,13 @@ services:
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: '--data-checksums'
     volumes:
-      - immich-db:/var/lib/postgresql/data
+      - /home/diego/services_data/photos/immich/postgresql:/var/lib/postgresql/data
     healthcheck:
       disable: false
 
 
 volumes:
   model-cache:
-  immich-db:
 
 networks:
   default:
