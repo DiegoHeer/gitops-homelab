@@ -96,6 +96,41 @@ hostname — no Cloudflare dashboard work (see [ADR 0019](docs/adr/0019-wildcard
 Because `*.dynabase.nl` is a catch-all to Traefik, **any** bare-hostname router is
 immediately public — review exposure at PR time. Unmatched public hostnames 404.
 
+### Debugging a stack or container
+
+`scripts/doco.sh`, and the `Makefile` wrapping it, drive the home server over
+`DOCKER_HOST=ssh://server`. No DocoCD API involved — see
+[ADR 0021](docs/adr/0021-ssh-over-dococd-api-for-debug-tooling.md).
+
+```bash
+make restart media          # restart a whole stack
+make restart jellyfin       # restart a single container
+make stop media ai          # several at once
+make mounts immich_server   # list mounts, flagging missing/empty bind sources
+make restart media DRY=1    # resolve only, change nothing
+```
+
+Names resolve automatically against live Docker state. If a name is both a stack
+and a container, pass `KIND=stack` or `KIND=container`.
+
+`DRY=1` and `KIND=` are Make variables rather than flags because `--dry-run`
+collides with Make's own option of that name and `--stack` makes Make abort.
+Calling the script directly takes the real flags:
+`./scripts/doco.sh mounts media --dry-run`.
+
+`mounts` flags bind sources that are **empty**, not just missing: Compose
+defaults to `create_host_path: true`, so a typo'd host path is silently created
+as an empty directory and the container starts up looking healthy with no data.
+An empty mount is not automatically a bug — it is a hint worth checking.
+
+**Caveat:** DocoCD reconciliation is enabled by default with `events: ["unhealthy"]`.
+A container that fails its healthcheck while you debug it gets auto-restarted, up
+to 5 times per 300 seconds. `stop` is not a reconciliation trigger and will not be
+reverted. Set `reconciliation: false` on the stack in `.doco-cd.yml` to debug in peace.
+
+Redeploys are not part of this tooling — use the `Reconcile DocoCD` workflow
+(`workflow_dispatch`) to reconcile every stack from `main` without a new commit.
+
 ---
 
 ## Ansible

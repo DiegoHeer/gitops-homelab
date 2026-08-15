@@ -27,6 +27,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0018](0018-authelia-oidc-for-exposed-services.md) | Authelia OIDC for authenticating exposed services | Accepted |
 | [0019](0019-wildcard-tunnel-via-traefik.md) | Wildcard Cloudflare Tunnel via Traefik | Accepted |
 | [0020](0020-cloudflare-dns-companion.md) | Cloudflare DNS sync via traefik-cloudflare-companion | Accepted |
+| [0021](0021-ssh-over-dococd-api-for-debug-tooling.md) | SSH over the DocoCD API for debug tooling | Accepted |
 
 ## Adding a new ADR
 
