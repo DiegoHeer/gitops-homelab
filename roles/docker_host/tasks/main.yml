@@ -3,6 +3,7 @@
   ansible.builtin.include_tasks: "{{ task }}"
   loop:
     - packages.yml
+    - logging.yml
     - storage.yml
     - network.yml
     - gitops.yml

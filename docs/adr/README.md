@@ -35,6 +35,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0026](0026-docker-waits-for-data-disk-mounts.md) | Docker waits for data disk mounts, in two tiers | Accepted |
 | [0027](0027-netalertx-pinned-plugin-roster.md) | NetAlertX's plugin roster is pinned in git | Superseded by 0028 |
 | [0028](0028-netalertx-loaded-plugins-env-var.md) | NetAlertX's plugin roster is pinned via the `LOADED_PLUGINS` env var | Accepted |
+| [0029](0029-docker-log-rotation.md) | Docker log rotation via `daemon.json` | Accepted |
 
 ## Adding a new ADR
 
