@@ -1,6 +1,6 @@
 # 0027 — NetAlertX's plugin roster is pinned in git
 
-- **Status**: Accepted
+- **Status**: Superseded by 0028
 - **Date**: 2026-08-16
 - **Deciders**: Diego
 
