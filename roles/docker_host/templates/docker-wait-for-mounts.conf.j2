@@ -1,0 +1,17 @@
+{{ ansible_managed | comment }}
+# Generated from roles/docker_host/templates/docker-wait-for-mounts.conf.j2
+#
+# RequiresMountsFor implies both Requires= and After=: Docker refuses to start
+# unless these are mounted. Reserved for disks whose absence should be a loud
+# failure rather than containers quietly binding an empty mountpoint.
+#
+# Ordered-only mounts get After= without Requires=, so a disk that fails to
+# mount delays Docker but does not keep the whole host down with it.
+
+[Unit]
+{% if docker_host_required_mounts %}
+RequiresMountsFor={{ docker_host_required_mounts | join(' ') }}
+{% endif %}
+{%- for mount in docker_host_ordered_mounts %}
+After={{ mount | regex_replace('^/', '') | regex_replace('/', '-') }}.mount
+{%- endfor %}

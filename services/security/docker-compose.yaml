@@ -10,7 +10,13 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/diego/services_data/security/frigate/config:/config
-      - /media/hd3/frigate:/media/frigate
+      # create_host_path: false so Frigate fails to start rather than recording
+      # to the root disk if hd3 has not mounted.
+      - type: bind
+        source: /media/hd3/frigate
+        target: /media/frigate
+        bind:
+          create_host_path: false
       - type: tmpfs
         target: /tmp/cache
         tmpfs:

@@ -32,6 +32,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0023](0023-netalertx-presence-detection.md) | NetAlertX for network presence detection into Home Assistant | Accepted |
 | [0024](0024-gluetun-netns-orphan-detection.md) | Detect gluetun netns orphaning rather than self-heal it | Accepted |
 | [0025](0025-netalertx-anonymous-mqtt.md) | NetAlertX publishes to mosquitto anonymously | Accepted |
+| [0026](0026-docker-waits-for-data-disk-mounts.md) | Docker waits for data disk mounts, in two tiers | Accepted |
 
 ## Adding a new ADR
 

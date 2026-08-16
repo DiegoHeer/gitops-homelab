@@ -21,6 +21,12 @@ provisioner:
     group_vars:
       all:
         username: test_user
+        # The real data disks do not exist in the test container, and a hard
+        # RequiresMountsFor on a missing mount unit would stop Docker starting.
+        # Exercise the ordering-only path against a mount that always exists.
+        docker_host_required_mounts: []
+        docker_host_ordered_mounts:
+          - /tmp
   env:
     ANSIBLE_CONFIG: ../../ansible.cfg
 
