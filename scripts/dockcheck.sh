@@ -201,9 +201,13 @@ main() {
         status_by_name["$name"]="$status"
     done < <(classify "${names[@]}")
 
-    # If docker inspect returned nothing at all, the daemon is unreachable —
-    # without this hint every row would render as "missing".
-    if [ "${#status_by_name[@]}" -eq 0 ] && [ "${#names[@]}" -gt 0 ]; then
+    # No rows back from docker inspect used to be read as "daemon unreachable" —
+    # a safe inference over the full sweep, but wrong once a filter can narrow
+    # the set to containers that are all genuinely absent, which is exactly when
+    # you reach for one. Probe the daemon instead of inferring; the extra round
+    # trip only happens on this already-degenerate path.
+    if [ "${#status_by_name[@]}" -eq 0 ] && [ "${#names[@]}" -gt 0 ] \
+        && ! docker info >/dev/null 2>&1; then
         echo "Error: docker daemon not reachable (DOCKER_HOST=${DOCKER_HOST:-<local>})." >&2
         echo "Check connectivity and that docker is running on the target host." >&2
         exit 2
