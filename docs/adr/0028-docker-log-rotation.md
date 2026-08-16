@@ -1,4 +1,4 @@
-# 0027 — Docker log rotation via daemon.json
+# 0028 — Docker log rotation via daemon.json
 
 - **Status**: Accepted
 - **Date**: 2026-08-16
