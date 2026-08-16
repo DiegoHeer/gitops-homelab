@@ -1,4 +1,8 @@
-VERBS := restart stop start mounts
+# DOCO_VERBS dispatch to doco.sh; status dispatches to dockcheck.sh. VERBS is
+# the union - it drives the typo guard, argument stripping and .PHONY, none of
+# which care which script a verb ends up calling.
+DOCO_VERBS := restart stop start mounts
+VERBS := $(DOCO_VERBS) status
 FIRST := $(firstword $(MAKECMDGOALS))
 
 # Make needs a catch-all rule to accept bare names as positional arguments,
@@ -27,10 +31,20 @@ ifneq ($(filter-out 0 false no off,$(KIND)),)
 DOCO_FLAGS += --$(KIND)
 endif
 
+# status only reads, so neither flag means anything to it. Accepting them
+# silently would imply a dry run had been honoured when nothing was ever going
+# to change - same reasoning as the unknown-verb guard above.
+ifeq ($(FIRST),status)
+ifneq ($(DOCO_FLAGS),)
+$(error DRY= and KIND= do not apply to 'status' - it only reads)
+endif
+endif
+
 .PHONY: help $(VERBS)
 
 help:
 	@echo "usage: make {restart|stop|start|mounts} <stack-or-container> [DRY=1] [KIND=stack|container]"
+	@echo "       make status [<stack-or-container>...]"
 	@echo ""
 	@echo "  make restart media               restart a whole stack"
 	@echo "  make restart jellyfin            restart a single container"
@@ -39,10 +53,21 @@ help:
 	@echo "  make restart media DRY=1         resolve only, change nothing"
 	@echo "  make restart media KIND=stack    force the stack reading of an ambiguous name"
 	@echo ""
+	@echo "  make status                      health of every container in every stack"
+	@echo "  make status media                one stack"
+	@echo "  make status jellyfin             one container"
+	@echo ""
+	@echo "status exits 1 when anything is unhealthy, so Make reports 'Error 1'"
+	@echo "on top of the table. DRY= and KIND= apply to the doco.sh verbs only."
+	@echo ""
 	@echo "DRY=0 / KIND=0 count as off. Full options: ./scripts/doco.sh --help"
+	@echo "                             and:          ./scripts/dockcheck.sh --help"
 
-$(VERBS):
+$(DOCO_VERBS):
 	@./scripts/doco.sh $@ $(ARGS) $(DOCO_FLAGS)
+
+status:
+	@./scripts/dockcheck.sh $(ARGS)
 
 # Absorbs bare names so Make does not try to build them as targets.
 %:

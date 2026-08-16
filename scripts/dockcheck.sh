@@ -6,6 +6,32 @@ set -euo pipefail
 # via ssh://$SERVER_SSH_ALIAS). Stack list and compose files are fetched from
 # the public repo at runtime — no repo clone needed on the host.
 
+usage() {
+    cat <<'EOF'
+usage: dockcheck.sh [<name>...] [--help]
+
+Prints a status table for every container in every DocoCD-managed stack.
+With no arguments the whole homelab is checked.
+
+name:
+  a stack name (e.g. media) or a container name (e.g. jellyfin).
+  Resolved against the stack list and compose files in the repo, not against
+  live Docker state — so a container that has disappeared entirely is still
+  reported as "missing" when you filter by its stack.
+
+  Unlike doco.sh there is no --stack/--container disambiguation: this command
+  only reads, so a name that is both matches both rather than erroring.
+
+exit status:
+  0  every checked container is healthy
+  1  at least one is not
+  2  the check could not run (fetch failed, docker unreachable, unknown name)
+
+Config via env: REPO_RAW_URL (default the public repo on main),
+SERVER_HOSTNAME (default home), SERVER_SSH_ALIAS (default server).
+EOF
+}
+
 REPO_RAW_URL="${REPO_RAW_URL:-https://raw.githubusercontent.com/DiegoHeer/gitops-homelab/main}"
 REPO_RAW_URL="${REPO_RAW_URL%/}"
 SERVER_HOSTNAME="${SERVER_HOSTNAME:-home}"
@@ -75,6 +101,37 @@ discover_containers() {
     done <<< "$stacks" | sort -u
 }
 
+# Reduce sorted stack|container lines to those matching the requested names.
+# Filtering happens here rather than at fetch time because a container name
+# cannot be mapped to its stack without parsing every compose file first, and
+# the fetch is already a single parallel curl. The batched docker inspect —
+# the call that actually costs SSH round trips — shrinks accordingly.
+filter_containers() {
+    local containers="$1"; shift
+    local name matched all_matches=""
+    local -a unknown=()
+
+    for name in "$@"; do
+        matched=$(echo "$containers" | awk -F'|' -v n="$name" '$1 == n || $2 == n')
+        if [ -z "$matched" ]; then
+            unknown+=("$name")
+        else
+            all_matches+="$matched"$'\n'
+        fi
+    done
+
+    # An unmatched name must be fatal. Filtering it away silently would print
+    # an empty table and "0 healthy, 0 problems" — which reads as success.
+    if [ "${#unknown[@]}" -gt 0 ]; then
+        echo "Error: unknown stack or container: ${unknown[*]}" >&2
+        echo "Stacks: $(echo "$containers" | cut -d'|' -f1 | sort -u | tr '\n' ' ')" >&2
+        echo "Run without arguments to check everything." >&2
+        return 2
+    fi
+
+    printf '%s' "$all_matches" | sort -u
+}
+
 # One batched docker inspect across every container name. Emit name|status
 # lines. Containers absent from docker simply produce no output line — the
 # caller maps that to "missing".
@@ -112,12 +169,26 @@ classify() {
 }
 
 main() {
+    local arg
+    local -a filters=()
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help) usage; exit 0 ;;
+            -*)        echo "Error: unknown option '$arg'" >&2; usage >&2; exit 2 ;;
+            *)         filters+=("$arg") ;;
+        esac
+    done
+
     local containers
     containers=$(discover_containers) || exit 2
     [ -n "$containers" ] || {
         echo "No containers discovered from $REPO_RAW_URL" >&2
         exit 2
     }
+
+    if [ "${#filters[@]}" -gt 0 ]; then
+        containers=$(filter_containers "$containers" "${filters[@]}") || exit 2
+    fi
 
     local -a names=()
     local stack container status color
@@ -130,9 +201,13 @@ main() {
         status_by_name["$name"]="$status"
     done < <(classify "${names[@]}")
 
-    # If docker inspect returned nothing at all, the daemon is unreachable —
-    # without this hint every row would render as "missing".
-    if [ "${#status_by_name[@]}" -eq 0 ] && [ "${#names[@]}" -gt 0 ]; then
+    # No rows back from docker inspect used to be read as "daemon unreachable" —
+    # a safe inference over the full sweep, but wrong once a filter can narrow
+    # the set to containers that are all genuinely absent, which is exactly when
+    # you reach for one. Probe the daemon instead of inferring; the extra round
+    # trip only happens on this already-degenerate path.
+    if [ "${#status_by_name[@]}" -eq 0 ] && [ "${#names[@]}" -gt 0 ] \
+        && ! docker info >/dev/null 2>&1; then
         echo "Error: docker daemon not reachable (DOCKER_HOST=${DOCKER_HOST:-<local>})." >&2
         echo "Check connectivity and that docker is running on the target host." >&2
         exit 2
@@ -177,4 +252,4 @@ main() {
     [ "$problem_count" -eq 0 ] || exit 1
 }
 
-main
+main "$@"
