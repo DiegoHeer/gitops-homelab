@@ -32,13 +32,22 @@ dependents rather than a check that always passes.
 - `+` The failure is visible in `docker ps`, Beszel and Uptime Kuma instead of silent
 - `+` No new containers; probe is instant and does no network I/O
 - `+` Dependents now wait for a working tunnel, not just a started container
-- `+` The probe tests the route table, not egress, so a routine VPN reconnect does not flap it
+- `+` The probe tests the route table rather than egress, and the dependents' 90s retry budget
+  (`retries: 3` × `interval: 30s`) absorbs any brief routeless window during a VPN reconnect
 - `+` `doco.sh`'s `wait_healthy` now gets a truthful signal from the dependents it restarts
+- `−` A VPN outage now fails the whole media stack's deploy, not just the five dependents: compose
+  aborts on the gate with `dependency failed to start: container gluetun is unhealthy` and exits 1,
+  so DocoCD rolls the stack back — including jellyfin, seerr, navidrome, audiobookshelf and
+  grimmory, which have nothing to do with the VPN
 - `−` Recovery stays manual — see `docs/runbooks/recover-gluetun-netns-orphan.md`
 - `−` `depends_on` is honoured only by Compose, so a raw `docker restart gluetun` can still orphan;
   this change makes that visible rather than preventing it
 - `−` gluetun's healthcheck now runs every 10s instead of every 60s to keep the new gate from
-  stalling a deploy into a DocoCD rollback
+  stalling a deploy into a DocoCD rollback; `ping -W 5` bounds a failing probe so convergence to
+  `unhealthy` is ~120s rather than the ~150s an unbounded `ping` would take
+- `−` The probe depends on `ip` being present in each dependent image. If a base-image bump ever
+  drops iproute2, `CMD-SHELL` returns 127 and every dependent goes permanently unhealthy — which
+  looks identical to a real orphaning event and blocks deploys on the gate
 - `−` Host-reboot ordering remains unverified
 
 ## Evidence

@@ -99,7 +99,7 @@ services:
       - VPN_TYPE=openvpn
       - SERVER_COUNTRIES=Netherlands,Belgium
     healthcheck:
-      test: ping -c 1 www.google.com || exit 1
+      test: ping -c 1 -W 5 www.google.com || exit 1
       interval: 10s
       timeout: 10s
       retries: 6

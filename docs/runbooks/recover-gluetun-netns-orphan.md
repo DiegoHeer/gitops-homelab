@@ -52,6 +52,11 @@ ssh server 'docker restart sonarr radarr prowlarr sabnzbd qbittorrent'
 
 Restart **only** the five dependents here, never gluetun.
 
+If gluetun reports anything other than `healthy`, stop — restarting the dependents accomplishes
+nothing while the tunnel is down, and you will just have to do it again. Check the VPN handshake
+with `docker logs gluetun --tail 50` (look for `Initialization Sequence Completed`) and wait for
+it to come up before touching the dependents.
+
 ## Verification
 
 1. All six inodes now match — re-run the command from step 1.
