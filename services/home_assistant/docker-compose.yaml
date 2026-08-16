@@ -117,7 +117,7 @@ services:
     environment:
       TZ: Europe/Amsterdam
       PORT: 20211
-      APP_CONF_OVERRIDE: '{"SCAN_SUBNETS":["192.168.1.0/24 --interface=wlp1s0"],"ARPSCAN_RUN":"schedule","ARPSCAN_RUN_SCHD":"*/30 * * * *","MQTT_RUN":"always_after_scan","MQTT_BROKER":"127.0.0.1","MQTT_PORT":1883,"MQTT_QOS":1,"MQTT_DEVICE_ID":"netalertx","MQTT_DEVICE_NAME":"NetAlertX","MQTT_SEND_DEVICES":true}'  # yamllint disable-line rule:line-length
+      APP_CONF_OVERRIDE: '{"SCAN_SUBNETS":["192.168.1.0/24 --interface=wlp1s0"],"ARPSCAN_RUN":"schedule","ARPSCAN_RUN_SCHD":"*/30 * * * *","LOADED_PLUGINS":["ARPSCAN","AVAHISCAN","CSVBCKP","DBCLNP","DIGSCAN","INTRNT","MAINT","NEWDEV","NBTSCAN","NSLOOKUP","NTFPRCS","SETPWD","SMTP","SYNC","VNDRPDT","WORKFLOWS","UI","CUSTPROP","MQTT"],"MQTT_RUN":"always_after_scan","MQTT_BROKER":"127.0.0.1","MQTT_PORT":1883,"MQTT_QOS":1,"MQTT_DEVICE_ID":"netalertx","MQTT_DEVICE_NAME":"NetAlertX","MQTT_SEND_DEVICES":true}'  # yamllint disable-line rule:line-length
     volumes:
       - /home/diego/services_data/home_assistant/netalertx/data:/data
       - /etc/localtime:/etc/localtime:ro
