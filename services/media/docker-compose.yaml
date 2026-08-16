@@ -98,9 +98,6 @@ services:
       - VPN_SERVICE_PROVIDER=surfshark
       - VPN_TYPE=openvpn
       - SERVER_COUNTRIES=Netherlands,Belgium
-    # Converges in ~10s (tunnel comes up in ~3s) so dependents gated on
-    # service_healthy cannot stall a deploy long enough for DocoCD to roll back.
-    # retries x interval keeps tolerance for a dropped tunnel at ~60s.
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 10s
@@ -130,7 +127,6 @@ services:
         limits:
           memory: 500M
     healthcheck:
-      # Route probe detects gluetun netns orphaning (ADR 0023); localhost alone still answers there.
       test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:8080"]
       interval: 30s
       timeout: 10s
@@ -152,7 +148,6 @@ services:
     volumes:
       - /home/diego/services_data/media/prowlarr/config:/config
     healthcheck:
-      # Route probe detects gluetun netns orphaning (ADR 0023); localhost alone still answers there.
       test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:9696/ping"]
       interval: 30s
       timeout: 10s
@@ -175,7 +170,6 @@ services:
       - /home/diego/services_data/media/sonarr/config:/config
       - /media/hd2/data:/data
     healthcheck:
-      # Route probe detects gluetun netns orphaning (ADR 0023); localhost alone still answers there.
       test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:8989/ping"]
       interval: 30s
       timeout: 10s
@@ -198,7 +192,6 @@ services:
       - /home/diego/services_data/media/radarr/config:/config
       - /media/hd2/data:/data
     healthcheck:
-      # Route probe detects gluetun netns orphaning (ADR 0023); localhost alone still answers there.
       test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:7878/ping"]
       interval: 30s
       timeout: 10s
@@ -221,7 +214,6 @@ services:
       - /home/diego/services_data/media/sabnzbd/config:/config
       - /media/hd2/data:/data
     healthcheck:
-      # Route probe detects gluetun netns orphaning (ADR 0023); localhost alone still answers there.
       test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:8085"]
       interval: 30s
       timeout: 10s
