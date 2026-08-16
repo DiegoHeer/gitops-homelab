@@ -116,13 +116,18 @@ services:
     image: ghcr.io/jokob-sk/netalertx:26.8.5
     restart: unless-stopped
     network_mode: host
-    env_file: secrets.enc.env
     cap_add:
       - NET_ADMIN
       - NET_RAW
     environment:
       TZ: Europe/Amsterdam
       PORT: 20211
+      # Re-applied with forceDefault on EVERY container start, so these 10 settings are
+      # owned by git — a UI edit to any of them is silently reverted on the next restart.
+      # Plaintext on purpose: it holds no credentials (the broker is anonymous, ADR 0025)
+      # and the subnet/interface are already plaintext elsewhere in this repo.
+      # ARPSCAN_RUN_SCHD is deliberately slow while arp-scan is on trial over WiFi; see ADR 0025.
+      APP_CONF_OVERRIDE: '{"SCAN_SUBNETS":["192.168.1.0/24 --interface=wlp1s0"],"ARPSCAN_RUN":"schedule","ARPSCAN_RUN_SCHD":"*/30 * * * *","MQTT_RUN":"always_after_scan","MQTT_BROKER":"127.0.0.1","MQTT_PORT":1883,"MQTT_QOS":1,"MQTT_DEVICE_ID":"netalertx","MQTT_DEVICE_NAME":"NetAlertX","MQTT_SEND_DEVICES":true}'  # yamllint disable-line rule:line-length
     volumes:
       - /home/diego/services_data/home_assistant/netalertx/data:/data
       - /etc/localtime:/etc/localtime:ro
