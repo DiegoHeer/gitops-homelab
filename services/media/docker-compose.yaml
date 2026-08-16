@@ -99,10 +99,11 @@ services:
       - VPN_TYPE=openvpn
       - SERVER_COUNTRIES=Netherlands,Belgium
     healthcheck:
-      test: ping -c 1 www.google.com || exit 1
-      interval: 60s
-      timeout: 20s
-      retries: 5
+      test: ping -c 1 -W 5 www.google.com || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 6
+      start_period: 30s
 
   qbittorrent:
     container_name: qbittorrent
@@ -110,7 +111,8 @@ services:
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
     volumes:
       - /home/diego/services_data/media/qbittorrent/config:/config
       - /media/hd2/data:/data
@@ -125,7 +127,7 @@ services:
         limits:
           memory: 500M
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:8080"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -137,7 +139,8 @@ services:
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -145,7 +148,7 @@ services:
     volumes:
       - /home/diego/services_data/media/prowlarr/config:/config
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
+      test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:9696/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -157,7 +160,8 @@ services:
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=0
       - PGID=0
@@ -166,7 +170,7 @@ services:
       - /home/diego/services_data/media/sonarr/config:/config
       - /media/hd2/data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
+      test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:8989/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -178,7 +182,8 @@ services:
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -187,7 +192,7 @@ services:
       - /home/diego/services_data/media/radarr/config:/config
       - /media/hd2/data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
+      test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:7878/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -199,7 +204,8 @@ services:
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -208,7 +214,7 @@ services:
       - /home/diego/services_data/media/sabnzbd/config:/config
       - /media/hd2/data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test: ["CMD-SHELL", "ip route show default | grep -q . && curl -f http://localhost:8085"]
       interval: 30s
       timeout: 10s
       retries: 3

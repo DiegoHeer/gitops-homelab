@@ -1,4 +1,4 @@
-# 0024 — NetAlertX publishes to mosquitto anonymously
+# 0025 — NetAlertX publishes to mosquitto anonymously
 
 - **Status**: Accepted
 - **Date**: 2026-08-16
