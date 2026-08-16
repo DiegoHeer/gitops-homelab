@@ -29,7 +29,6 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0020](0020-cloudflare-dns-companion.md) | Cloudflare DNS sync via traefik-cloudflare-companion | Accepted |
 | [0021](0021-immich-data-media-location.md) | Immich media mounted at `/data` (upstream default) | Accepted |
 | [0022](0022-ssh-over-dococd-api-for-debug-tooling.md) | SSH over the DocoCD API for debug tooling | Accepted |
-| [0023](0023-netalertx-presence-detection.md) | NetAlertX for network presence detection into Home Assistant | Accepted |
 
 ## Adding a new ADR
 

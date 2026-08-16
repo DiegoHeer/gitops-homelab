@@ -35,13 +35,6 @@ http:
       service: proxmox
       tls: {}
 
-    netalertx:
-      rule: "Host(`netalertx.local.dynabase.nl`)"
-      entryPoints:
-        - "https"
-      service: netalertx
-      tls: {}
-
   services:
     router:
       loadBalancer:
@@ -62,10 +55,3 @@ http:
       loadBalancer:
         servers:
           - url: "https://192.168.1.100:8006"
-
-    # netalertx runs network_mode: host on the home server, so it is reached at
-    # the host LAN IP:20211 rather than through Docker-label discovery.
-    netalertx:
-      loadBalancer:
-        servers:
-          - url: "http://192.168.1.10:20211"
