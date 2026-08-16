@@ -27,6 +27,23 @@ jobs:
       - name: Run ansible-lint
         run: uv run ansible-lint
 
+  shell:
+    name: Shell
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # Run the pinned pre-commit hook rather than the runner's own shellcheck:
+      # the two versions disagree (the runner's flags SC2015 in dockcheck.sh,
+      # v0.11.0.1 does not), and CI drifting from the local hook is worse than
+      # no CI check at all. No vault password needed, unlike lint.
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-ansible-deps
+
+      - name: Run shellcheck
+        run: uv run pre-commit run shellcheck --all-files
+
   molecule:
     name: Molecule - ${{ matrix.scenario }}
     runs-on: ubuntu-latest

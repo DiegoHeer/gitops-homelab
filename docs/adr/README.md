@@ -28,6 +28,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0019](0019-wildcard-tunnel-via-traefik.md) | Wildcard Cloudflare Tunnel via Traefik | Accepted |
 | [0020](0020-cloudflare-dns-companion.md) | Cloudflare DNS sync via traefik-cloudflare-companion | Accepted |
 | [0021](0021-immich-data-media-location.md) | Immich media mounted at `/data` (upstream default) | Accepted |
+| [0022](0022-ssh-over-dococd-api-for-debug-tooling.md) | SSH over the DocoCD API for debug tooling | Accepted |
 
 ## Adding a new ADR
 
