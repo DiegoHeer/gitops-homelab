@@ -1,11 +1,12 @@
 ---
-# daemon-reload only. Restarting Docker here would bounce every container on
-# the host, and the drop-in only changes boot ordering — it takes effect on the
-# next boot regardless.
+# The mount-ordering drop-in from storage.yml only changes boot ordering, so a
+# daemon-reload is enough here — it takes effect on the next boot regardless.
 - name: Reload systemd unit files
   ansible.builtin.systemd_service:
     daemon_reload: true
 
+# Runs after the reload above, since handlers fire in definition order, so the
+# restarted daemon picks up the drop-in.
 - name: Restart Docker
   ansible.builtin.systemd_service:
     name: docker

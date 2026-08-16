@@ -1,4 +1,14 @@
 ---
+# docker.service sets RequiresMountsFor on the required disks (storage.yml), so a
+# restart with one of them unmounted leaves Docker down. Fail before that happens.
+- name: Assert the required data disks are mounted
+  ansible.builtin.assert:
+    that:
+      - docker_host_required_mounts | difference(ansible_facts.mounts | map(attribute='mount') | list) | length == 0
+    fail_msg: >-
+      Not mounted: {{ docker_host_required_mounts | difference(ansible_facts.mounts | map(attribute='mount') | list) | join(', ') }}.
+      Restarting Docker now would leave it down.
+
 - name: Ensure the Docker configuration directory exists
   ansible.builtin.file:
     path: /etc/docker
