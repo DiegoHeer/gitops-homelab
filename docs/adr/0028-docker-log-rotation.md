@@ -17,9 +17,11 @@ incident, and filling `/` would take down all 61 containers at once.
 ## Decision
 
 Manage `/etc/docker/daemon.json` from the `docker_host` role with
-`log-driver: json-file` and `log-opts` of `max-size: "10m"` / `max-file: "3"`,
-capping each container at 30 MB. A service that needs more history overrides the
-default with its own `logging:` block in its compose file.
+`log-driver: json-file` and `log-opts` of `max-size: "10m"` / `max-file: "3"` /
+`compress: "true"`, capping each container at 30 MB while gzipping rotated files
+so the ceiling buys more retained history. A service that needs more than that
+can override the default with its own `logging:` block in its compose file —
+no stack does today, so that path is documented rather than exercised.
 
 ## Consequences
 
@@ -28,8 +30,11 @@ default with its own `logging:` block in its compose file.
 - `+` Dozzle and `docker logs` are unaffected — the driver is unchanged, only limits are added.
 - `−` Applies only to containers created after the daemon restarts. The existing 61 keep their unbounded logs until recreated, so the 22 GB is reclaimed by recreation, not by this change alone.
 - `−` Applying it restarts the Docker daemon, which bounces every container; it needs a maintenance window.
-- `−` Per-container history is capped at 30 MB, so long-tail forensics on a chatty service is lost.
+- `−` Per-container history is capped at 30 MB, so long-tail forensics on a chatty service is lost. `compress` softens this but does not remove it.
 - `−` Ansible now owns `daemon.json` wholesale; a hand-edit on the host is overwritten on the next run.
+- `−` The `Restart Docker` handler is **unconditional**. It only fires when the config actually changes, but that includes any future edit to `docker_host_daemon_config` and any run that reverts a hand-edit on the host — so a full container bounce can land on a run nobody intended as a maintenance window.
+- `−` The restart makes ADR 0026's mount drop-in load-bearing at playbook time, not just at boot: `RequiresMountsFor=/media/hd1 /media/hd2` means restarting with either unmounted leaves Docker down. `logging.yml` asserts those mounts first so the play fails before touching Docker rather than after.
+- `−` A daemon restart is the event class behind gluetun netns orphaning (ADR 0024). Five services in `services/media/docker-compose.yaml` run `network_mode: service:gluetun` and can return 502 while Docker still reports them healthy, so rollout must verify the arr stack per `docs/runbooks/recover-gluetun-netns-orphan.md`.
 
 Rejected alternatives: per-service `logging:` blocks in every compose file (30+
 files of churn, and silently forgotten on each new stack); and the `local` log
