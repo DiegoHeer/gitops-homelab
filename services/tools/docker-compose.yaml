@@ -43,6 +43,11 @@ services:
       - "traefik.http.routers.docuseal.entrypoints=https"
       - "traefik.http.routers.docuseal.tls=true"
       - "traefik.http.services.docuseal.loadbalancer.server.port=3000"
+      - "traefik.http.routers.docuseal-external.rule=Host(`docuseal.dynabase.nl`)"
+      - "traefik.http.routers.docuseal-external.entrypoints=https"
+      - "traefik.http.routers.docuseal-external.tls=true"
+    environment:
+      - HOST=docuseal.dynabase.nl
     volumes:
       - /home/diego/services_data/tools/docuseal:/data
     healthcheck:

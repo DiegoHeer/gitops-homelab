@@ -1,4 +1,4 @@
-# 0021 — NetAlertX for network presence detection into Home Assistant
+# 0023 — NetAlertX for network presence detection into Home Assistant
 
 - **Status**: Accepted
 - **Date**: 2026-08-13

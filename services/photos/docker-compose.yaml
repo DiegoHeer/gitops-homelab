@@ -7,7 +7,7 @@ services:
       file: ./immich/hwaccel.transcoding.yml
       service: quicksync
     volumes:
-      - /media/hd1/photo_library:/usr/src/app/upload
+      - /media/hd1/photo_library:/data
       - /media/hd2/data/backups/photos:/external_libraries:ro
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -51,14 +51,13 @@ services:
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: '--data-checksums'
     volumes:
-      - immich-db:/var/lib/postgresql/data
+      - /home/diego/services_data/photos/immich/postgresql:/var/lib/postgresql/data
     healthcheck:
       disable: false
 
 
 volumes:
   model-cache:
-  immich-db:
 
 networks:
   default:
