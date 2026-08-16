@@ -70,7 +70,7 @@ services:
     restart: unless-stopped
     env_file: secrets.enc.env
     volumes:
-      - nextcloud-db:/var/lib/mysql
+      - /home/diego/services_data/storage/nextcloud/mysql:/var/lib/mysql
     environment:
       - TZ=Europe/Amsterdam
       - MYSQL_RANDOM_ROOT_PASSWORD=true
@@ -125,9 +125,6 @@ services:
       retries: 3
       start_period: 40s
 
-
-volumes:
-  nextcloud-db:
 
 networks:
   default:
