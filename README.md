@@ -208,14 +208,17 @@ corollary is that **it reads `main`, not your working tree** — running
 `REPO_RAW_URL` elsewhere to override.
 
 `dockcheck.sh` exits 0 when everything is healthy, 1 when something is not, and
-2 when the check could not run at all. Make collapses that: any recipe failure
-makes Make exit 2 and print a `*** [status] Error 1` line under the table.
-`make status && ...` still chains correctly, but to tell "unhealthy" apart from
-"could not run", call `./scripts/dockcheck.sh` directly.
+2 when the check could not run at all. Through Make the printed `*** [status]
+Error N` line mirrors that code, but Make's own exit status is always 2 on any
+recipe failure — so `make status && ...` chains correctly, while branching on
+the exact code means calling `./scripts/dockcheck.sh` directly.
 
-Status is derived, not read off `docker ps`: a container restarting more than
-three times inside ten minutes is reported as `crash-loop` even while its
-healthcheck says healthy. Note the gluetun caveat above — the five services
+Status is derived, not read off `docker ps`: a container whose cumulative
+restart count is above three and that last started within ten minutes is
+reported as `crash-loop` even while its healthcheck says healthy. That is
+deliberately a cheap approximation, not a rate — a long-lived container that
+accumulated four restarts over months and is then restarted by hand reads as
+`crash-loop` for ten minutes. Note the gluetun caveat above — the five services
 sharing its network namespace report healthy through a total outage, and no
 status tool can see through that.
 
