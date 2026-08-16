@@ -12,4 +12,5 @@ enough to need a second try, document it here.
 
 ## Contents
 
-_No runbooks yet. The next incident writes the first one._
+- [recover-gluetun-netns-orphan.md](recover-gluetun-netns-orphan.md) — media services 502 through
+  Traefik after a gluetun restart stranded them in a dead network namespace
