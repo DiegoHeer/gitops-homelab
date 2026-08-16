@@ -75,9 +75,15 @@ services:
       - TZ=Europe/Amsterdam
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_DATABASE=nextcloud
+      # Run mariadb-upgrade on start when the datadir predates the image version.
+      # Without it the entrypoint skips the upgrade and the system schema silently
+      # drifts behind the server across Renovate major bumps.
+      - MARIADB_AUTO_UPGRADE=1
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      start_period: 10s
+      # Generous start_period: an upgrade start runs a temporary server, backs up
+      # the mysql database and then mariadb-upgrade before accepting connections.
+      start_period: 60s
       interval: 10s
       timeout: 5s
       retries: 3
