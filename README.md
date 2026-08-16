@@ -178,6 +178,50 @@ and will not be reverted.
 Redeploys are not part of this tooling — use the `Reconcile DocoCD` workflow
 (`workflow_dispatch`) to reconcile every stack from `main` without a new commit.
 
+### Checking container health
+
+`scripts/dockcheck.sh`, fronted by `make status`, prints one row per container
+across every stack. Like `doco.sh` it reaches the host over
+`DOCKER_HOST=ssh://server` when run from anywhere but the server itself.
+
+```bash
+make status                 # every container in every stack
+make status media           # one stack
+make status jellyfin        # one container
+make status media ai        # several at once
+```
+
+Names resolve against the **repo manifest** — `.doco-cd.yml` plus each stack's
+compose file — not against live Docker state. That is the point: a container
+that has vanished entirely still appears as `missing` under its stack, which
+resolving against Docker could never show. It also means there is no
+`KIND=stack|container` here. The command only reads, so a name that is both a
+stack and a container matches both rather than demanding disambiguation;
+`DRY=` and `KIND=` are rejected outright rather than silently ignored. An
+unknown name is a hard error, because filtering it away would print an empty
+table and `0 healthy, 0 problems` — which reads as success.
+
+The script is standalone by design: it fetches the stack list and compose files
+from the public repo at runtime, so it runs on any host with no clone. The
+corollary is that **it reads `main`, not your working tree** — running
+`make status` from a feature branch checks main's stack list. Point
+`REPO_RAW_URL` elsewhere to override.
+
+`dockcheck.sh` exits 0 when everything is healthy, 1 when something is not, and
+2 when the check could not run at all. Through Make the printed `*** [status]
+Error N` line mirrors that code, but Make's own exit status is always 2 on any
+recipe failure — so `make status && ...` chains correctly, while branching on
+the exact code means calling `./scripts/dockcheck.sh` directly.
+
+Status is derived, not read off `docker ps`: a container whose cumulative
+restart count is above three and that last started within ten minutes is
+reported as `crash-loop` even while its healthcheck says healthy. That is
+deliberately a cheap approximation, not a rate — a long-lived container that
+accumulated four restarts over months and is then restarted by hand reads as
+`crash-loop` for ten minutes. Note the gluetun caveat above — the five services
+sharing its network namespace report healthy through a total outage, and no
+status tool can see through that.
+
 ---
 
 ## Ansible

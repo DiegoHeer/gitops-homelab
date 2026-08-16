@@ -11,7 +11,9 @@
     owner: root
     group: root
     mode: "0755"
-  when: docker_host_required_mounts or docker_host_ordered_mounts
+  # Explicit length checks: a bare `list or list` yields a list, and Ansible
+  # rejects a non-boolean conditional result.
+  when: (docker_host_required_mounts | length > 0) or (docker_host_ordered_mounts | length > 0)
 
 - name: Order Docker after the data disk mounts
   ansible.builtin.template:
@@ -20,5 +22,7 @@
     owner: root
     group: root
     mode: "0644"
-  when: docker_host_required_mounts or docker_host_ordered_mounts
+  # Explicit length checks: a bare `list or list` yields a list, and Ansible
+  # rejects a non-boolean conditional result.
+  when: (docker_host_required_mounts | length > 0) or (docker_host_ordered_mounts | length > 0)
   notify: Reload systemd unit files
