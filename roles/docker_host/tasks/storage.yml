@@ -1,0 +1,24 @@
+---
+# Docker must not start before the data disks are mounted. If it does, every
+# bind mount under /media/* resolves to the empty mountpoint on the root disk
+# and containers silently serve from the wrong directory — no error, no restart
+# loop, just wrong data (and writes landing on the root filesystem).
+
+- name: Ensure the docker.service drop-in directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: docker_host_required_mounts or docker_host_ordered_mounts
+
+- name: Order Docker after the data disk mounts
+  ansible.builtin.template:
+    src: docker-wait-for-mounts.conf.j2
+    dest: /etc/systemd/system/docker.service.d/10-wait-for-mounts.conf
+    owner: root
+    group: root
+    mode: "0644"
+  when: docker_host_required_mounts or docker_host_ordered_mounts
+  notify: Reload systemd unit files
