@@ -32,8 +32,11 @@ dependents rather than a check that always passes.
 - `+` The failure is visible in `docker ps`, Beszel and Uptime Kuma instead of silent
 - `+` No new containers; probe is instant and does no network I/O
 - `+` Dependents now wait for a working tunnel, not just a started container
-- `+` The probe tests the route table rather than egress, and the dependents' 90s retry budget
-  (`retries: 3` × `interval: 30s`) absorbs any brief routeless window during a VPN reconnect
+- `+` The probe tests the route table rather than egress. What `ip route show default` matches is
+  the Docker bridge route (`default via 172.18.0.1 dev eth0`); OpenVPN uses the `def1` split
+  (`0.0.0.0/1` + `128.0.0.0/1` via tun0) specifically so it never replaces that entry, so a tunnel
+  reconnect should not clear it — and the dependents' 90s retry budget (`retries: 3` ×
+  `interval: 30s`) absorbs the window if it ever does
 - `+` `doco.sh`'s `wait_healthy` now gets a truthful signal from the dependents it restarts
 - `−` A VPN outage now fails the whole media stack's deploy, not just the five dependents: compose
   aborts on the gate with `dependency failed to start: container gluetun is unhealthy` and exits 1,
@@ -48,7 +51,9 @@ dependents rather than a check that always passes.
 - `−` The probe depends on `ip` being present in each dependent image. If a base-image bump ever
   drops iproute2, `CMD-SHELL` returns 127 and every dependent goes permanently unhealthy — which
   looks identical to a real orphaning event and blocks deploys on the gate
-- `−` Host-reboot ordering remains unverified
+- `+` A host reboot does not orphan: observed on 2026-08-16 after an unattended kernel upgrade
+  (6.8.0-107 → 6.8.0-137) rebooted the host, when all six containers came back sharing one
+  namespace and every service returned 200/302 through Traefik
 
 ## Evidence
 
