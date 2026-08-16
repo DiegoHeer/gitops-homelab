@@ -208,7 +208,7 @@ services:
       - /home/diego/services_data/media/sabnzbd/config:/config
       - /media/hd2/data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test: ["CMD", "curl", "-f", "http://localhost:8085"]
       interval: 30s
       timeout: 10s
       retries: 3
