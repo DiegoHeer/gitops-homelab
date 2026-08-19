@@ -32,10 +32,11 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0023](0023-netalertx-presence-detection.md) | NetAlertX for network presence detection into Home Assistant | Accepted |
 | [0024](0024-gluetun-netns-orphan-detection.md) | Detect gluetun netns orphaning rather than self-heal it | Accepted |
 | [0025](0025-netalertx-anonymous-mqtt.md) | NetAlertX publishes to mosquitto anonymously | Accepted |
-| [0026](0026-docker-waits-for-data-disk-mounts.md) | Docker waits for data disk mounts, in two tiers | Accepted |
+| [0026](0026-docker-waits-for-data-disk-mounts.md) | Docker waits for data disk mounts, in two tiers | Superseded by 0030 |
 | [0027](0027-netalertx-pinned-plugin-roster.md) | NetAlertX's plugin roster is pinned in git | Superseded by 0028 |
 | [0028](0028-netalertx-loaded-plugins-env-var.md) | NetAlertX's plugin roster is pinned via the `LOADED_PLUGINS` env var | Accepted |
 | [0029](0029-docker-log-rotation.md) | Docker log rotation via `daemon.json` | Accepted |
+| [0030](0030-retire-hd3-data-disk.md) | Retire the hd3 data disk | Accepted |
 
 ## Adding a new ADR
 

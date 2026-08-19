@@ -1,6 +1,6 @@
 # 0026 — Docker waits for data disk mounts, in two tiers
 
-- **Status**: Accepted
+- **Status**: Superseded by 0030
 - **Date**: 2026-08-16
 - **Deciders**: Diego Heer
 
