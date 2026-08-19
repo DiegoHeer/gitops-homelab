@@ -15,6 +15,7 @@ services:
       - /media/hd1/nextcloud/diego/files:/nextcloud
       - /home/diego/services_data:/services_data:ro
       - /media/hd1/photo_library:/photo_library
+      - /media/hd2:/hd2
       - /media/hd3:/hd3
     labels:
       - "traefik.enable=true"
