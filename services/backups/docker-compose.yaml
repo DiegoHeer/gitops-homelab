@@ -16,7 +16,6 @@ services:
       - /home/diego/services_data:/services_data:ro
       - /media/hd1/photo_library:/photo_library
       - /media/hd2:/hd2
-      - /media/hd3:/hd3
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.zerobyte.rule=Host(`zerobyte.local.dynabase.nl`)"
