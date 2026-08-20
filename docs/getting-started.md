@@ -18,7 +18,7 @@ If you're looking for *how the system works* (deploy flow, SOPS edit loop, Ansib
 
 - **Ubuntu 24.04** server (the only tested distro — other versions/distros are untested).
 - A **non-root user account** matching whatever you substitute for `diego` in Step 4, with `sudo` + `docker` groups. The `system` role creates this, but SSH must already work as *some* user.
-- Storage drives mounted at `/media/hd1`, `/media/hd2`, `/media/hd3` (or remap — see Step 5).
+- Storage drives mounted at `/media/hd1`, `/media/hd2` (or remap — see Step 5).
 - A **domain you control** with DNS managed in **Cloudflare** (required for Traefik ACME DNS-01 and Cloudflare Tunnel — see [ADR 0007](adr/0007-cloudflare-tunnel-external-exposure.md)).
 - A **Tailscale tailnet** if you want the GitHub Actions workflow to reach your server (see [ADR 0016](adr/0016-tailscale-for-ci-access.md)).
 
@@ -60,7 +60,7 @@ Edit [`services/networking/traefik/config.yml`](../services/networking/traefik/c
 - `192.168.1.11` → your Pi-hole (or delete the block if you're not running one)
 - `192.168.1.100` → your Proxmox host (or delete)
 
-If your disks aren't at `/media/hd1..hd3`, edit those bind mount sources in `services/media/`, `services/storage/`, `services/games/`, `services/photos/`, and `services/backups/docker-compose.yaml`.
+If your disks aren't at `/media/hd1..hd2`, edit those bind mount sources in `services/media/`, `services/storage/`, `services/games/`, `services/photos/`, and `services/backups/docker-compose.yaml`.
 
 ## Step 6 — Populate Ansible vault files
 
