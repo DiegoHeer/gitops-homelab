@@ -9,8 +9,7 @@
 docker_host_required_mounts:
   - /media/hd1
   - /media/hd2
-docker_host_ordered_mounts:
-  - /media/hd3
+docker_host_ordered_mounts: []
 
 docker_host_daemon_config:
   log-driver: json-file

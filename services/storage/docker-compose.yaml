@@ -9,7 +9,6 @@ services:
     volumes:
       - /media/hd1:/hd1
       - /media/hd2:/hd2
-      - /media/hd3:/hd3
       - /home/diego:/user_home
       - /home/diego/services_data/storage/filebrowser/data:/home/filebrowser/data
     labels:
