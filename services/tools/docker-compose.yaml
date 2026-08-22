@@ -159,6 +159,31 @@ services:
       retries: 3
       start_period: 30s
 
+  convertx:
+    container_name: convertx
+    image: ghcr.io/c4illin/convertx:v0.18.0
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - TZ=Europe/Amsterdam
+      - ALLOW_UNAUTHENTICATED=true
+      - ACCOUNT_REGISTRATION=false
+      - AUTO_DELETE_EVERY_N_HOURS=24
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.convertx.rule=Host(`convertx.local.dynabase.nl`)"
+      - "traefik.http.routers.convertx.entrypoints=https"
+      - "traefik.http.routers.convertx.tls=true"
+      - "traefik.http.services.convertx.loadbalancer.server.port=3000"
+    volumes:
+      - /home/diego/services_data/tools/convertx:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
 
 networks:
   default:
