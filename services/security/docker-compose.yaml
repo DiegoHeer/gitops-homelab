@@ -1,7 +1,7 @@
 services:
   frigate:
     container_name: frigate
-    image: ghcr.io/blakeblackshear/frigate:0.17.2
+    image: ghcr.io/blakeblackshear/frigate:0.18.0
     restart: unless-stopped
     privileged: true
     shm_size: 512mb
@@ -34,7 +34,7 @@ services:
 
   authelia:
     container_name: authelia
-    image: authelia/authelia:4.39.22
+    image: authelia/authelia:4.39.26
     restart: unless-stopped
     user: "1000:1000"
     command:
