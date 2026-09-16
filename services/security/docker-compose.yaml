@@ -1,10 +1,8 @@
 services:
   frigate:
-    # PAUSED 2026-09-16: deploys held by request. The `paused` profile is never
-    # activated in .doco-cd.yml, so frigate is left out of the deployed project
-    # while authelia keeps reconciling. Compose counts a profile-disabled service
-    # as a project member, so remove_orphans leaves the running container alone.
-    # Delete this line to resume. See ADR 0032.
+    # PAUSED 2026-09-16: deploys held by request. A profile rather than
+    # webhook_filter, which is per stack and would hold authelia back too.
+    # See ADR 0032.
     profiles: [paused]
     container_name: frigate
     image: ghcr.io/blakeblackshear/frigate:0.18.0
