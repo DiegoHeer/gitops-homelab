@@ -1,9 +1,8 @@
 services:
   frigate:
-    # PAUSED 2026-09-16: deploys held by request. A profile rather than
-    # webhook_filter, which is per stack and would hold authelia back too.
-    # See ADR 0032.
-    profiles: [paused]
+    # OUT OF SERVICE 2026-09-16: scaled to zero on request. Per service rather
+    # than per stack, because authelia has to keep running. See ADR 0033.
+    scale: 0
     container_name: frigate
     image: ghcr.io/blakeblackshear/frigate:0.18.0
     restart: unless-stopped

@@ -1,5 +1,9 @@
+# OUT OF SERVICE 2026-09-16: every service scaled to zero on request. DocoCD keeps
+# reconciling this stack, so deleting the `scale: 0` lines brings it straight back.
+# Data under services_data/ and any named volumes are untouched. See ADR 0033.
 services:
   romm:
+    scale: 0
     container_name: romm
     image: rommapp/romm:5.0.0
     restart: unless-stopped
@@ -38,6 +42,7 @@ services:
       start_period: 90s
 
   romm_mariadb:
+    scale: 0
     container_name: romm_mariadb
     image: mariadb:12.2.2
     restart: unless-stopped
