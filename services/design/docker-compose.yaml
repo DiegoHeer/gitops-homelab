@@ -1,6 +1,10 @@
+# OUT OF SERVICE 2026-09-16: every service scaled to zero on request. DocoCD keeps
+# reconciling this stack, so deleting the `scale: 0` lines brings it straight back.
+# Data under services_data/ and any named volumes are untouched. See ADR 0033.
 services:
 
   penpot_frontend:
+    scale: 0
     container_name: penpot_frontend
     image: penpotapp/frontend:2.17
     restart: unless-stopped
@@ -39,6 +43,7 @@ services:
       start_period: 15s
 
   penpot_backend:
+    scale: 0
     container_name: penpot_backend
     image: penpotapp/backend:2.17
     restart: unless-stopped
@@ -76,6 +81,7 @@ services:
       start_period: 30s
 
   penpot_exporter:
+    scale: 0
     container_name: penpot_exporter
     image: penpotapp/exporter:2.17
     restart: unless-stopped
@@ -104,6 +110,7 @@ services:
       start_period: 30s
 
   penpot_mcp:
+    scale: 0
     container_name: penpot_mcp
     image: penpotapp/mcp:2.17
     restart: unless-stopped
@@ -128,6 +135,7 @@ services:
       start_period: 15s
 
   penpot_postgres:
+    scale: 0
     container_name: penpot_postgres
     image: postgres:15-alpine
     restart: unless-stopped
@@ -154,6 +162,7 @@ services:
       start_period: 10s
 
   penpot_valkey:
+    scale: 0
     container_name: penpot_valkey
     image: valkey/valkey:9.1
     restart: unless-stopped

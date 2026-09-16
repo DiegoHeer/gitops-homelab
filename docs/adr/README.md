@@ -38,7 +38,8 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0029](0029-docker-log-rotation.md) | Docker log rotation via `daemon.json` | Accepted |
 | [0030](0030-retire-hd3-data-disk.md) | Retire the hd3 data disk | Accepted |
 | [0031](0031-rustfs-console-authelia-oidc.md) | RustFS console SSO via Authelia OIDC | Accepted |
-| [0032](0032-pause-stack-deploys-via-webhook-filter.md) | Pause stack deploys via `webhook_filter` | Accepted |
+| [0032](0032-pause-stack-deploys-via-webhook-filter.md) | Pause stack deploys via `webhook_filter` | Superseded by 0033 |
+| [0033](0033-scale-zero-to-take-services-out-of-service.md) | `scale: 0` to take services out of service | Accepted |
 
 ## Adding a new ADR
 

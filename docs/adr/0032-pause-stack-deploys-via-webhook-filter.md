@@ -1,6 +1,6 @@
 # 0032 — Pause stack deploys via `webhook_filter`
 
-- **Status**: Accepted
+- **Status**: Superseded by 0033
 - **Date**: 2026-09-16
 - **Deciders**: Diego
 

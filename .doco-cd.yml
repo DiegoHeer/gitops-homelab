@@ -6,10 +6,6 @@
 # main trigger a reconcile. Without this, pushes to feature/Renovate branches
 # would deploy their content to the live stack.
 #
-# To pause a stack, point `webhook_filter` at `^refs/heads/__paused__$` and say
-# why above it. DocoCD has no disable key, and deleting the entry instead would
-# lose the reason with it. Containers keep running. See ADR 0032.
-#
 # NOT listed here on purpose:
 # - gitops/: DocoCD cannot manage its own container (self-deploy recursion).
 name: monitoring
@@ -30,8 +26,7 @@ webhook_filter: "^refs/heads/main$"
 ---
 name: ai
 working_dir: services/ai
-# PAUSED 2026-09-16: deploys held by request.
-webhook_filter: "^refs/heads/__paused__$"
+webhook_filter: "^refs/heads/main$"
 ---
 name: storage
 working_dir: services/storage
@@ -43,8 +38,7 @@ webhook_filter: "^refs/heads/main$"
 ---
 name: games
 working_dir: services/games
-# PAUSED 2026-09-16: deploys held by request.
-webhook_filter: "^refs/heads/__paused__$"
+webhook_filter: "^refs/heads/main$"
 ---
 name: photos
 working_dir: services/photos
@@ -68,5 +62,4 @@ webhook_filter: "^refs/heads/main$"
 ---
 name: design
 working_dir: services/design
-# PAUSED 2026-09-16: deploys held by request.
-webhook_filter: "^refs/heads/__paused__$"
+webhook_filter: "^refs/heads/main$"
