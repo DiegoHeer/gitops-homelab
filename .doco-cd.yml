@@ -32,7 +32,8 @@ webhook_filter: "^refs/heads/main$"
 ---
 name: ai
 working_dir: services/ai
-webhook_filter: "^refs/heads/main$"
+# PAUSED 2026-09-16: deploys held by request. Restore "^refs/heads/main$" to resume.
+webhook_filter: "^refs/heads/__paused__$"
 ---
 name: storage
 working_dir: services/storage
@@ -44,7 +45,8 @@ webhook_filter: "^refs/heads/main$"
 ---
 name: games
 working_dir: services/games
-webhook_filter: "^refs/heads/main$"
+# PAUSED 2026-09-16: deploys held by request. Restore "^refs/heads/main$" to resume.
+webhook_filter: "^refs/heads/__paused__$"
 ---
 name: photos
 working_dir: services/photos
@@ -68,4 +70,5 @@ webhook_filter: "^refs/heads/main$"
 ---
 name: design
 working_dir: services/design
-webhook_filter: "^refs/heads/main$"
+# PAUSED 2026-09-16: deploys held by request. Restore "^refs/heads/main$" to resume.
+webhook_filter: "^refs/heads/__paused__$"
