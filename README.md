@@ -59,7 +59,7 @@ The DocoCD container itself lives at `bootstrap/gitops/` (not under `services/`)
 3. GitHub webhook → DocoCD on the home server.
 4. DocoCD clones the repo, decrypts any `*.enc.env` files with the host's age key, and runs `docker compose up -d` for each stack registered in `.doco-cd.yml`.
 
-Only pushes to `main` trigger a reconcile — every stack in `.doco-cd.yml` pins `webhook_filter: "^refs/heads/main$"`. Pushes to feature or Renovate branches are ignored.
+Only pushes to `main` trigger a reconcile — every active stack in `.doco-cd.yml` pins `webhook_filter: "^refs/heads/main$"`. Pushes to feature or Renovate branches are ignored. The same knob doubles as the pause switch — see [Pausing a stack](#pausing-a-stack).
 
 Runtime state (SQLite DBs, uploaded files, app config) lives at absolute host paths under `/home/diego/services_data/<category>/<service>/`, so stacks can be torn down and recreated without touching user data. Compose bind mounts reference those absolute paths.
 
@@ -79,6 +79,31 @@ Runtime state (SQLite DBs, uploaded files, app config) lives at absolute host pa
 ### Removing a stack
 
 Delete the `---` block from `.doco-cd.yml` and the `services/<name>/` tree. Commit + push. DocoCD stops and removes the containers. Named volumes and absolute-path bind mounts are preserved by default.
+
+### Pausing a stack
+
+To stop DocoCD redeploying a stack without taking it down, point its `webhook_filter` at a ref that never exists:
+
+```yaml
+---
+name: games
+working_dir: services/games
+# PAUSED 2026-09-16: reason goes here. Restore "^refs/heads/main$" to resume.
+webhook_filter: "^refs/heads/__paused__$"
+```
+
+DocoCD checks the filter before it clones anything, answers the webhook `202 Accepted` with `deployment skipped, webhook filter did not match`, and records the run as *skipped* rather than failed — so a paused stack sends no Apprise error notifications. Its containers keep running at their current image; nothing is stopped, removed or pruned, and `restart: unless-stopped` still brings them back across a host reboot. Every other stack in the same push deploys normally, and `Reconcile DocoCD` skips the paused ones too (it posts `refs/heads/main`).
+
+Resume by restoring `^refs/heads/main$`. Renovate keeps merging image bumps into a paused stack meanwhile, so the first deploy after resuming applies all of them at once — worth a look at the diff before pushing if the pause was long.
+
+Pausing works per stack, not per service. To hold back **one** service while its stack keeps deploying, put it behind an unused Compose profile instead:
+
+```yaml
+  frigate:
+    profiles: [paused]
+```
+
+A service in an inactive profile is excluded from the project, but Compose's orphan check counts it as a project member (`isOrphaned` unions `ServiceNames()` with `DisabledServiceNames()`), so `remove_orphans: true` leaves the running container alone. The catch: if any still-active service names it in `depends_on` or `network_mode: service:`, the whole project fails to load with `depends on undefined service` and the stack's deploy errors out — so in `services/media/` the five gluetun-netns services can only be paused together with gluetun. See [ADR 0032](docs/adr/0032-pause-stack-deploys-via-webhook-filter.md).
 
 ### Exposing a service publicly (Cloudflare Tunnel)
 
