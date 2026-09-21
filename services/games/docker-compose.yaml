@@ -5,7 +5,7 @@ services:
   romm:
     scale: 0
     container_name: romm
-    image: rommapp/romm:5.0.0
+    image: rommapp/romm:5.2.0
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
@@ -44,7 +44,7 @@ services:
   romm_mariadb:
     scale: 0
     container_name: romm_mariadb
-    image: mariadb:12.2.2
+    image: mariadb:12.3.3
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
