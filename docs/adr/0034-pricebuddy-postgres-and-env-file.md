@@ -1,6 +1,6 @@
 # 0034 — PriceBuddy uses Postgres and env_file, not upstream MySQL + mounted .env
 
-- **Status**: Accepted
+- **Status**: Superseded by 0035
 - **Date**: 2026-09-24
 - **Deciders**: Diego Heer
 
