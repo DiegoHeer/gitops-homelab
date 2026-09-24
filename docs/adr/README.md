@@ -40,6 +40,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0031](0031-rustfs-console-authelia-oidc.md) | RustFS console SSO via Authelia OIDC | Accepted |
 | [0032](0032-pause-stack-deploys-via-webhook-filter.md) | Pause stack deploys via `webhook_filter` | Superseded by 0033 |
 | [0033](0033-scale-zero-to-take-services-out-of-service.md) | `scale: 0` to take services out of service | Accepted |
+| [0034](0034-pricebuddy-postgres-and-env-file.md) | PriceBuddy uses Postgres and `env_file`, not upstream MySQL + mounted `.env` | Accepted |
 
 ## Adding a new ADR
 
