@@ -195,9 +195,9 @@ services:
       - TRUSTED_PROXIES=*
       - SESSION_SECURE_COOKIE=true
       - TZ=Europe/Amsterdam
-      - DB_CONNECTION=pgsql
-      - DB_HOST=pricebuddy_postgres
-      - DB_PORT=5432
+      - DB_CONNECTION=mysql
+      - DB_HOST=pricebuddy_mysql
+      - DB_PORT=3306
       - DB_DATABASE=pricebuddy
       - DB_USERNAME=pricebuddy
       - SCRAPER_BASE_URL=http://pricebuddy_scraper:3000
@@ -210,7 +210,7 @@ services:
     volumes:
       - /home/diego/services_data/tools/pricebuddy/storage:/app/storage
     depends_on:
-      pricebuddy_postgres:
+      pricebuddy_mysql:
         condition: service_healthy
       pricebuddy_scraper:
         condition: service_started
@@ -221,22 +221,22 @@ services:
       retries: 3
       start_period: 60s
 
-  pricebuddy_postgres:
-    container_name: pricebuddy_postgres
-    image: postgres:16.14-alpine
+  pricebuddy_mysql:
+    container_name: pricebuddy_mysql
+    image: mysql:8.2
     restart: unless-stopped
     env_file: pricebuddy.enc.env
     environment:
-      - POSTGRES_USER=pricebuddy
-      - POSTGRES_DB=pricebuddy
+      - MYSQL_DATABASE=pricebuddy
+      - MYSQL_USER=pricebuddy
     volumes:
-      - /home/diego/services_data/tools/pricebuddy/postgresql:/var/lib/postgresql/data
+      - /home/diego/services_data/tools/pricebuddy/mysql:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pricebuddy -d pricebuddy"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 20s
 
   pricebuddy_scraper:
     container_name: pricebuddy_scraper
