@@ -184,6 +184,71 @@ services:
       retries: 3
       start_period: 30s
 
+  pricebuddy:
+    container_name: pricebuddy
+    image: jez500/pricebuddy:v1.0.54
+    restart: unless-stopped
+    env_file: pricebuddy.enc.env
+    environment:
+      - APP_URL=https://pricebuddy.local.dynabase.nl
+      - ASSET_URL=https://pricebuddy.local.dynabase.nl
+      - TRUSTED_PROXIES=*
+      - SESSION_SECURE_COOKIE=true
+      - TZ=Europe/Amsterdam
+      - DB_CONNECTION=pgsql
+      - DB_HOST=pricebuddy_postgres
+      - DB_PORT=5432
+      - DB_DATABASE=pricebuddy
+      - DB_USERNAME=pricebuddy
+      - SCRAPER_BASE_URL=http://pricebuddy_scraper:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pricebuddy.rule=Host(`pricebuddy.local.dynabase.nl`)"
+      - "traefik.http.routers.pricebuddy.entrypoints=https"
+      - "traefik.http.routers.pricebuddy.tls=true"
+      - "traefik.http.services.pricebuddy.loadbalancer.server.port=80"
+    volumes:
+      - /home/diego/services_data/tools/pricebuddy/storage:/app/storage
+    depends_on:
+      pricebuddy_postgres:
+        condition: service_healthy
+      pricebuddy_scraper:
+        condition: service_started
+    healthcheck:
+      test: wget --spider --no-verbose http://localhost:80 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  pricebuddy_postgres:
+    container_name: pricebuddy_postgres
+    image: postgres:16.14-alpine
+    restart: unless-stopped
+    env_file: pricebuddy.enc.env
+    environment:
+      - POSTGRES_USER=pricebuddy
+      - POSTGRES_DB=pricebuddy
+    volumes:
+      - /home/diego/services_data/tools/pricebuddy/postgresql:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pricebuddy -d pricebuddy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  pricebuddy_scraper:
+    container_name: pricebuddy_scraper
+    image: jez500/seleniumbase-scrapper:v1.0
+    restart: unless-stopped
+    healthcheck:
+      test: wget --spider --no-verbose http://localhost:3000 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
 
 networks:
   default:
