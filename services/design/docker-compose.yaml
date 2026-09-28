@@ -6,7 +6,7 @@ services:
   penpot_frontend:
     scale: 0
     container_name: penpot_frontend
-    image: penpotapp/frontend:2.17
+    image: penpotapp/frontend:2.18
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -45,7 +45,7 @@ services:
   penpot_backend:
     scale: 0
     container_name: penpot_backend
-    image: penpotapp/backend:2.17
+    image: penpotapp/backend:2.18
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
@@ -83,7 +83,7 @@ services:
   penpot_exporter:
     scale: 0
     container_name: penpot_exporter
-    image: penpotapp/exporter:2.17
+    image: penpotapp/exporter:2.18
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
@@ -112,7 +112,7 @@ services:
   penpot_mcp:
     scale: 0
     container_name: penpot_mcp
-    image: penpotapp/mcp:2.17
+    image: penpotapp/mcp:2.18
     restart: unless-stopped
     environment:
       - PENPOT_BACKEND_URI=http://penpot-backend:6060
@@ -164,7 +164,7 @@ services:
   penpot_valkey:
     scale: 0
     container_name: penpot_valkey
-    image: valkey/valkey:9.1
+    image: valkey/valkey:9.2
     restart: unless-stopped
     command: valkey-server --maxmemory 128mb --maxmemory-policy allkeys-lru
     networks:
