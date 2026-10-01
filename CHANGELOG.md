@@ -3,6 +3,36 @@
 All notable changes to this homelab are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning uses CalVer (`YYYY.MM.N`).
+## [2026.10.0] - 2026-09-29
+
+### Added
+
+- Config|Add: scoped nextcloud MCP server to this repo via .mcp.json
+- Services|Add: RustFS console SSO via Authelia OIDC
+- Config|Add: documented how to pause a DocoCD stack (ADR 0032)
+- Services|Add: pricebuddy price tracker with postgres and scraper
+- Config|Add: ADR for pricebuddy postgres and env_file choices
+- Config|Add: ADR 0035 supersedes 0034, pricebuddy on mysql
+
+### Changed
+
+- Config|Update: regenerate CHANGELOG for 2026.09.0
+- Config|Update: paused ai, design and games stack deploys
+- Services|Update: paused frigate deploys behind an inactive Compose profile
+- Config|Refactor: trimmed the pause comments to why, not what
+- Services|Update: scaled ai, design, games and frigate to zero
+- Services|Migrate: pricebuddy from postgres to mysql (fixes JSON operator 500s)
+- Config|Refactor: fold pricebuddy mysql decision into ADR 0034, drop 0035
+
+### Fixed
+
+- Services|Fix: RustFS OIDC client uses client_secret_post token auth
+- Services|Fix: pricebuddy healthcheck uses curl (image has no wget)
+
+### Removed
+
+- Services|Remove: removed changedetection from tools stack
+
 ## [2026.09.0] - 2026-08-31
 
 ### Added
