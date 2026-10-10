@@ -1,0 +1,6 @@
+/* Phones: one big video per row instead of two cramped ones */
+@container widget (max-width: 500px) {
+    .widget-type-videos .cards-grid {
+        --cards-per-row: 1;
+    }
+}
