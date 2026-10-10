@@ -23,7 +23,7 @@
           markets:
             - symbol: NU
               name: Nu Holdings
-            - symbol: NATO
+            - symbol: ASWC.DE
               name: Defence UCITS ETF
               chart-link: https://www.tradingview.com/symbols/EURONEXT-NATO/
             - symbol: NVDA
@@ -34,12 +34,15 @@
               name: Tesla
             - symbol: RHM.DE
               name: Rheinmetall
-            - symbol: AIR
+            - symbol: AIR.PA
               name: Airbus
-            - symbol: BA.
+              chart-link: https://www.tradingview.com/chart/?symbol=EURONEXT:AIR
+            - symbol: BA.L
               name: BAE Systems
-            - symbol: CSF
+              chart-link: https://www.tradingview.com/chart/?symbol=LSE:BA.
+            - symbol: HO.PA
               name: Thales
+              chart-link: https://www.tradingview.com/chart/?symbol=EURONEXT:HO
 
     - size: full
       widgets:
@@ -49,15 +52,11 @@
           feeds:
             - url: https://www.investing.com/rss/news.rss
               title: Investing
-            - url: https://finance.yahoo.com/news/rssindex
-              title: Yahoo Finance
 
         - type: rss
           title: Market News
           style: horizontal-cards
           feeds:
-            - url: https://rss.app/feeds/41KeBM03Luiz2hDq.xml
-              title: Reuters
             - url: https://feeds.bloomberg.com/markets/news.rss
               title: Bloomberg
             - url: https://moxie.foxbusiness.com/google-publisher/markets.xml
@@ -87,7 +86,7 @@
           feeds:
             - url: https://www.ft.com/technology?format=rss
               title: Financial Times
-            - url: https://feeds.a.dj.com/rss/RSSMarketsMain.xml
+            - url: https://feeds.content.dowjones.io/public/rss/RSSMarketsMain
               title: Wall Street Journal
             - url: https://seekingalpha.com/market_currents.xml
               title: Seeking Alpha

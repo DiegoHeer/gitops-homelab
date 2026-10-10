@@ -18,10 +18,16 @@
               card-height: 24
               collapse-after: 3
               feeds:
-                - url: https://fetchrss.com/rss/67d69938efb49bbbe00bac3467d69c4872009cbb6206c122.xml
-                  title: Lonely Planet # News
-                - url: http://fetchrss.com/rss/67d69938efb49bbbe00bac3467d699072a1a4249580d2d23.xml
-                  title: Lonely Planet # Articles
+                - url: https://news.google.com/rss/search?q=%22lonely+planet%22+when:7d&hl=en-US&gl=US&ceid=US:en
+                  title: Lonely Planet
+            - type: rss
+              title: Condé Nast Traveler
+              style: detailed-list
+              card-height: 24
+              collapse-after: 3
+              feeds:
+                - url: https://www.cntraveler.com/feed/rss
+                  title: Condé Nast Traveler
             - type: rss
               title: Nomadicmatt
               style: detailed-list
