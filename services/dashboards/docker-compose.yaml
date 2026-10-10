@@ -23,8 +23,9 @@ services:
     container_name: glance
     image: glanceapp/glance:v0.8.6
     restart: unless-stopped
+    entrypoint: ["/app/glance", "--config", "/app/config/glance.yaml"]
     volumes:
-      - /home/diego/services_data/dashboards/glance/config:/app/config
+      - ./glance:/app/config:ro
       - /var/run/docker.sock:/var/run/docker.sock
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:8080/api/healthz || exit 1

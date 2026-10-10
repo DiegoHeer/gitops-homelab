@@ -1,0 +1,91 @@
+- name: Home
+  columns:
+    - size: small
+      widgets:
+        - type: clock
+          hour-format: 24h
+          timezones:
+            - timezone: Europe/Amsterdam
+              label: Netherlands
+            - timezone: America/Sao_Paulo
+              label: Brazil
+
+        - type: calendar
+          first-day-of-week: monday
+
+        - type: weather
+          location: The Hague, Netherlands
+          units: metric
+          hour-format: 24h
+
+    - size: full
+      widgets:
+        - type: search
+          search-engine: google
+          new-tab: true
+          bangs:
+            - title: YouTube
+              shortcut: "!yt"
+              url: https://www.youtube.com/results?search_query={QUERY}
+
+        - type: videos
+          style: grid-cards
+          collapse-after-rows: 1
+          limit: 16
+          channels:
+            - UC176GAQozKKjhz62H8u9vQQ # Real Science
+            - UCB_qr75-ydFVKSF9Dmo6izg # Formula 1
+            - UCf63l7Wp_wX7T-5ChM_Km9Q # NOS op 3
+            - UCsBjURrPoezykLs9EqgamOA # Fireship
+            - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
+            - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+            - UCODHrzPMGbNv67e84WDZhQQ # Fern
+            - UCqjwF8rxRsotnojGl4gM0Zw # Thenx
+            - UCr3cBLTYmIK9kY0F_OdFWFQ # Casual Explained
+            - UCmGSJVG3mCRXVOP4yZrU1Dw # Johnny Harris
+            - UC4QZ_LsYcvcq7qOsOhpAX4A # ColdFusion
+            - UC6uKrU_WqJ1R2HMTY3LIx5Q # Everyday Astronaut
+            - UCgNg3vwj3xt7QOrcIDaHdFg # PolyMatter
+            - UCpbClyFMuJQJJH7skfiVeQg # Ryan Shirley
+            - UCjSEJkpGbcZhvo0lr-44X_w # TechHut
+            - UCsXVk37bltHxD1rDPwtNM8Q # Kurzgesagt – In a Nutshell
+            - UCD5jAyCSDRR5yTgswfDbK8w # P1 with Matt & Tommy
+
+        - type: group
+          widgets:
+            - type: reddit
+              subreddit: selfhosted
+              show-thumbnails: true
+              collapse-after: 4
+
+            - type: reddit
+              subreddit: space
+              show-thumbnails: true
+              collapse-after: 4
+            - type: reddit
+              subreddit: Damnthatsinteresting
+              show-thumbnails: true
+              collapse-after: 4
+
+    - size: small
+      widgets:
+        - type: rss
+          title: Interests
+          collapse-after: 6
+          feeds:
+            - url: https://rss.tecmundo.com.br/feed.html
+              title: Tecmundo
+              limit: 5
+            - url: https://www.inverse.com/rss
+              title: Inverse
+              limit: 5
+            - url: https://www.theverge.com/rss/index.xml
+              title: The Verge
+              limit: 5
+
+        - type: custom-api
+          title: Random Fact
+          cache: 30s
+          url: https://uselessfacts.jsph.pl/api/v2/facts/random
+          template: |
+            <p class="size-h4 color-paragraph">{{ .JSON.String "text" }}</p>

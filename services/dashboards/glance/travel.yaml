@@ -1,0 +1,68 @@
+- name: Travel
+  columns:
+    - size: small
+      widgets:
+        - type: videos
+          style: grid-cards
+          channels:
+            - UCxDZs_ltFFvn0FDHT6kmoXA # Bald and Bankrupt
+            - UCpbClyFMuJQJJH7skfiVeQg # Ryan Shirley
+
+    - size: full
+      widgets:
+        - type: split-column
+          widgets:
+            - type: rss
+              title: Lonely Planet
+              style: detailed-list
+              card-height: 24
+              collapse-after: 3
+              feeds:
+                - url: https://fetchrss.com/rss/67d69938efb49bbbe00bac3467d69c4872009cbb6206c122.xml
+                  title: Lonely Planet # News
+                - url: http://fetchrss.com/rss/67d69938efb49bbbe00bac3467d699072a1a4249580d2d23.xml
+                  title: Lonely Planet # Articles
+            - type: rss
+              title: Nomadicmatt
+              style: detailed-list
+              card-height: 24
+              collapse-after: 3
+              feeds:
+                - url: https://www.nomadicmatt.com/travel-blog/feed
+                  title: Nomadicmatt
+                  hide-categories: true
+
+        - type: group
+          define: &shared-properties
+            type: reddit
+            collapse-after: 4
+          widgets:
+            - subreddit: backpacking
+              show-thumbnails: true
+              <<: *shared-properties
+            - subreddit: solotravel
+              <<: *shared-properties
+            - subreddit: travel
+              <<: *shared-properties
+            - subreddit: digitalnomad
+              <<: *shared-properties
+            - subreddit: TravelHacks
+              <<: *shared-properties
+            - subreddit: vagabond
+              <<: *shared-properties
+
+    - size: small
+      widgets:
+        - type: search
+          title: Maps Search
+          search-engine: https://www.google.com/maps/search/?q={QUERY}
+          new-tab: true
+
+        - type: bookmarks
+          groups:
+            - title: Deals
+              links:
+                - title: Pepper
+                  url: https://nl.pepper.com/groep/reizen?temperatureFrom=200&sortBy=new
+                - title: Secret Flying
+                  url: https://www.secretflying.com/search2/?cityFrom=Amsterdam&cityTo=&month=&showOldDeals=on
