@@ -1,0 +1,93 @@
+- name: Finance
+  columns:
+    - size: small
+      widgets:
+        - type: markets
+          title: General
+          symbol-link-template: https://finance.yahoo.com/quote/{SYMBOL}
+          chart-link-template: https://www.tradingview.com/chart/?symbol={SYMBOL}
+          markets:
+            - symbol: SPY
+              name: S&P 500
+            - symbol: EURBRL=X
+              name: Forex
+              chart-link: https://www.tradingview.com/chart/?symbol=EURBRL
+            - symbol: BTC-USD
+              name: Bitcoin
+
+        - type: markets
+          title: Stocks
+          sort-by: absolute-change
+          symbol-link-template: https://finance.yahoo.com/quote/{SYMBOL}
+          chart-link-template: https://www.tradingview.com/chart/?symbol={SYMBOL}
+          markets:
+            - symbol: NU
+              name: Nu Holdings
+            - symbol: NATO
+              name: Defence UCITS ETF
+              chart-link: https://www.tradingview.com/symbols/EURONEXT-NATO/
+            - symbol: NVDA
+              name: NVIDIA
+            - symbol: AMD
+              name: AMD
+            - symbol: TSLA
+              name: Tesla
+            - symbol: RHM.DE
+              name: Rheinmetall
+            - symbol: AIR
+              name: Airbus
+            - symbol: BA.
+              name: BAE Systems
+            - symbol: CSF
+              name: Thales
+
+    - size: full
+      widgets:
+        - type: rss
+          title: Finance News
+          style: horizontal-cards
+          feeds:
+            - url: https://www.investing.com/rss/news.rss
+              title: Investing
+            - url: https://finance.yahoo.com/news/rssindex
+              title: Yahoo Finance
+
+        - type: rss
+          title: Market News
+          style: horizontal-cards
+          feeds:
+            - url: https://rss.app/feeds/41KeBM03Luiz2hDq.xml
+              title: Reuters
+            - url: https://feeds.bloomberg.com/markets/news.rss
+              title: Bloomberg
+            - url: https://moxie.foxbusiness.com/google-publisher/markets.xml
+              title: Fox Business
+            - url: https://moxie.foxbusiness.com/google-publisher/technology.xml
+              title: Fox Business
+
+        - type: group
+          widgets:
+            - type: reddit
+              subreddit: valueinvesting
+              collapse-after: 3
+            - type: reddit
+              subreddit: technology
+              show-thumbnails: true
+              collapse-after: 4
+            - type: reddit
+              show-thumbnails: true
+              subreddit: wallstreetbets
+              collapse-after: 3
+
+    - size: small
+      widgets:
+        - type: rss
+          title: Business News
+          collapse-after: 8
+          feeds:
+            - url: https://www.ft.com/technology?format=rss
+              title: Financial Times
+            - url: https://feeds.a.dj.com/rss/RSSMarketsMain.xml
+              title: Wall Street Journal
+            - url: https://seekingalpha.com/market_currents.xml
+              title: Seeking Alpha
