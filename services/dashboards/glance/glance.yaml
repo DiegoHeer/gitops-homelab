@@ -1,6 +1,10 @@
 # Configuration docs: https://github.com/glanceapp/glance/blob/main/docs/configuration.md
 
+server:
+  assets-path: /app/config/assets
+
 theme:
+  custom-css-file: /assets/custom.css
   background-color: 50 1 6
   primary-color: 24 97 58
   negative-color: 209 88 54
@@ -9,3 +13,4 @@ pages:
   - $include: home.yaml
   - $include: travel.yaml
   - $include: finance.yaml
+  - $include: homelab.yaml

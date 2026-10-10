@@ -1,0 +1,21 @@
+- name: Homelab
+  width: slim
+  columns:
+    - size: full
+      widgets:
+        - type: releases
+          limit: 12
+          collapse-after: 12
+          repositories:
+            - immich-app/immich
+            - home-assistant/core
+            - jellyfin/jellyfin
+            - nextcloud/server
+            - mattermost/mattermost
+            - n8n-io/n8n
+            - blakeblackshear/frigate
+            - traefik/traefik
+            - authelia/authelia
+            - gristlabs/grist-core
+            - glanceapp/glance
+            - kimdre/doco-cd
