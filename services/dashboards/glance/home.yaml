@@ -14,7 +14,7 @@
           first-day-of-week: monday
 
         - type: weather
-          location: The Hague, Netherlands
+          location: The Hague, The Netherlands
           units: metric
           hour-format: 24h
 
