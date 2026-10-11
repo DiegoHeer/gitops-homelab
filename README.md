@@ -8,7 +8,7 @@ Personal homelab deployed GitOps-style on Ubuntu. Three pillars:
 
 - **Ansible playbooks** for one-time host bootstrap (Docker, shared network, SOPS age key, cloudflared tunnel token, the DocoCD stack itself)
 - **Docker Compose services** deployed **GitOps-style** by [DocoCD](https://github.com/kimdre/doco-cd) — a `git push` to `main` is the deploy
-- **Restic backups** implementing the 3-2-1 backup rule (managed by the Ansible restore role)
+- **Restic backups** implementing the 3-2-1 backup rule (managed by Zerobyte, see ADR 0015)
 
 ## Documentation
 
@@ -22,9 +22,9 @@ Personal homelab deployed GitOps-style on Ubuntu. Three pillars:
 .doco-cd.yml        # Registry of DocoCD-managed stacks (one YAML doc per stack)
 .sops.yaml          # age recipient for services/**/*.enc.env
 bootstrap/gitops/   # DocoCD itself — Ansible-managed (can't redeploy itself)
-services/           # Docker Compose stacks (12 DocoCD-managed categories)
-roles/              # Ansible roles: system, projects, docker_host, restore
-playbooks/          # Playbooks: update_home_server.yml, restore_home_server.yml
+services/           # Docker Compose stacks (14 DocoCD-managed categories)
+roles/              # Ansible roles: system, docker_host
+playbooks/          # Playbook: update_home_server.yml
 molecule/           # Ansible role testing (one scenario per role)
 .github/            # CI workflows and shared composite actions
 ```
@@ -264,19 +264,21 @@ Used for host bootstrap only. After the host is set up, Ansible is not in the se
 - Plants the cloudflared tunnel token at `~/.config/cloudflared/tunnel_token` from `vault_cloudflared_tunnel_token`.
 - Creates `/home/diego/services_data/`.
 - Renders the `bootstrap/gitops/` stack's `.env` file from `vault_docker_host_env.gitops` and syncs its compose file to `~/bootstrap/gitops/`.
+- Starts that stack. A merged `bootstrap/**` change (including Renovate's auto-merged DocoCD bumps) therefore redeploys DocoCD on the next Configure Home Server run (ADR 0035).
 
-Everything else (12 other categories) is DocoCD's job.
+The `system` role creates the user, installs base packages and installs Tailscale with `tailscaled` enabled. `tailscale up` stays manual.
+
+Everything else (14 categories) is DocoCD's job.
 
 ### Playbooks
 
-- **update_home_server.yml** — runs `system` + `projects` + `docker_host` roles against the home server. Deployed via the **Update Home Server** GitHub Actions workflow on every push to `main`, and available via `workflow_dispatch`.
-- **restore_home_server.yml** — runs `system` + `projects` + `restore` + `docker_host` roles. Deployed via the **Restore Home Server** workflow (manual only).
+- **update_home_server.yml** — runs the `system` + `docker_host` roles against the home server and starts DocoCD. Deployed via the **Configure Home Server** GitHub Actions workflow on every push to `main` that touches Ansible, and available via `workflow_dispatch`.
 
-Both workflows share a composite action (`.github/actions/setup-ansible/`) that handles Python/uv setup, Galaxy roles, vault key, SSH, and Tailscale connectivity.
+The workflow uses a composite action (`.github/actions/setup-ansible/`) that handles Python/uv setup, Galaxy roles, vault key, SSH, and Tailscale connectivity.
 
 ### Testing
 
-Testing is done with [Molecule](https://ansible.readthedocs.io/projects/molecule/). Available scenarios: `system`, `projects`, `restore`, `docker_host`.
+Testing is done with [Molecule](https://ansible.readthedocs.io/projects/molecule/). Available scenarios: `system`, `docker_host`.
 
 ```bash
 molecule test -s <role>        # full sequence
@@ -300,7 +302,7 @@ There are two classes of secret with different handling.
 
 ### Per-stack service env — SOPS + age (committed to git)
 
-Each DocoCD-managed stack has a `services/<cat>/secrets.enc.env` (or per-service split like `services/ai/paperclip.enc.env`). It's encrypted with the age recipient in [`.sops.yaml`](.sops.yaml); only someone with the secret age key can decrypt. The host has that key because Ansible plants it from vault on bootstrap.
+Each DocoCD-managed stack has a `services/<cat>/secrets.enc.env` (or per-service split like `services/ai/n8n.enc.env`). It's encrypted with the age recipient in [`.sops.yaml`](.sops.yaml); only someone with the secret age key can decrypt. The host has that key because Ansible plants it from vault on bootstrap.
 
 Edit directly with SOPS:
 
@@ -317,8 +319,6 @@ Used only for secrets that must be present **before** DocoCD can run:
 | Vault file | Contents |
 |---|---|
 | `roles/system/vars/main/vault.yml` | User password (`vault_password`) |
-| `roles/projects/vars/main/vault.yml` | Project-specific secrets |
-| `roles/restore/vars/main/vault.yml` | Backup/restore credentials |
 | `roles/docker_host/vars/main/env_vault.yml` | `vault_sops_age_key`, `vault_cloudflared_tunnel_token`, `vault_docker_host_env.gitops` (only the `gitops/` stack's env) |
 
 Editing:

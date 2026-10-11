@@ -45,10 +45,10 @@ Global find/replace across the repo. Verify each with `git grep` when you're don
 |---|---|---|
 | `diego` (username, path segments) | your Linux username | Ansible roles, every `docker-compose.yaml` volume mount under `/home/diego/services_data/`, `roles/*/defaults/main.yml` |
 | `/home/diego/` | `/home/<you>/` | ~70+ compose volume mounts; `services_data/` root; `~/.config/` paths |
-| `Diego Heer` / `diegojonathanheer@gmail.com` | your name + email | `roles/projects/defaults/main.yml` (git config), [`services/networking/traefik/traefik.yml`](../services/networking/traefik/traefik.yml) (ACME email) |
+| `Diego Heer` / `diegojonathanheer@gmail.com` | your name + email | [`services/networking/traefik/traefik.yml`](../services/networking/traefik/traefik.yml) (ACME email) |
 | `DiegoHeer/gitops-homelab` | `<youruser>/gitops-homelab` | `.github/` workflows, README badges, DocoCD stack git URL in [`bootstrap/gitops/`](../bootstrap/gitops/) |
 | `local.dynabase.nl` | your own domain | Traefik router labels across `services/**/docker-compose.yaml` (~35 labels), [`services/networking/traefik/traefik.yml`](../services/networking/traefik/traefik.yml) SANs, [`services/networking/traefik/config.yml`](../services/networking/traefik/config.yml) Host rules |
-| Nextcloud backup path `…/nextcloud/diego/files` | `…/nextcloud/<you>/files` | `services/backups/docker-compose.yaml`, `roles/restore/defaults/main.yml` |
+| Nextcloud backup path `…/nextcloud/diego/files` | `…/nextcloud/<you>/files` | `services/backups/docker-compose.yaml` |
 | Author's age public key in [`.sops.yaml`](../.sops.yaml) | your age public key (from Step 3) | `.sops.yaml` |
 
 ## Step 5 — Replace home-network-specific values
@@ -69,9 +69,7 @@ Four vault files, re-created from scratch with your values. Edit each with `uv r
 | File | Required keys |
 |---|---|
 | `roles/system/vars/main/vault.yml` | `vault_password` — the Linux user account password Ansible will set |
-| `roles/projects/vars/main/vault.yml` | Git/SSH credentials per the role's defaults |
 | `roles/docker_host/vars/main/env_vault.yml` | `vault_sops_age_key` (full private age key), `vault_cloudflared_tunnel_token`, `vault_docker_host_env.gitops` (map containing `WEBHOOK_SECRET`, `SOPS_AGE_KEY`, `APPRISE_NOTIFY_URLS`, `APPRISE_NOTIFY_LEVEL`) |
-| `roles/restore/vars/main/vault.yml` | Restic repo URL + password + credentials for your 3-2-1 targets (see [ADR 0015](adr/0015-restic-zerobyte-backup-strategy.md)) |
 
 ## Step 7 — Re-encrypt the per-stack SOPS secrets
 
@@ -99,7 +97,7 @@ From your workstation, with SSH working to the server:
 uv run ansible-playbook playbooks/update_home_server.yml
 ```
 
-This runs `system` → `projects` → `docker_host`, which creates the user, installs Docker, creates the external `home_server_network` bridge, plants the age key and tunnel token, creates `/home/<you>/services_data/`, and brings up the DocoCD stack in `~/bootstrap/gitops/`.
+This runs `system` → `docker_host`, which creates the user, installs Docker and Tailscale, creates the external `home_server_network` bridge, plants the age key and tunnel token, creates `/home/<you>/services_data/`, and brings up the DocoCD stack in `~/bootstrap/gitops/`.
 
 ## Step 10 — Point the GitHub webhook at DocoCD
 
@@ -117,7 +115,7 @@ Run these checks in order — each one confirms the prior step:
 4. **DocoCD is up** — on the server, `docker ps | grep doco-cd` shows the container; its logs show a successful repo clone.
 5. **First deploy** — push a trivial change (bump a compose label) to `main`; DocoCD logs show the webhook received and `docker compose up -d` for the affected stack.
 6. **Service reachable externally** — hit `https://<service>.<yourdomain>` from off your LAN (proves Cloudflare Tunnel + Traefik + ACME + DNS all line up).
-7. **Restore drill** — run `uv run ansible-playbook playbooks/restore_home_server.yml` against a scratch host to confirm the `restore` role's vault values work *before* you need them (see [ADR 0015](adr/0015-restic-zerobyte-backup-strategy.md)).
+7. **Restore drill** — restore a single file from a snapshot in the Zerobyte UI to confirm the backup repos and credentials work *before* you need them (see [ADR 0015](adr/0015-restic-zerobyte-backup-strategy.md)).
 
 ## Files an adopter ends up editing
 
