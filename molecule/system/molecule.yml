@@ -7,7 +7,7 @@ driver:
 
 platforms:
   - name: test_ansible_role_system
-    image: geerlingguy/docker-ubuntu2404-ansible:latest
+    image: geerlingguy/docker-ubuntu2604-ansible:latest
     privileged: true
     pre_build_image: true
     cgroupns_mode: host
