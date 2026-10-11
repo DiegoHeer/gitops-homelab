@@ -1,9 +1,0 @@
----
-# Service runtime data has lived under ~/services_data/<cat>/<svc>/ since the
-# DocoCD migration. restic restore with --target=/home/<user>/ unpacks the
-# archive with its original paths preserved, so the snapshot must contain
-# services_data/* entries (not the legacy services/* layout).
-restore_services_dir: /home/{{ username }}/services_data
-restore_services_target: /home/{{ username }}
-restore_nextcloud_data_dir: /media/hd1/nextcloud/{{ username }}/files
-restore_nextcloud_target: /media/hd1
