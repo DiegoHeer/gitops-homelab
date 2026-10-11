@@ -1,0 +1,14 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Check the gitops stack containers are running
+      ansible.builtin.command: docker inspect -f '{{ "{{" }}.State.Running{{ "}}" }}' {{ item }}
+      register: docker_host_verify_running
+      changed_when: false
+      failed_when: docker_host_verify_running.stdout != "true"
+      loop:
+        - doco-cd
+        - apprise

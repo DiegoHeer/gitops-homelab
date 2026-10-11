@@ -24,6 +24,11 @@ provisioner:
         # The real data disks do not exist in the test container, and a hard
         # RequiresMountsFor on a missing mount unit would stop Docker starting.
         docker_host_required_mounts: []
+        # Nested Docker cannot unpack image layers onto overlayfs inside the test container.
+        docker_host_daemon_config:
+          storage-driver: vfs
+          features:
+            containerd-snapshotter: false
   env:
     ANSIBLE_CONFIG: ../../ansible.cfg
 

@@ -75,3 +75,13 @@
     group: "{{ username }}"
     mode: "0600"
   no_log: true
+
+# Restart Docker with any new daemon.json before the stack starts on it.
+- name: Apply pending Docker daemon changes
+  ansible.builtin.meta: flush_handlers
+
+- name: Start the gitops stack
+  community.docker.docker_compose_v2:
+    project_src: "/home/{{ username }}/bootstrap/gitops"
+    state: present
+    pull: missing
