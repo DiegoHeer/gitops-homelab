@@ -2,5 +2,3 @@
 roles:
   - name: haxorof.docker_ce
     version: 6.1.0
-  - name: nephelaiio.tmux
-    version: 4.0.2
