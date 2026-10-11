@@ -1,9 +1,0 @@
----
-- name: Converge
-  hosts: all
-  gather_facts: true
-  become: true
-  tasks:
-    - name: Test projects role
-      ansible.builtin.include_role:
-        name: projects
