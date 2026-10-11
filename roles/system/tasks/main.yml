@@ -4,5 +4,6 @@
   loop:
     - user.yml
     - packages.yml
+    - tailscale.yml
   loop_control:
     loop_var: task

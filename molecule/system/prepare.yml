@@ -13,3 +13,23 @@
         path: "{{ lookup('env', 'HOME') + '/.ssh/id_ed25519' }}"
         type: ed25519
         state: present
+
+# Mirror a host where Tailscale's install.sh already set up the apt source, as on the live server.
+- name: Prepare an install.sh-style Tailscale apt source
+  hosts: all
+  become: true
+  tasks:
+    - name: Add the install.sh Tailscale keyring
+      ansible.builtin.get_url:
+        url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_facts['distribution_release'] }}.noarmor.gpg"
+        dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+        mode: "0644"
+
+    - name: Add the install.sh Tailscale source list
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/tailscale.list
+        content: |
+          deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ release }} main
+        mode: "0644"
+      vars:
+        release: "{{ ansible_facts['distribution_release'] }}"
