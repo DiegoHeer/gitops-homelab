@@ -68,7 +68,7 @@ services:
 
   grist:
     container_name: grist
-    image: gristlabs/grist:1.7.20
+    image: gristlabs/grist:1.7.21
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
