@@ -10,8 +10,7 @@ services:
       - /dev:/dev
     privileged: true
     network_mode: host
-    devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
+    # No devices: entry. The /dev mount gives HA the udev /dev/serial/by-id links, which ZHA uses.
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8123"]
       interval: 30s
@@ -46,7 +45,7 @@ services:
       - SYS_ADMIN
       - NET_ADMIN
     environment:
-      DEVICE: "/dev/ttyUSB1"
+      DEVICE: "/dev/ttyThread"
       BACKBONE_IF: wlp1s0
       FLOW_CONTROL: 0
       FIREWALL: 1
@@ -56,8 +55,10 @@ services:
       OTBR_WEB_PORT: 7586
       AUTOFLASH_FIRMWARE: 0
       OTBR_LOG_LEVEL: info
+    # Stable host link, flat container path: privileged containers also get every host ttyUSBn,
+    # and Docker does not create nested /dev/serial/by-id paths for them.
     devices:
-      - /dev/ttyUSB1:/dev/ttyUSB1
+      - /dev/serial/by-id/usb-SONOFF_SONOFF_Dongle_Lite_MG21_fa11fe8ce3a2ef118d9a976661ce3355-if00-port0:/dev/ttyThread
       - /dev/net/tun:/dev/net/tun
     volumes:
       - /home/diego/services_data/home_assistant/otbr/otbr_data:/data/thread
