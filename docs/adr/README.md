@@ -21,7 +21,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0012](0012-absolute-bind-mounts-services-data.md) | Absolute bind mounts under `/home/diego/services_data/` | Accepted |
 | [0013](0013-external-home-server-network.md) | External `home_server_network` Docker network | Accepted |
 | [0014](0014-traefik-v3-replaces-nginx-proxy-manager.md) | Traefik v3 replacing Nginx Proxy Manager | Accepted |
-| [0015](0015-restic-zerobyte-backup-strategy.md) | Restic + Zerobyte for 3-2-1 backups | Superseded by 0035 |
+| [0015](0015-restic-zerobyte-backup-strategy.md) | Restic + Zerobyte for 3-2-1 backups | Accepted |
 | [0016](0016-tailscale-for-ci-access.md) | Tailscale for CI → homelab access | Accepted |
 | [0017](0017-lightweight-observability.md) | Lightweight observability over Prometheus stack | Accepted |
 | [0018](0018-authelia-oidc-for-exposed-services.md) | Authelia OIDC for authenticating exposed services | Accepted |
@@ -41,7 +41,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0032](0032-pause-stack-deploys-via-webhook-filter.md) | Pause stack deploys via `webhook_filter` | Superseded by 0033 |
 | [0033](0033-scale-zero-to-take-services-out-of-service.md) | `scale: 0` to take services out of service | Accepted |
 | [0034](0034-pricebuddy-postgres-and-env-file.md) | PriceBuddy runs on MySQL with `env_file`, not a mounted `.env` | Accepted |
-| [0035](0035-server-only-ansible-and-zerobyte-restores.md) | Server-only Ansible, Ansible starts DocoCD, restores via Zerobyte | Accepted |
+| [0035](0035-ansible-starts-dococd-and-installs-tailscale.md) | Server-only Ansible that installs Tailscale and starts DocoCD | Accepted |
 
 ## Adding a new ADR
 

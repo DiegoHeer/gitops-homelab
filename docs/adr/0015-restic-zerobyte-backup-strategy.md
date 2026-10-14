@@ -1,6 +1,6 @@
 # 0015 — Restic + Zerobyte for 3-2-1 backups
 
-- **Status**: Superseded by 0035
+- **Status**: Accepted
 - **Date**: 2026-04-18
 - **Deciders**: Diego
 
