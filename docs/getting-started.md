@@ -45,7 +45,7 @@ Global find/replace across the repo. Verify each with `git grep` when you're don
 |---|---|---|
 | `diego` (username, path segments) | your Linux username | Ansible roles, every `docker-compose.yaml` volume mount under `/home/diego/services_data/`, `roles/*/defaults/main.yml` |
 | `/home/diego/` | `/home/<you>/` | ~70+ compose volume mounts; `services_data/` root; `~/.config/` paths |
-| `Diego Heer` / `diegojonathanheer@gmail.com` | your name + email | `roles/projects/defaults/main.yml` (git config), [`services/networking/traefik/traefik.yml`](../services/networking/traefik/traefik.yml) (ACME email) |
+| `Diego Heer` / `diegojonathanheer@gmail.com` | your name + email | [`services/networking/traefik/traefik.yml`](../services/networking/traefik/traefik.yml) (ACME email) |
 | `DiegoHeer/gitops-homelab` | `<youruser>/gitops-homelab` | `.github/` workflows, README badges, DocoCD stack git URL in [`bootstrap/gitops/`](../bootstrap/gitops/) |
 | `local.dynabase.nl` | your own domain | Traefik router labels across `services/**/docker-compose.yaml` (~35 labels), [`services/networking/traefik/traefik.yml`](../services/networking/traefik/traefik.yml) SANs, [`services/networking/traefik/config.yml`](../services/networking/traefik/config.yml) Host rules |
 | Nextcloud backup path `…/nextcloud/diego/files` | `…/nextcloud/<you>/files` | `services/backups/docker-compose.yaml`, `roles/restore/defaults/main.yml` |
@@ -64,12 +64,11 @@ If your disks aren't at `/media/hd1..hd2`, edit those bind mount sources in `ser
 
 ## Step 6 — Populate Ansible vault files
 
-Four vault files, re-created from scratch with your values. Edit each with `uv run ansible-vault edit <file>` (it'll read the password from `.vault_key`):
+Three vault files, re-created from scratch with your values. Edit each with `uv run ansible-vault edit <file>` (it'll read the password from `.vault_key`):
 
 | File | Required keys |
 |---|---|
 | `roles/system/vars/main/vault.yml` | `vault_password` — the Linux user account password Ansible will set |
-| `roles/projects/vars/main/vault.yml` | Git/SSH credentials per the role's defaults |
 | `roles/docker_host/vars/main/env_vault.yml` | `vault_sops_age_key` (full private age key), `vault_cloudflared_tunnel_token`, `vault_docker_host_env.gitops` (map containing `WEBHOOK_SECRET`, `SOPS_AGE_KEY`, `APPRISE_NOTIFY_URLS`, `APPRISE_NOTIFY_LEVEL`) |
 | `roles/restore/vars/main/vault.yml` | Restic repo URL + password + credentials for your 3-2-1 targets (see [ADR 0015](adr/0015-restic-zerobyte-backup-strategy.md)) |
 
@@ -89,7 +88,7 @@ In your fork → Settings → Secrets and variables → Actions, add:
 - `VAULT_PASSWORD` (same value as `.vault_key`)
 - `SSH_PRIVATE_KEY`
 - `SERVER_USER`
-- `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_CLIENT_SECRET`, `TAILSCALE_SERVER_IP` — or rip the Tailscale step out of `.github/actions/setup-ansible/` and use a reachable public IP instead.
+- `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_CLIENT_SECRET`, `TAILSCALE_SERVER_IP` — or rip the Tailscale step out of `.github/actions/setup-ansible/` and use a reachable public IP instead. The `system` role still installs Tailscale on the server either way.
 
 ## Step 9 — First bootstrap run
 
@@ -99,7 +98,15 @@ From your workstation, with SSH working to the server:
 uv run ansible-playbook playbooks/update_home_server.yml
 ```
 
-This runs `system` → `projects` → `docker_host`, which creates the user, installs Docker, creates the external `home_server_network` bridge, plants the age key and tunnel token, creates `/home/<you>/services_data/`, and brings up the DocoCD stack in `~/bootstrap/gitops/`.
+This runs `system` → `docker_host`, which creates the user, installs Docker and Tailscale, creates the external `home_server_network` bridge, plants the age key and tunnel token, creates `/home/<you>/services_data/`, and brings up the DocoCD stack in `~/bootstrap/gitops/`.
+
+Then log the server into your tailnet. Ansible installs Tailscale but does not log in ([ADR 0035](adr/0035-ansible-starts-dococd-and-installs-tailscale.md)). On the server:
+
+```bash
+sudo tailscale up --advertise-routes=192.168.1.0/24  # your LAN subnet
+```
+
+Approve the subnet route in the Tailscale admin console, and put the server's Tailscale IP in the `TAILSCALE_SERVER_IP` secret. Until then, the Configure and Restore workflows cannot reach the server.
 
 ## Step 10 — Point the GitHub webhook at DocoCD
 

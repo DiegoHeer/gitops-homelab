@@ -1,0 +1,29 @@
+---
+# Same keyring and list paths as Tailscale's install.sh, so hosts set up by hand
+# don't end up with two sources signed by different keys (apt refuses that).
+# Login (`tailscale up`) stays manual: it needs a browser or a short-lived auth key.
+- name: Add Tailscale apt keyring
+  ansible.builtin.get_url:
+    url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_facts['distribution_release'] }}.noarmor.gpg"
+    dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    force: true
+    mode: "0644"
+
+- name: Add Tailscale apt repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg]
+      https://pkgs.tailscale.com/stable/ubuntu {{ ansible_facts['distribution_release'] }} main
+    filename: tailscale
+
+- name: Install Tailscale
+  ansible.builtin.apt:
+    name: tailscale
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Enable and start tailscaled
+  ansible.builtin.systemd_service:
+    name: tailscaled
+    enabled: true
+    state: started

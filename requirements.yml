@@ -1,8 +1,6 @@
 ---
 roles:
   - name: haxorof.docker_ce
-    version: 6.1.0
-  - name: nephelaiio.tmux
-    version: 4.0.2
+    version: 6.2.2
   - name: andrewrothstein.restic
     version: v1.2.5

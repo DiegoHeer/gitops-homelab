@@ -5,11 +5,4 @@ services/**/.env
 .superpowers/
 .worktrees/
 .claude/worktrees/
-
-.terraform/
-terraform.tfstate
-terraform.tfstate.backup
-.terraform.tfstate.lock.info
-
-tests/inventory.yml
 .vault_key

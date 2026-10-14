@@ -7,7 +7,7 @@ driver:
 
 platforms:
   - name: test_ansible_role_docker_host
-    image: geerlingguy/docker-ubuntu2404-ansible:latest
+    image: geerlingguy/docker-${MOLECULE_DISTRO:-ubuntu2604}-ansible:latest
     privileged: true
     pre_build_image: true
     cgroupns_mode: host
@@ -21,12 +21,14 @@ provisioner:
     group_vars:
       all:
         username: test_user
-        # The real data disks do not exist in the test container, and a hard
-        # RequiresMountsFor on a missing mount unit would stop Docker starting.
-        # Exercise the ordering-only path against a mount that always exists.
-        docker_host_required_mounts: []
-        docker_host_ordered_mounts:
+        # /tmp is a real mount in this image (Ansible's mount facts skip tmpfs); it stands in for the data disks.
+        docker_host_required_mounts:
           - /tmp
+        # Nested Docker cannot unpack image layers onto overlayfs inside the test container.
+        docker_host_daemon_config_extra:
+          storage-driver: vfs
+          features:
+            containerd-snapshotter: false
   env:
     ANSIBLE_CONFIG: ../../ansible.cfg
 

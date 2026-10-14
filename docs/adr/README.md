@@ -41,6 +41,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0032](0032-pause-stack-deploys-via-webhook-filter.md) | Pause stack deploys via `webhook_filter` | Superseded by 0033 |
 | [0033](0033-scale-zero-to-take-services-out-of-service.md) | `scale: 0` to take services out of service | Accepted |
 | [0034](0034-pricebuddy-postgres-and-env-file.md) | PriceBuddy runs on MySQL with `env_file`, not a mounted `.env` | Accepted |
+| [0035](0035-ansible-starts-dococd-and-installs-tailscale.md) | Server-only Ansible that installs Tailscale and starts DocoCD | Accepted |
 
 ## Adding a new ADR
 

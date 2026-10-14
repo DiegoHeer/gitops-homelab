@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Check tailscaled is enabled
+      ansible.builtin.assert:
+        that: ansible_facts.services['tailscaled.service'].status | default('absent') == 'enabled'
+
+    - name: Stat workstation extras
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: system_verify_extra
+      loop:
+        - /home/linuxbrew/.linuxbrew/bin/brew
+        - /bin/oh-my-posh
+        - /usr/bin/flatpak
+
+    - name: Check workstation extras are absent
+      ansible.builtin.assert:
+        that: not item.stat.exists
+        fail_msg: "{{ item.item }} should not be installed"
+      loop: "{{ system_verify_extra.results }}"
+      loop_control:
+        label: "{{ item.item }}"

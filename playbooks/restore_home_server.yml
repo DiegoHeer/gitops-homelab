@@ -5,6 +5,5 @@
 
   roles:
     - role: system
-    - role: projects
     - role: restore
     - role: docker_host

@@ -1,0 +1,48 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Check the gitops stack containers are running
+      ansible.builtin.command: docker inspect -f '{{ "{{" }}.State.Running{{ "}}" }}' {{ item }}
+      register: docker_host_verify_running
+      changed_when: false
+      failed_when: docker_host_verify_running.stdout != "true"
+      loop:
+        - doco-cd
+        - apprise
+
+    # DocoCD only reports its notification errors per deploy, so a broken Apprise image would go unnoticed.
+    - name: Wait for apprise to be healthy
+      ansible.builtin.command: docker inspect -f '{{ "{{" }}.State.Health.Status{{ "}}" }}' apprise
+      register: docker_host_verify_apprise
+      changed_when: false
+      until: docker_host_verify_apprise.stdout == "healthy"
+      retries: 12
+      delay: 5
+
+    - name: Read the Docker daemon config
+      ansible.builtin.slurp:
+        src: /etc/docker/daemon.json
+      register: docker_host_verify_daemon
+
+    - name: Check log rotation survives the test-only extra keys
+      ansible.builtin.assert:
+        that:
+          - docker_host_verify_daemon_json['log-driver'] == 'json-file'
+          - docker_host_verify_daemon_json['log-opts']['max-size'] == '10m'
+          - docker_host_verify_daemon_json['log-opts']['max-file'] == '3'
+          - docker_host_verify_daemon_json['storage-driver'] == 'vfs'
+      vars:
+        docker_host_verify_daemon_json: "{{ docker_host_verify_daemon.content | b64decode | from_json }}"
+
+    - name: Read Docker's unit properties
+      ansible.builtin.systemd_service:
+        name: docker
+      register: docker_host_verify_unit
+
+    - name: Check Docker waits for the required mount
+      ansible.builtin.assert:
+        that: "'/tmp' in docker_host_verify_unit.status.RequiresMountsFor"
+        fail_msg: "RequiresMountsFor={{ docker_host_verify_unit.status.RequiresMountsFor }}"

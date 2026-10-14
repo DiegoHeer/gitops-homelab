@@ -3,10 +3,7 @@
   ansible.builtin.include_tasks: "{{ task }}"
   loop:
     - user.yml
-    - settings.yml
     - packages.yml
-    - linuxbrew.yml
-    - tmux.yml
-    - oh_my_posh.yml
+    - tailscale.yml
   loop_control:
     loop_var: task
