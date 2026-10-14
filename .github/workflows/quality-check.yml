@@ -45,7 +45,7 @@ jobs:
         run: uv run pre-commit run shellcheck --all-files
 
   molecule:
-    name: Molecule - ${{ matrix.scenario }}
+    name: Molecule - ${{ matrix.scenario }} (${{ matrix.distro }})
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     strategy:
@@ -55,6 +55,10 @@ jobs:
           - system
           - docker_host
           - restore
+        # 2404 is the live host until the new-server migration; 2604 is the new host.
+        distro:
+          - ubuntu2604
+          - ubuntu2404
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -66,3 +70,5 @@ jobs:
 
       - name: Run Molecule
         run: uv run molecule test -s ${{ matrix.scenario }}
+        env:
+          MOLECULE_DISTRO: ${{ matrix.distro }}
