@@ -25,10 +25,12 @@
         dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
         mode: "0644"
 
+    # Byte-for-byte copy of the live server's file, with the release templated.
     - name: Add the install.sh Tailscale source list
       ansible.builtin.copy:
         dest: /etc/apt/sources.list.d/tailscale.list
         content: |
+          # Tailscale packages for ubuntu {{ release }}
           deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ release }} main
         mode: "0644"
       vars:
