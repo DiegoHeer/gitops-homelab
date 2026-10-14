@@ -6,6 +6,7 @@
   ansible.builtin.get_url:
     url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_facts['distribution_release'] }}.noarmor.gpg"
     dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    force: true
     mode: "0644"
 
 - name: Add Tailscale apt repository
@@ -19,6 +20,7 @@
   ansible.builtin.apt:
     name: tailscale
     update_cache: true
+    cache_valid_time: 3600
 
 - name: Enable and start tailscaled
   ansible.builtin.systemd_service:
