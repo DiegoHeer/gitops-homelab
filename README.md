@@ -8,7 +8,7 @@ Personal homelab deployed GitOps-style on Ubuntu. Three pillars:
 
 - **Ansible playbooks** for one-time host bootstrap (Docker, shared network, SOPS age key, cloudflared tunnel token, the DocoCD stack itself)
 - **Docker Compose services** deployed **GitOps-style** by [DocoCD](https://github.com/kimdre/doco-cd) — a `git push` to `main` is the deploy
-- **Restic backups** implementing the 3-2-1 backup rule (managed by Zerobyte, see ADR 0015)
+- **Restic backups** implementing the 3-2-1 backup rule (taken by Zerobyte, restored by the Ansible restore role, see ADR 0015)
 
 ## Documentation
 
@@ -23,8 +23,8 @@ Personal homelab deployed GitOps-style on Ubuntu. Three pillars:
 .sops.yaml          # age recipient for services/**/*.enc.env
 bootstrap/gitops/   # DocoCD itself — Ansible-managed (can't redeploy itself)
 services/           # Docker Compose stacks (14 DocoCD-managed categories)
-roles/              # Ansible roles: system, docker_host
-playbooks/          # Playbook: update_home_server.yml
+roles/              # Ansible roles: system, docker_host, restore
+playbooks/          # Playbooks: update_home_server.yml, restore_home_server.yml
 molecule/           # Ansible role testing (one scenario per role)
 .github/            # CI workflows and shared composite actions
 ```
@@ -273,12 +273,13 @@ Everything else (14 categories) is DocoCD's job.
 ### Playbooks
 
 - **update_home_server.yml** — runs the `system` + `docker_host` roles against the home server and starts DocoCD. Deployed via the **Configure Home Server** GitHub Actions workflow on every push to `main` that touches Ansible, and available via `workflow_dispatch`.
+- **restore_home_server.yml** — runs `system` + `restore` + `docker_host` roles. Deployed via the **Restore Home Server** workflow (manual only).
 
-The workflow uses a composite action (`.github/actions/setup-ansible/`) that handles Python/uv setup, Galaxy roles, vault key, SSH, and Tailscale connectivity.
+Both workflows share a composite action (`.github/actions/setup-ansible/`) that handles Python/uv setup, Galaxy roles, vault key, SSH, and Tailscale connectivity.
 
 ### Testing
 
-Testing is done with [Molecule](https://ansible.readthedocs.io/projects/molecule/). Available scenarios: `system`, `docker_host`.
+Testing is done with [Molecule](https://ansible.readthedocs.io/projects/molecule/). Available scenarios: `system`, `restore`, `docker_host`.
 
 ```bash
 molecule test -s <role>        # full sequence
@@ -319,6 +320,7 @@ Used only for secrets that must be present **before** DocoCD can run:
 | Vault file | Contents |
 |---|---|
 | `roles/system/vars/main/vault.yml` | User password (`vault_password`) |
+| `roles/restore/vars/main/vault.yml` | Backup/restore credentials |
 | `roles/docker_host/vars/main/env_vault.yml` | `vault_sops_age_key`, `vault_cloudflared_tunnel_token`, `vault_docker_host_env.gitops` (only the `gitops/` stack's env) |
 
 Editing:
