@@ -19,7 +19,7 @@
 
 - name: Configure the Docker daemon
   ansible.builtin.copy:
-    content: "{{ docker_host_daemon_config | to_nice_json }}\n"
+    content: "{{ docker_host_daemon_config | combine(docker_host_daemon_config_extra, recursive=true) | to_nice_json }}\n"
     dest: /etc/docker/daemon.json
     owner: root
     group: root

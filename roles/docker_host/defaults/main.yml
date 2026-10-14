@@ -15,3 +15,6 @@ docker_host_daemon_config:
     max-size: "10m"
     max-file: "3"
     compress: "true"
+
+# Merged on top of docker_host_daemon_config, for host-specific keys (e.g. storage-driver).
+docker_host_daemon_config_extra: {}

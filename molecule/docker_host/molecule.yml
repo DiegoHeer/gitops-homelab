@@ -21,11 +21,11 @@ provisioner:
     group_vars:
       all:
         username: test_user
-        # The real data disks do not exist in the test container, and a hard
-        # RequiresMountsFor on a missing mount unit would stop Docker starting.
-        docker_host_required_mounts: []
+        # /tmp is a real mount in this image (Ansible's mount facts skip tmpfs); it stands in for the data disks.
+        docker_host_required_mounts:
+          - /tmp
         # Nested Docker cannot unpack image layers onto overlayfs inside the test container.
-        docker_host_daemon_config:
+        docker_host_daemon_config_extra:
           storage-driver: vfs
           features:
             containerd-snapshotter: false
