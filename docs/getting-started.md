@@ -88,7 +88,7 @@ In your fork → Settings → Secrets and variables → Actions, add:
 - `VAULT_PASSWORD` (same value as `.vault_key`)
 - `SSH_PRIVATE_KEY`
 - `SERVER_USER`
-- `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_CLIENT_SECRET`, `TAILSCALE_SERVER_IP` — or rip the Tailscale step out of `.github/actions/setup-ansible/` and use a reachable public IP instead.
+- `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_CLIENT_SECRET`, `TAILSCALE_SERVER_IP` — or rip the Tailscale step out of `.github/actions/setup-ansible/` and use a reachable public IP instead. The `system` role still installs Tailscale on the server either way.
 
 ## Step 9 — First bootstrap run
 
@@ -99,6 +99,14 @@ uv run ansible-playbook playbooks/update_home_server.yml
 ```
 
 This runs `system` → `docker_host`, which creates the user, installs Docker and Tailscale, creates the external `home_server_network` bridge, plants the age key and tunnel token, creates `/home/<you>/services_data/`, and brings up the DocoCD stack in `~/bootstrap/gitops/`.
+
+Then log the server into your tailnet. Ansible installs Tailscale but does not log in ([ADR 0035](adr/0035-ansible-starts-dococd-and-installs-tailscale.md)). On the server:
+
+```bash
+sudo tailscale up --advertise-routes=192.168.1.0/24  # your LAN subnet
+```
+
+Approve the subnet route in the Tailscale admin console, and put the server's Tailscale IP in the `TAILSCALE_SERVER_IP` secret. Until then, the Configure and Restore workflows cannot reach the server.
 
 ## Step 10 — Point the GitHub webhook at DocoCD
 
