@@ -54,6 +54,7 @@ jobs:
         scenario:
           - system
           - docker_host
+          - restore
     steps:
       - name: Checkout
         uses: actions/checkout@v5

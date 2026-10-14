@@ -1,0 +1,7 @@
+---
+- name: Install Restic
+  ansible.builtin.include_role:
+    name: andrewrothstein.restic
+
+- name: Restore relevant data
+  ansible.builtin.include_tasks: restore.yml

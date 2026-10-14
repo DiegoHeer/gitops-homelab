@@ -1,0 +1,9 @@
+---
+- name: Play for configuring home server
+  hosts: home_server
+  become: true
+
+  roles:
+    - role: system
+    - role: restore
+    - role: docker_host
