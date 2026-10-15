@@ -5,7 +5,7 @@ services:
   romm:
     scale: 0
     container_name: romm
-    image: rommapp/romm:5.3.1
+    image: rommapp/romm:5.4.0
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
