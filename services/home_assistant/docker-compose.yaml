@@ -1,7 +1,7 @@
 services:
   homeassistant:
     container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:2026.7.4
+    image: ghcr.io/home-assistant/home-assistant:2026.10.1
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/home_assistant/homeassistant/config:/config
@@ -37,7 +37,7 @@ services:
 
   openthread_border_router:
     container_name: openthread_border_router
-    image: ghcr.io/ownbee/hass-otbr-docker:v0.3.0
+    image: ghcr.io/ownbee/hass-otbr-docker:v0.4.0
     restart: unless-stopped
     privileged: true
     network_mode: host
@@ -109,7 +109,7 @@ services:
   # reaches it via the file provider rather than Docker labels. See ADR 0023, 0025.
   netalertx:
     container_name: netalertx
-    image: ghcr.io/jokob-sk/netalertx:26.8.5
+    image: ghcr.io/jokob-sk/netalertx:26.10.0
     restart: unless-stopped
     network_mode: host
     cap_add:
