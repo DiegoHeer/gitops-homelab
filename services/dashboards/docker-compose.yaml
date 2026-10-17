@@ -21,7 +21,7 @@ services:
 
   glance:
     container_name: glance
-    image: glanceapp/glance:v0.8.6
+    image: glanceapp/glance:v0.8.7
     restart: unless-stopped
     entrypoint: ["/app/glance", "--config", "/app/config/glance.yaml"]
     volumes:
