@@ -34,7 +34,7 @@ services:
 
   apprise:
     container_name: apprise
-    image: caronc/apprise:v1.5.4
+    image: caronc/apprise:2.0.1
     restart: unless-stopped
     environment:
       TZ: Europe/Amsterdam
