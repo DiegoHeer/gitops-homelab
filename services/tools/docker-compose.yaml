@@ -231,6 +231,37 @@ services:
       retries: 3
       start_period: 30s
 
+  linkding:
+    container_name: linkding
+    image: sissbruecker/linkding:1.47.0
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - LD_CSRF_TRUSTED_ORIGINS=https://linkding.dynabase.nl
+      # OIDC-only: no LD_SUPERUSER_*, the account is created on first Authelia login.
+      - LD_ENABLE_OIDC=True
+      - OIDC_OP_AUTHORIZATION_ENDPOINT=https://auth.dynabase.nl/api/oidc/authorization
+      - OIDC_OP_TOKEN_ENDPOINT=https://auth.dynabase.nl/api/oidc/token
+      - OIDC_OP_USER_ENDPOINT=https://auth.dynabase.nl/api/oidc/userinfo
+      - OIDC_OP_JWKS_ENDPOINT=https://auth.dynabase.nl/jwks.json
+      - OIDC_RP_CLIENT_ID=linkding
+      - OIDC_USERNAME_CLAIM=preferred_username
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkding-external.rule=Host(`linkding.dynabase.nl`)"
+      - "traefik.http.routers.linkding-external.entrypoints=https"
+      - "traefik.http.routers.linkding-external.tls=true"
+      - "traefik.http.services.linkding.loadbalancer.server.port=9090"
+    volumes:
+      - /home/diego/services_data/tools/linkding:/etc/linkding/data
+      - ./linkding/custom.py:/etc/linkding/bookmarks/settings/custom.py:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
 
 networks:
   default:
