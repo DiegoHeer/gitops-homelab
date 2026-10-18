@@ -18,7 +18,7 @@ services:
 
   bentopdf:
     container_name: bentopdf
-    image: ghcr.io/alam00000/bentopdf:2.8.7
+    image: ghcr.io/alam00000/bentopdf:2.8.8
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -35,7 +35,7 @@ services:
 
   docuseal:
     container_name: docuseal
-    image: docuseal/docuseal:3.1.7
+    image: docuseal/docuseal:3.3.2
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -59,7 +59,7 @@ services:
 
   tandoor:
     container_name: tandoor
-    image: vabene1111/recipes:2.6.13
+    image: vabene1111/recipes:2.6.15
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
@@ -99,7 +99,7 @@ services:
   tandoor_postgres:
     container_name: tandoor_postgres
     restart: unless-stopped
-    image: postgres:16.14-alpine
+    image: postgres:16.15-alpine
     env_file: secrets.enc.env
     volumes:
       - /home/diego/services_data/tools/tandoor/postgresql:/var/lib/postgresql/data
@@ -143,7 +143,7 @@ services:
 
   convertx:
     container_name: convertx
-    image: ghcr.io/c4illin/convertx:v0.18.0
+    image: ghcr.io/c4illin/convertx:v0.19.0
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
@@ -168,7 +168,7 @@ services:
 
   pricebuddy:
     container_name: pricebuddy
-    image: jez500/pricebuddy:v1.0.54
+    image: jez500/pricebuddy:v1.0.55
     restart: unless-stopped
     env_file: pricebuddy.enc.env
     environment:
@@ -205,7 +205,7 @@ services:
 
   pricebuddy_mysql:
     container_name: pricebuddy_mysql
-    image: mysql:8.2
+    image: mysql:8.4
     restart: unless-stopped
     env_file: pricebuddy.enc.env
     environment:
