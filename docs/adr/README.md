@@ -26,7 +26,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0017](0017-lightweight-observability.md) | Lightweight observability over Prometheus stack | Accepted |
 | [0018](0018-authelia-oidc-for-exposed-services.md) | Authelia OIDC for authenticating exposed services | Accepted |
 | [0019](0019-wildcard-tunnel-via-traefik.md) | Wildcard Cloudflare Tunnel via Traefik | Accepted |
-| [0020](0020-cloudflare-dns-companion.md) | Cloudflare DNS sync via traefik-cloudflare-companion | Accepted |
+| [0020](0020-cloudflare-dns-companion.md) | Cloudflare DNS sync via traefik-cloudflare-companion | Superseded by 0036 |
 | [0021](0021-immich-data-media-location.md) | Immich media mounted at `/data` (upstream default) | Accepted |
 | [0022](0022-ssh-over-dococd-api-for-debug-tooling.md) | SSH over the DocoCD API for debug tooling | Accepted |
 | [0023](0023-netalertx-presence-detection.md) | NetAlertX for network presence detection into Home Assistant | Accepted |
@@ -42,6 +42,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0033](0033-scale-zero-to-take-services-out-of-service.md) | `scale: 0` to take services out of service | Accepted |
 | [0034](0034-pricebuddy-postgres-and-env-file.md) | PriceBuddy runs on MySQL with `env_file`, not a mounted `.env` | Accepted |
 | [0035](0035-ansible-starts-dococd-and-installs-tailscale.md) | Server-only Ansible that installs Tailscale and starts DocoCD | Accepted |
+| [0036](0036-herald-replaces-cloudflare-companion.md) | Herald replaces traefik-cloudflare-companion | Accepted |
 
 ## Adding a new ADR
 
