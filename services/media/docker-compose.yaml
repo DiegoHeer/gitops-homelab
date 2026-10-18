@@ -26,7 +26,7 @@ services:
 
   seerr:
     container_name: seerr
-    image: ghcr.io/seerr-team/seerr:v3.4.1
+    image: ghcr.io/seerr-team/seerr:v3.5.0
     init: true
     restart: unless-stopped
     labels:
@@ -107,7 +107,7 @@ services:
 
   qbittorrent:
     container_name: qbittorrent
-    image: lscr.io/linuxserver/qbittorrent:5.2.3
+    image: lscr.io/linuxserver/qbittorrent:5.2.4
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
@@ -135,7 +135,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:2.5.2
+    image: linuxserver/prowlarr:2.6.5
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
@@ -156,7 +156,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:4.0.19
+    image: linuxserver/sonarr:4.0.20
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
@@ -178,7 +178,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:6.3.0
+    image: linuxserver/radarr:6.4.4
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
@@ -200,7 +200,7 @@ services:
 
   sabnzbd:
     container_name: sabnzbd
-    image: lscr.io/linuxserver/sabnzbd:5.0.4
+    image: lscr.io/linuxserver/sabnzbd:5.1.3
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
@@ -222,7 +222,7 @@ services:
 
   navidrome:
     container_name: navidrome
-    image: deluan/navidrome:0.63.2
+    image: deluan/navidrome:0.64.2
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -242,7 +242,7 @@ services:
 
   audiobookshelf:
     container_name: audiobookshelf
-    image: ghcr.io/advplyr/audiobookshelf:2.36.0
+    image: ghcr.io/advplyr/audiobookshelf:2.37.1
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -267,7 +267,7 @@ services:
 
   grimmory:
     container_name: grimmory
-    image: grimmory/grimmory:v3.2.4
+    image: grimmory/grimmory:v3.5.0
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
