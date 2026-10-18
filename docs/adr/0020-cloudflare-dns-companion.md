@@ -1,6 +1,6 @@
 # 0020 — Cloudflare DNS sync via traefik-cloudflare-companion
 
-- **Status**: Accepted
+- **Status**: Superseded by 0036
 - **Date**: 2026-07-29
 - **Deciders**: Diego
 
