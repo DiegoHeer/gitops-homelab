@@ -1,0 +1,42 @@
+# Herald config (HERALD_SETUP_TYPE=manual). Auto mode always enables the Docker input,
+# and we don't mount the Docker socket, so the config lives here instead.
+general:
+  log_level: info
+  log_timestamps: true
+  dry_run: false
+
+inputs:
+  traefik:
+    type: traefik
+    api_url: http://traefik:8080/api/http/routers
+    interval: 60s
+    process_existing: true
+    record_remove_on_stop: false
+    # *.local is Pi-hole's job. exclude_subdomains is parsed but unused in Herald 2.3.4.
+    filter:
+      - type: rule
+        negate: true
+        conditions:
+          - value: "*.local.dynabase.nl*"
+
+outputs:
+  cloudflare:
+    type: dns
+    provider: cloudflare
+    api_token: env://CF_TOKEN
+
+domains:
+  dynabase:
+    name: dynabase.nl
+    zone_id: fd6e52b06c2f0fbe6c343ba00ad99c12
+    profiles:
+      inputs:
+        - traefik
+      outputs:
+        - cloudflare
+    record:
+      type: CNAME
+      target: 8b7293d9-91d4-4245-83ac-2bcf2aa57f1c.cfargotunnel.com
+      ttl: 1
+      proxied: true
+      update_existing: true
