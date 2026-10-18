@@ -9,6 +9,13 @@
         "NEXTCLOUD_USERNAME": "${NEXTCLOUD_USERNAME}",
         "NEXTCLOUD_PASSWORD": "${NEXTCLOUD_PASSWORD}"
       }
+    },
+    "homarr": {
+      "type": "http",
+      "url": "https://homarr.local.dynabase.nl/api/mcp/mcp",
+      "headers": {
+        "ApiKey": "${HOMARR_API_KEY}"
+      }
     }
   }
 }

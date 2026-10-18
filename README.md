@@ -75,10 +75,13 @@ Runtime state (SQLite DBs, uploaded files, app config) lives at absolute host pa
    webhook_filter: "^refs/heads/main$"
    ```
 4. Commit + push. DocoCD reconciles.
+5. Add a tile for each user-facing service to the Homarr dashboard (see [Homarr dashboard via MCP](#homarr-dashboard-via-mcp)).
+
+The same goes for a new service in an existing stack: step 5 applies whenever a service gets a Traefik router.
 
 ### Removing a stack
 
-Delete the `---` block from `.doco-cd.yml` and the `services/<name>/` tree. Commit + push. DocoCD stops and removes the containers. Named volumes and absolute-path bind mounts are preserved by default.
+Delete the `---` block from `.doco-cd.yml` and the `services/<name>/` tree. Commit + push. DocoCD stops and removes the containers. Named volumes and absolute-path bind mounts are preserved by default. Remove its Homarr tiles too.
 
 ### Taking a service out of service
 
@@ -234,6 +237,44 @@ accumulated four restarts over months and is then restarted by hand reads as
 `crash-loop` for ten minutes. Note the gluetun caveat above — the five services
 sharing its network namespace report healthy through a total outage, and no
 status tool can see through that.
+
+---
+
+## Claude Code MCP servers
+
+[`.mcp.json`](.mcp.json) registers project-scoped MCP servers for Claude Code. Credentials are never committed: every
+secret is a `${VAR}` reference that Claude Code expands from your shell environment at startup. Claude Code asks
+you to approve project MCP servers the first time; check with `/mcp`.
+
+| Server | Purpose | Env vars |
+|---|---|---|
+| `nextcloud` | Nextcloud files, notes, calendar, etc. | `NEXTCLOUD_HOST`, `NEXTCLOUD_USERNAME`, `NEXTCLOUD_PASSWORD` |
+| `homarr` | Edit Homarr dashboards (apps, boards, tiles) | `HOMARR_API_KEY` |
+
+### Homarr dashboard via MCP
+
+Homarr v2 has no config file: boards live in its database under
+`/home/diego/services_data/dashboards/homarr/appdata`. Its built-in MCP server (`/api/mcp/mcp`, Streamable HTTP,
+authenticated with an `ApiKey` header) lets Claude edit them directly — mainly to add a tile when a service is added
+to this repo, and remove it when one goes.
+
+Setup, once per machine:
+
+1. In Homarr, create a dedicated user (e.g. `claude`) with only the board permissions it needs. An API key carries
+   the permissions of the user that created it, so an admin key would also let the assistant manage users and keys.
+2. Log in as that user and create an API key under **Management → Tools → API**. The key has the form `<id>.<token>`.
+3. Export it in your shell profile (or a password-manager-backed env loader), never in a tracked file:
+   ```bash
+   export HOMARR_API_KEY='<id>.<token>'
+   ```
+4. Restart Claude Code in the repo and run `/mcp` — `homarr` should show as connected.
+
+Notes:
+
+- `homarr.local.dynabase.nl` only resolves on the LAN (Pi-hole) or over Tailscale, so the server is unreachable from
+  anywhere else, including Claude Code cloud sessions.
+- Dashboard edits made this way are **runtime state, not GitOps**: they go straight to Homarr's database and are
+  backed up with the rest of `services_data/` by Zerobyte, not by git.
 
 ---
 

@@ -54,6 +54,20 @@ Config|Update: updated multiple services to latest versions
 - Per-service split `.enc.env` files are allowed only when two services in the same stack need the same env var name with different values (see `services/ai/n8n.enc.env`).
 - Never commit plaintext `.env` or vault passwords.
 
+## Homarr dashboard (MCP)
+
+The `homarr` MCP server in `.mcp.json` edits the Homarr dashboard. Setup → README, "Homarr dashboard via MCP".
+
+- **Adding a service** with a Traefik router: after the compose change, add it to Homarr. Create the app (name, URL
+  from the router's `Host()` rule, icon) and add a tile to the board. Inspect the board first and follow its existing
+  layout: put the tile in the section matching the service's category, and match the existing tiles' size and style.
+- **Removing a service**: remove its tile and app from Homarr.
+- **Renaming or changing a hostname**: update the app's URL.
+- Ask before deleting or restructuring anything you didn't create in this session (boards, sections, other apps).
+- Tool not available (no `HOMARR_API_KEY`, off-LAN, cloud session) → don't block the repo change. Finish it and tell
+  the user which Homarr edits are still pending.
+- These edits are runtime state in Homarr's database, not in git. Nothing to commit for them.
+
 ## Architectural Decision Records
 
 Load-bearing decisions live under [`docs/adr/`](docs/adr/). Any PR that rejects an alternative, replaces a load-bearing tool, or changes how a subsystem works (GitOps model, secrets, orchestrator, network topology, backup strategy, commit convention, etc.) **must** include a new ADR in the same PR.
