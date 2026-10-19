@@ -44,7 +44,7 @@ services:
   romm_mariadb:
     scale: 0
     container_name: romm_mariadb
-    image: mariadb:12.3.3
+    image: mariadb:13.0.2
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
