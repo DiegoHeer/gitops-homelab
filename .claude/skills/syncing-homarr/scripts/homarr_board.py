@@ -84,7 +84,7 @@ def save_verified(board, items, sections=None):
     expected_ids = {i["id"] for i in items}
     if saved_ids != expected_ids:
         sys.exit(f"VERIFY FAILED on {board['name']}: if nobody edited it in the UI meanwhile, `restore {backup_path}`")
-    print(f"{board['name']}: saved {len(items)} items (backup {backup_path})")
+    print(f"{board['name']}: saved and verified {len(items)} items (backup {backup_path})")
 
 
 def app_tiles(board, app_id):
@@ -199,10 +199,25 @@ def cmd_sections(args):
 
 
 def cmd_find(args):
+    found = False
     for name in board_names():
         board = read_board(name)
         for tile in app_tiles(board, args.app_id):
+            found = True
             print(f"{name}: tile {tile['id']} {describe_tile(board, tile)}")
+    if not found:
+        print(f"no tiles for {args.app_id} on any board")
+
+
+def cmd_orphans(args):
+    """Tiles whose app was deleted; clear them with `remove <app-id>`."""
+    app_ids = {app["id"] for app in call("app_all", {})}
+    for name in board_names():
+        board = read_board(name)
+        for tile in board["items"]:
+            app_id = tile["options"].get("appId")
+            if tile["kind"] == "app" and app_id not in app_ids:
+                print(f"{name}: tile {tile['id']} -> missing app {app_id} at {describe_tile(board, tile)}")
 
 
 def new_item_id():
@@ -233,11 +248,15 @@ def cmd_place(args):
 
 
 def cmd_remove(args):
+    removed_any = False
     for name in args.boards or board_names():
         board = read_board(name)
         doomed = {tile["id"] for tile in app_tiles(board, args.app_id)}
         if doomed:
+            removed_any = True
             save_verified(board, [i for i in board["items"] if i["id"] not in doomed])
+    if not removed_any:
+        print(f"no tiles for {args.app_id}; nothing removed")
 
 
 def cmd_restore(args):
@@ -256,6 +275,9 @@ def main():
     find = sub.add_parser("find", help="list every tile of an app across all boards")
     find.add_argument("app_id")
     find.set_defaults(run=cmd_find)
+
+    orphans = sub.add_parser("orphans", help="list tiles whose app no longer exists")
+    orphans.set_defaults(run=cmd_orphans)
 
     place = sub.add_parser("place", help="add a 1x1 tile for an app at the first free cell")
     place.add_argument("board")

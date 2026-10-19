@@ -9,7 +9,7 @@ description: Use when a service is added to, removed from, renamed in, or re-hos
 
 Homarr has two layers: **apps** (name, icon, URL) and **tiles** on boards that point at an app via `options.appId`. Apps are safe to change with the `mcp__homarr__app_*` tools. Tiles are not: `board_addItem` only drops tiles on the main canvas (never inside a section like *Productivity*), and `board_saveBoard` **deletes every item you leave out**. Use `scripts/homarr_board.py` for all tile work — it backs up, saves, and verifies item IDs.
 
-Needs `HOMARR_API_KEY` in the environment (from `.claude/settings.local.json` `env`).
+Needs `HOMARR_API_KEY` in the environment. It is set by the `env` block of the main checkout's `.claude/settings.local.json`, and worktree sessions inherit it.
 
 ## Quick reference
 
@@ -19,6 +19,7 @@ Needs `HOMARR_API_KEY` in the environment (from `.claude/settings.local.json` `e
 | Where an app's tiles are | `... homarr_board.py find <app-id>` |
 | Add tile | `... homarr_board.py place <board> <app-id> [--section <container title>]` |
 | Remove tiles | `... homarr_board.py remove <app-id> [<board>...]` |
+| Tiles whose app is gone | `... homarr_board.py orphans`, then clear each with `remove <missing-app-id>` |
 | Undo a board save | `... homarr_board.py restore ~/.cache/homarr-sync/<board>-<ts>.json` |
 
 ## Adding a service
@@ -29,18 +30,18 @@ Needs `HOMARR_API_KEY` in the environment (from `.claude/settings.local.json` `e
    - `iconUrl`: an exact URL from `mcp__homarr__icon_findIcons`. Prefer `homarr-labs/dashboard-icons`, `svg` over `png`, then `selfhst/icons`. Never hand-build an icon URL.
    - `description: null`, `pingUrl: null`.
 2. Check `app_search` first, so you don't create a duplicate. Then `app_create`, and keep the returned id.
-3. **Pick boards and section.** Run `sections` and ask the user. Offer the section where the most similar existing app sits (`find` its id). Default: `home` only.
+3. **Pick boards and section.** If the user already named them, use those, and match the section name to a real title from `sections`. Otherwise run `sections` and ask. Offer the section where the most similar existing app sits (`find` its id). Default: `home` only.
 4. Run `place` for each chosen board. The script copies the board's usual tile options and layouts. It does not copy any single tile, so don't hand-copy one.
 5. Confirm with `find <app-id>`.
 
 ## Removing a service
 
-1. `app_search` → app id.
-2. `remove <app-id>` (all boards).
-3. `mcp__homarr__app_delete`.
-4. `app_search` again. It must return nothing.
+1. `app_search` for the name, and check `app_all` for the old `href`. If neither finds an app, nothing needs to change. Report that and stop.
+2. `remove <app-id>` (all boards). It prints `saved and verified` for each board it changes.
+3. `mcp__homarr__app_delete` (it returns `null`).
+4. `app_search` must return nothing, and `find <app-id>` must print `no tiles`.
 
-Rename or new URL: `app_update` only. Tiles follow the app id.
+Rename or new URL: `app_update` only, and send all fields, not just the changed one. Tiles follow the app id. Confirm with `app_search`.
 
 ## Common mistakes
 
