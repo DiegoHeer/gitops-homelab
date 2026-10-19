@@ -48,4 +48,5 @@ Rename or new URL: `app_update` only. Tiles follow the app id.
 - Using `board_addItem` for a sectioned board. The tile lands outside every container.
 - Copying a single existing tile's options or layouts. Odd tiles exist (for example, a home tile with an extra Mobile position).
 - Reporting success without checking the result with `find` / `app_search`.
-- If the script prints `VERIFY FAILED`, run the `restore` command it prints before you do anything else.
+- Running the script while someone edits the same board in the browser. Each save replaces the whole board, so their edit is lost.
+- If the script prints `VERIFY FAILED`, check whether someone edited the board in the browser at the same time. If nobody did, run the `restore` command it prints before you do anything else.

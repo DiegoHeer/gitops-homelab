@@ -11,8 +11,8 @@ import os
 import secrets
 import string
 import sys
-import time
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 
 HOMARR_URL = os.environ.get("HOMARR_URL", "https://homarr.local.dynabase.nl/api/mcp")
@@ -34,8 +34,8 @@ def call(tool, arguments):
     )
     with urllib.request.urlopen(request, timeout=30) as response:
         raw = response.read().decode()
-    payload = next((line[6:] for line in raw.splitlines() if line.startswith("data: ")), raw)
-    result = json.loads(payload)
+    data_lines = [line.removeprefix("data:").removeprefix(" ") for line in raw.splitlines() if line.startswith("data:")]
+    result = json.loads("\n".join(data_lines) if data_lines else raw)
     if "error" in result or result["result"].get("isError"):
         sys.exit(f"{tool} failed: {json.dumps(result)[:500]}")
     return json.loads(result["result"]["content"][0]["text"] or "null")
@@ -51,12 +51,12 @@ def read_board(name):
 
 def backup(board):
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-    path = BACKUP_DIR / f"{board['name']}-{time.strftime('%Y%m%d-%H%M%S')}.json"
+    path = BACKUP_DIR / f"{board['name']}-{datetime.now().strftime('%Y%m%d-%H%M%S-%f')}.json"
     path.write_text(json.dumps(board))
     return path
 
 
-def save_payload(board, items):
+def save_payload(board, items, sections):
     def section(s):
         keys = (
             ("id", "kind", "xOffset", "yOffset")
@@ -68,19 +68,22 @@ def save_payload(board, items):
     item_keys = ("id", "kind", "options", "layouts", "integrationIds", "advancedOptions")
     return {
         "id": board["id"],
-        "sections": [section(s) for s in board["sections"]],
+        "sections": [section(s) for s in sections],
         "items": [{k: i[k] for k in item_keys} for i in items],
     }
 
 
-def save_verified(board, items):
-    """Back up, save, and confirm the board now holds exactly `items`."""
+def save_verified(board, items, sections=None):
+    """Back up, save, and confirm the board now holds exactly `items`.
+
+    Not atomic: a UI edit between our read and save is overwritten.
+    """
     backup_path = backup(board)
-    call("board_saveBoard", save_payload(board, items))
+    call("board_saveBoard", save_payload(board, items, sections or board["sections"]))
     saved_ids = {i["id"] for i in read_board(board["name"])["items"]}
     expected_ids = {i["id"] for i in items}
     if saved_ids != expected_ids:
-        sys.exit(f"VERIFY FAILED on {board['name']}: restore with `restore {backup_path}`")
+        sys.exit(f"VERIFY FAILED on {board['name']}: if nobody edited it in the UI meanwhile, `restore {backup_path}`")
     print(f"{board['name']}: saved {len(items)} items (backup {backup_path})")
 
 
@@ -93,10 +96,13 @@ def section_title(board, section_id):
     return (section.get("options") or {}).get("title") or "(main)"
 
 
+def layout_name(board, layout_id):
+    return next(layout["name"] for layout in board["layouts"] if layout["id"] == layout_id)
+
+
 def describe_tile(board, tile):
-    layout_names = {layout["id"]: layout["name"] for layout in board["layouts"]}
     spots = [
-        f"{layout_names[pos['layoutId']]}:{section_title(board, pos['sectionId'])}@{pos['xOffset']},{pos['yOffset']}"
+        f"{layout_name(board, pos['layoutId'])}:{section_title(board, pos['sectionId'])}@{pos['xOffset']},{pos['yOffset']}"
         for pos in tile["layouts"]
     ]
     return " ".join(spots)
@@ -120,12 +126,15 @@ def usual_options(board):
 
 
 def target_section(board, layout_id, title):
-    """The titled container if it exists in this layout, else the main (empty) section."""
-    for s in board["sections"]:
-        in_layout = any(pos["layoutId"] == layout_id for pos in s.get("layouts") or [])
-        if title and in_layout and (s.get("options") or {}).get("title", "").lower() == title.lower():
+    """The titled container in this layout, or the main (empty) section when no title is given."""
+    if not title:
+        return next(s for s in board["sections"] if s["kind"] == "empty")
+    in_layout = [s for s in board["sections"] if any(pos["layoutId"] == layout_id for pos in s.get("layouts") or [])]
+    for s in in_layout:
+        if ((s.get("options") or {}).get("title") or "").lower() == title.lower():
             return s
-    return next(s for s in board["sections"] if s["kind"] == "empty")
+    valid = [section_title(board, s["id"]) for s in in_layout]
+    sys.exit(f"No section '{title}' in layout {layout_name(board, layout_id)} of {board['name']}; valid: {valid}")
 
 
 def section_box(board, section, layout_id):
@@ -196,19 +205,29 @@ def cmd_find(args):
             print(f"{name}: tile {tile['id']} {describe_tile(board, tile)}")
 
 
+def new_item_id():
+    """cuid2-shaped like Homarr's own ids: 24 chars, leading letter."""
+    alphabet = string.ascii_lowercase + string.digits
+    return secrets.choice(string.ascii_lowercase) + "".join(secrets.choice(alphabet) for _ in range(23))
+
+
 def cmd_place(args):
     board = read_board(args.board)
     if app_tiles(board, args.app_id):
         sys.exit(f"{args.board} already has a tile for {args.app_id}")
+    layout_ids = usual_layout_ids(board)
     tile = {
-        "id": "".join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(24)),
+        "id": new_item_id(),
         "kind": "app",
         "options": {**usual_options(board), "appId": args.app_id},
-        "layouts": [new_tile_position(board, layout_id, args.section) for layout_id in usual_layout_ids(board)],
+        "layouts": [new_tile_position(board, layout_id, args.section) for layout_id in layout_ids],
         "integrationIds": [],
         "advancedOptions": {"title": None, "customCssClasses": [], "borderColor": ""},
     }
     save_verified(board, board["items"] + [tile])
+    skipped = [layout["name"] for layout in board["layouts"] if layout["id"] not in layout_ids]
+    if skipped:
+        print(f"{args.board}: no position in layouts {skipped} (most tiles there have none either)")
     placed = next(iter(app_tiles(read_board(args.board), args.app_id)))
     print(f"{args.board}: placed {describe_tile(board, placed)}")
 
@@ -223,7 +242,7 @@ def cmd_remove(args):
 
 def cmd_restore(args):
     snapshot = json.loads(Path(args.backup).read_text())
-    save_verified(read_board(snapshot["name"]), snapshot["items"])
+    save_verified(read_board(snapshot["name"]), snapshot["items"], snapshot["sections"])
 
 
 def main():
