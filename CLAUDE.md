@@ -54,6 +54,10 @@ Config|Update: updated multiple services to latest versions
 - Per-service split `.enc.env` files are allowed only when two services in the same stack need the same env var name with different values (see `services/ai/n8n.enc.env`).
 - Never commit plaintext `.env` or vault passwords.
 
+## Homarr dashboard
+
+When a service is added, removed, renamed or re-hosted, also update its Homarr app and tiles. Use the **`syncing-homarr`** skill ([`.claude/skills/syncing-homarr/`](.claude/skills/syncing-homarr/SKILL.md)). It uses the `homarr` MCP server from `.mcp.json`. Never hand-write a `board_saveBoard` call.
+
 ## Architectural Decision Records
 
 Load-bearing decisions live under [`docs/adr/`](docs/adr/). Any PR that rejects an alternative, replaces a load-bearing tool, or changes how a subsystem works (GitOps model, secrets, orchestrator, network topology, backup strategy, commit convention, etc.) **must** include a new ADR in the same PR.

@@ -6,3 +6,4 @@ services/**/.env
 .worktrees/
 .claude/worktrees/
 .vault_key
+__pycache__/
