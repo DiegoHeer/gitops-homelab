@@ -100,7 +100,7 @@ identity_providers:
           - 'email'
       - client_id: 'linkding'
         client_name: 'Linkding'
-        client_secret: '$pbkdf2-sha512$310000$rdAxKsGwIsEJcNHRmDwsFQ$6S8IkTJxMVyhEApE0Q11.61hucLq7WBQ9HgH7u/oq4Tqhv9dry0YNEEh9JVXQ8eJgvVzZAC3r.pbrpKrN/Z19g'
+        client_secret: '$pbkdf2-sha512$310000$zjc3pkchw5kkvaybM41T8g$q4x3EekF2jYV/7FWlW.AQajmDXOB9AUM26D0ljpWV34/jTa7V4s7aMe3pMLcMi0JUGJ5yj2TmbYgYOBasRv9YQ'
         public: false
         consent_mode: 'implicit'
         authorization_policy: 'one_factor'
