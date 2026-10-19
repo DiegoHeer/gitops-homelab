@@ -98,3 +98,19 @@ identity_providers:
           - 'openid'
           - 'profile'
           - 'email'
+      - client_id: 'linkding'
+        client_name: 'Linkding'
+        client_secret: '$pbkdf2-sha512$310000$zjc3pkchw5kkvaybM41T8g$q4x3EekF2jYV/7FWlW.AQajmDXOB9AUM26D0ljpWV34/jTa7V4s7aMe3pMLcMi0JUGJ5yj2TmbYgYOBasRv9YQ'
+        public: false
+        consent_mode: 'implicit'
+        authorization_policy: 'one_factor'
+        require_pkce: true
+        pkce_challenge_method: 'S256'
+        # mozilla-django-oidc posts the client secret in the token-request body.
+        token_endpoint_auth_method: 'client_secret_post'
+        redirect_uris:
+          - 'https://linkding.dynabase.nl/oidc/callback/'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
