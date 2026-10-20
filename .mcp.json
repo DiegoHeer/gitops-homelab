@@ -19,7 +19,7 @@
     },
     "home-assistant": {
       "type": "http",
-      "url": "https://ha-mcp.local.dynabase.nl${HA_MCP_SECRET_PATH}/readonly"
+      "url": "https://ha-mcp.local.dynabase.nl${HA_MCP_SECRET_PATH}"
     }
   }
 }
