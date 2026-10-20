@@ -96,6 +96,16 @@
       "allowedVersions": "<17"
     },
     {
+      "description": "Hold mysql on 8.4 LTS. 8.4 cannot upgrade straight to 26.x (it must go through 9.7 LTS), and PriceBuddy is tested on MySQL 8.x.",
+      "matchPackageNames": ["mysql"],
+      "allowedVersions": "<9"
+    },
+    {
+      "description": "Hold mariadb on 12.x LTS. Nextcloud 35 supports up to 12.3, 13.0 is a short-term rolling release, and MARIADB_AUTO_UPGRADE makes a major bump one-way.",
+      "matchPackageNames": ["mariadb"],
+      "allowedVersions": "<13"
+    },
+    {
       "description": "Auto-merge patch and minor updates once CI passes",
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true,
