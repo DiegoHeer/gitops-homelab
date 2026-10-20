@@ -26,8 +26,11 @@ services:
     restart: unless-stopped
     network_mode: host
     env_file: secrets.enc.env
+    security_opt:
+      - apparmor:unconfined  # docker-default AppArmor profile blocks D-Bus, which systemd service monitoring needs
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
       - /media/hd1/.beszel:/extra-filesystems/sdb1:ro
       - /media/hd2/.beszel:/extra-filesystems/sdd1:ro
       - /home/diego/services_data/monitoring/beszel/agent_data:/var/lib/beszel-agent
