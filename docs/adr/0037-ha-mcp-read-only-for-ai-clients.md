@@ -1,6 +1,6 @@
 # 0037 — ha-mcp in read-only mode for AI clients
 
-- **Status**: Accepted
+- **Status**: Superseded by 0038
 - **Date**: 2026-10-20
 - **Deciders**: Diego
 
