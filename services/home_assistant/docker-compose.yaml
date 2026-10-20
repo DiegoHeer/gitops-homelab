@@ -18,6 +18,34 @@ services:
       retries: 5
       start_period: 30s
 
+  # MCP server for AI clients. HOMEASSISTANT_TOKEN and MCP_SECRET_PATH come from secrets.enc.env;
+  # the secret path is the only auth on the HTTP endpoint.
+  ha_mcp:
+    container_name: ha_mcp
+    image: ghcr.io/homeassistant-ai/ha-mcp:8.7.0
+    restart: unless-stopped
+    command: ha-mcp-web
+    user: 1000:1000
+    env_file: secrets.enc.env
+    environment:
+      HOMEASSISTANT_URL: http://192.168.1.10:8123
+      READ_ONLY_MODE: "true"
+      MCP_HEALTHZ: "true"
+    volumes:
+      - /home/diego/services_data/home_assistant/ha_mcp:/home/mcpuser/.ha-mcp
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8086/healthz')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ha_mcp.rule=Host(`ha-mcp.local.dynabase.nl`)"
+      - "traefik.http.routers.ha_mcp.entrypoints=https"
+      - "traefik.http.routers.ha_mcp.tls=true"
+      - "traefik.http.services.ha_mcp.loadbalancer.server.port=8086"
+
   mosquitto:
     container_name: mosquitto
     image: eclipse-mosquitto:2.1.2-alpine
