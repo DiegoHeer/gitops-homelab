@@ -43,6 +43,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0034](0034-pricebuddy-postgres-and-env-file.md) | PriceBuddy runs on MySQL with `env_file`, not a mounted `.env` | Accepted |
 | [0035](0035-ansible-starts-dococd-and-installs-tailscale.md) | Server-only Ansible that installs Tailscale and starts DocoCD | Accepted |
 | [0036](0036-herald-replaces-cloudflare-companion.md) | Herald replaces traefik-cloudflare-companion | Accepted |
+| [0037](0037-ha-mcp-read-only-for-ai-clients.md) | ha-mcp in read-only mode for AI clients | Accepted |
 
 ## Adding a new ADR
 
