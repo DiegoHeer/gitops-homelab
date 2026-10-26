@@ -1,7 +1,7 @@
 services:
   homeassistant:
     container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:2026.10.2
+    image: ghcr.io/home-assistant/home-assistant:2026.10.4
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/home_assistant/homeassistant/config:/config
@@ -136,7 +136,7 @@ services:
   # reaches it via the file provider rather than Docker labels. See ADR 0023, 0025.
   netalertx:
     container_name: netalertx
-    image: ghcr.io/jokob-sk/netalertx:26.10.0
+    image: ghcr.io/jokob-sk/netalertx:26.10.24
     restart: unless-stopped
     network_mode: host
     cap_add:
