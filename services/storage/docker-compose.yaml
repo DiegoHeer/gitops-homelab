@@ -1,7 +1,7 @@
 services:
   filebrowser:
     container_name: filebrowser
-    image: gtstef/filebrowser:2.0.1-stable
+    image: gtstef/filebrowser:2.0.2-stable
     restart: unless-stopped
     environment:
       TZ: "Europe/Amsterdam"
