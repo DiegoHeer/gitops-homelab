@@ -40,6 +40,32 @@ services:
       - "traefik.http.routers.glance.tls=true"
       - "traefik.http.services.glance.loadbalancer.server.port=8080"
 
+  larapaper:
+    container_name: larapaper
+    image: ghcr.io/usetrmnl/larapaper:0.45.1
+    restart: unless-stopped
+    env_file: secrets.enc.env
+    environment:
+      - APP_URL=https://larapaper.local.dynabase.nl
+      - FORCE_HTTPS=true
+      - PHP_OPCACHE_ENABLE=1
+      - DB_DATABASE=database/storage/database.sqlite
+    volumes:
+      - /home/diego/services_data/dashboards/larapaper/database:/var/www/html/database/storage
+      - /home/diego/services_data/dashboards/larapaper/generated:/var/www/html/storage/app/public/images/generated
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.larapaper.rule=Host(`larapaper.local.dynabase.nl`)"
+      - "traefik.http.routers.larapaper.entrypoints=https"
+      - "traefik.http.routers.larapaper.tls=true"
+      - "traefik.http.services.larapaper.loadbalancer.server.port=8080"
+
 networks:
   default:
     name: home_server_network
