@@ -50,6 +50,7 @@ services:
       - FORCE_HTTPS=true
       - PHP_OPCACHE_ENABLE=1
       - DB_DATABASE=database/storage/database.sqlite
+      - REGISTRATION_ENABLED=0
     volumes:
       - /home/diego/services_data/dashboards/larapaper/database:/var/www/html/database/storage
       - /home/diego/services_data/dashboards/larapaper/generated:/var/www/html/storage/app/public/images/generated
