@@ -19,7 +19,9 @@ so DocoCD cannot deploy them.
 Render the screen as one LaraPaper Blade recipe that polls all five URLs. Keep
 its source in `services/dashboards/larapaper/recipes/` and apply it with
 `apply.sh setup`, which builds the markup, writes it into LaraPaper and sets the
-device's refresh and night sleep. The iCal URL lives in its own SOPS file there.
+device's refresh and night sleep. The iCal URL lives in its own SOPS file there,
+not in `services/dashboards/secrets.enc.env`: that file is an `env_file` for the
+stack's containers, and the URL must not reach Homarr's or LaraPaper's environment.
 
 ## Consequences
 

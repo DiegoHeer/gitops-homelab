@@ -1,44 +1,17 @@
 <?php
 
-// Usage (inside the larapaper container): ICS_URL=... php setup.php [--remove-old]
+// Usage (inside the larapaper container): ICS_URL=... php setup.php
 // Idempotent: upserts the "Weather + Calendar" recipe, shows it on device 2, sets refresh and
-// night sleep, refreshes the data and renders the live screen. --remove-old deletes the two
-// recipes of the old "Rain + Calendar" mashup.
+// night sleep, refreshes the data and renders the live screen.
 
-use App\Models\Device;
 use App\Models\Playlist;
 use App\Models\PlaylistItem;
 use App\Models\Plugin;
 use App\Services\ImageGenerationService;
 use Illuminate\Support\Str;
 
-require '/var/www/html/vendor/autoload.php';
-$app = require '/var/www/html/bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-require_once __DIR__.'/build.php';
-
-$device = Device::findOrFail(2);
+$device = require __DIR__.'/bootstrap.php';
 $user = $device->user;
-
-if (in_array('--remove-old', $argv, true)) {
-    // Only after setup moved the device off the old mashup, or the playlist would point at deleted plugins.
-    $current = Plugin::where('user_id', $user->id)->where('plugin_type', 'recipe')->where('name', 'Weather + Calendar')->first();
-    $onDevice = $current !== null && PlaylistItem::whereHas('playlist', fn ($query) => $query->where('device_id', $device->id))
-        ->where('plugin_id', $current->id)->whereNull('mashup')->exists();
-    if (! $onDevice) {
-        fwrite(STDERR, "Refusing: run setup first, so device {$device->id} shows \"Weather + Calendar\".\n");
-        exit(1);
-    }
-    $removed = Plugin::where('user_id', $user->id)
-        ->where('plugin_type', 'recipe')
-        ->whereIn('name', ['Buienradar Den Haag', 'Calendar'])
-        ->get();
-    foreach ($removed as $plugin) {
-        echo "removed plugin {$plugin->id} ({$plugin->name})\n";
-        $plugin->delete();
-    }
-    exit(0);
-}
 
 $icsUrl = getenv('ICS_URL');
 if (! $icsUrl) {
@@ -85,7 +58,11 @@ $user->update(['timezone' => 'Europe/Amsterdam']);
 $plugin->updateDataPayload();
 $plugin->refresh();
 foreach ($plugin->data_payload as $key => $source) {
-    $summary = isset($source['error']) ? "ERROR {$source['error']}" : 'keys='.implode(',', array_keys($source));
+    $summary = match (true) {
+        ! is_array($source) => 'ERROR not a parsed response ('.get_debug_type($source).')',
+        isset($source['error']) => "ERROR {$source['error']}",
+        default => 'keys='.implode(',', array_keys($source)),
+    };
     echo "{$key}: {$summary}\n";
 }
 echo 'payload bytes: '.strlen(json_encode($plugin->data_payload, JSON_PRETTY_PRINT))."\n";

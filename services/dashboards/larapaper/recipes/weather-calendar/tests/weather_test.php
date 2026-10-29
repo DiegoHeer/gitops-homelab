@@ -67,7 +67,10 @@ $result = $weather($meteo(daily: ['weather_code' => [3, 71, 2]]), $now);
 check('weather_day_danger', $result['days'][0]['danger'] === 'Snow', json_encode($result['days'][0]));
 
 $result = $weather($meteo(hourlyCodes: ['2026-10-29 18:00' => 95, '2026-10-29 19:00' => 96]), $now);
-check('weather_danger_12h', $result['danger'] === ['word' => 'Hail and thunder', 'at' => '19:00'], json_encode($result['danger']));
+check('weather_danger_12h', $result['danger'] === ['word' => 'Hail and thunder', 'at' => '19:00', 'isNow' => false], json_encode($result['danger']));
+
+$result = $weather($meteo(hourlyCodes: ['2026-10-29 08:00' => 95]), $now);
+check('weather_danger_current_hour_is_now', $result['danger'] === ['word' => 'Thunder', 'at' => '08:00', 'isNow' => true], json_encode($result['danger']));
 
 $result = $weather($meteo(hourlyCodes: ['2026-10-30 21:00' => 95]), $now);
 check('weather_danger_outside_window', $result['danger'] === null, json_encode($result['danger']));

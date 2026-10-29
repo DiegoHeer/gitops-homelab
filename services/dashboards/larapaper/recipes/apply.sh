@@ -8,7 +8,6 @@ set -euo pipefail
 #   apply.sh test              run the recipe's PHP tests
 #   apply.sh render [outdir]   render the fixture scenarios to PNGs (live screen untouched)
 #   apply.sh setup [outdir]    install/update the recipe on the TRMNL and fetch the live screen
-#   apply.sh cleanup           delete the old "Rain + Calendar" mashup recipes
 #
 # Talks to the server's Docker over DOCKER_HOST=ssh://$SERVER_SSH_ALIAS unless
 # already running on the server itself, like scripts/doco.sh.
@@ -25,7 +24,7 @@ REMOTE_DIR="/tmp/trmnl-recipe"
 GENERATED_DIR="/var/www/html/storage/app/public/images/generated"
 
 usage() {
-    echo "Usage: $0 {test|render [outdir]|setup [outdir]|cleanup}" >&2
+    echo "Usage: $0 {test|render [outdir]|setup [outdir]}" >&2
     exit 2
 }
 
@@ -54,7 +53,9 @@ case "${1:-}" in
         ;;
     render)
         push_recipe
-        docker exec "$CONTAINER" php "$REMOTE_DIR/render-fixtures.php" | fetch_images "${2:-${TMPDIR:-/tmp}/trmnl-render}"
+        # Only "<name>=<uuid>" lines; a PHP notice on stdout must not be read as an image.
+        docker exec "$CONTAINER" php "$REMOTE_DIR/render-fixtures.php" \
+            | grep -E '^[a-z_]+=[0-9a-f-]+$' | fetch_images "${2:-${TMPDIR:-/tmp}/trmnl-render}"
         ;;
     setup)
         ICS_URL="$(sops -d "$SCRIPT_DIR/secrets.enc.env" | sed -n 's/^TRMNL_ICS_URL=//p')"
@@ -63,10 +64,6 @@ case "${1:-}" in
         # -e ICS_URL passes the value from this shell's environment, never on a command line.
         docker exec -e ICS_URL "$CONTAINER" php "$REMOTE_DIR/setup.php" \
             | tee /dev/stderr | grep '^live=' | fetch_images "${2:-${TMPDIR:-/tmp}/trmnl-render}" keep
-        ;;
-    cleanup)
-        push_recipe
-        docker exec "$CONTAINER" php "$REMOTE_DIR/setup.php" --remove-old
         ;;
     *)
         usage

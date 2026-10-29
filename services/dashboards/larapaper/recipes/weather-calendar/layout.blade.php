@@ -8,20 +8,25 @@
 @php
     $now = \Carbon\CarbonImmutable::now('Europe/Amsterdam');
     // Malformed upstream data must cost one block, not the whole screen.
-    $safely = function (callable $run, array $fallback): array {
+    // On failure each logic runs again with empty input, which returns its "unavailable" shape.
+    $safely = function (callable $logic, array $sources) use ($now): array {
         try {
-            return $run();
+            return $logic(...$sources, now: $now);
         } catch (\Throwable) {
-            return $fallback;
+            return $logic(...array_fill(0, count($sources), []), now: $now);
         }
     };
-    $rain = $safely(fn () => $rainLogic($data['IDX_0'] ?? [], $data['IDX_1'] ?? [], $now), $rainLogic([], [], $now));
-    $weather = $safely(fn () => $weatherLogic($data['IDX_2'] ?? [], $now), $weatherLogic([], $now));
-    $warnings = $safely(fn () => $warningsLogic($data['IDX_3'] ?? [], $now), $warningsLogic([], $now));
-    $calendar = $safely(fn () => $calendarLogic($data['IDX_4'] ?? [], $now), $calendarLogic([], $now));
+    $rain = $safely($rainLogic, [$data['IDX_0'] ?? [], $data['IDX_1'] ?? []]);
+    $weather = $safely($weatherLogic, [$data['IDX_2'] ?? []]);
+    $warnings = $safely($warningsLogic, [$data['IDX_3'] ?? []]);
+    $calendar = $safely($calendarLogic, [$data['IDX_4'] ?? []]);
     $tempLine = $weather['ok'] ? $weather['tempLine'] : null;
     $danger = $weather['danger'];
-    $dangerLine = $danger === null ? null : $danger['word'].' possible around '.$danger['at'].'.';
+    $dangerLine = match (true) {
+        $danger === null => null,
+        $danger['isNow'] => $danger['word'].' possible now.',
+        default => $danger['word'].' possible around '.$danger['at'].'.',
+    };
     $chartLabels = ['Hail and thunder' => 'HAIL', 'Freezing rain' => 'ICE', 'Snow' => 'SNOW', 'Thunder' => 'THUNDER', 'Violent showers' => 'STORM'];
     $showTempLine = $rain['dry'] || ! $rain['ok'];
 
@@ -59,7 +64,7 @@
         foreach ([0, 3, 6, 9, 12] as $i) {
             $point = $line['points'][$i] ?? null;
             if ($point !== null) {
-                $svgLabels[] = ['x' => round($x($i), 1), 'y' => round($y($point['temp']), 1), 'temp' => (int) round($point['temp']).'°', 'at' => $i === 0 ? 'Now' : $point['at'], 'last' => $i === 12];
+                $svgLabels[] = ['x' => round($x($i), 1), 'y' => round($y($point['temp']), 1), 'temp' => (int) round($point['temp']).'°', 'at' => $point['at'], 'last' => $i === 12];
             }
         }
     }
