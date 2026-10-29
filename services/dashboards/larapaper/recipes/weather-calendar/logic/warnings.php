@@ -23,11 +23,13 @@ return static function (array $atom, DateTimeImmutable $now): array {
         return $hazard === '' ? 'Weather' : ucfirst(strtolower($hazard));
     };
 
+    $now = $now->setTimezone($tz);
     $endOfToday = $now->setTime(23, 59, 59);
     $matches = [];
     foreach ($entries as $entry) {
         $level = $levels[$entry['severity'] ?? ''] ?? null;
-        if ($level === null || ($entry['areaDesc'] ?? '') !== 'Zuid-Holland') {
+        // An entry covering several areas parses to a list of areaDesc values.
+        if ($level === null || ! in_array('Zuid-Holland', (array) ($entry['areaDesc'] ?? []), true)) {
             continue;
         }
         // CAP makes onset optional; effective is the next best start time.

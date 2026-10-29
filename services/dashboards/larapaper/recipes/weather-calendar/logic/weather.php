@@ -10,6 +10,8 @@ return static function (array $meteo, DateTimeImmutable $now): array {
 
     $round = static fn (float|int $value): int => (int) round($value, 0, PHP_ROUND_HALF_UP);
 
+    $now = $now->setTimezone($tz);
+
     // WMO codes worth shouting about, most severe first.
     $dangers = [
         'Hail and thunder' => [96, 99],
@@ -18,14 +20,14 @@ return static function (array $meteo, DateTimeImmutable $now): array {
         'Thunder' => [95],
         'Violent showers' => [82],
     ];
-    $dangerRank = static function (int $code) use ($dangers): ?int {
-        $rank = array_search(true, array_map(static fn (array $codes): bool => in_array($code, $codes, true), array_values($dangers)), true);
+    $dangerWords = array_keys($dangers);
+    $rankByCode = [];
+    foreach (array_values($dangers) as $rank => $codes) {
+        $rankByCode += array_fill_keys($codes, $rank);
+    }
+    $dangerWord = static fn (int $code): ?string => isset($rankByCode[$code]) ? $dangerWords[$rankByCode[$code]] : null;
 
-        return $rank === false ? null : $rank;
-    };
-    $dangerWord = static fn (int $code): ?string => ($rank = $dangerRank($code)) === null ? null : array_keys($dangers)[$rank];
-
-    $beaufort = static function (int $kmh): int {
+    $beaufort = static function (float $kmh): int {
         foreach ([1, 6, 12, 20, 29, 39, 50, 62, 75, 89, 103, 118] as $bft => $upper) {
             if ($kmh < $upper) {
                 return $bft;
@@ -42,7 +44,7 @@ return static function (array $meteo, DateTimeImmutable $now): array {
         'feels' => $round($current['apparent_temperature']),
         'code' => (int) $current['weather_code'],
         'isDay' => (bool) ($current['is_day'] ?? true),
-        'bft' => $beaufort($round($current['wind_speed_10m'] ?? 0)),
+        'bft' => $beaufort((float) ($current['wind_speed_10m'] ?? 0)),
         'dir' => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][$round(($current['wind_direction_10m'] ?? 0) / 45) % 8],
         'humidity' => $round($current['relative_humidity_2m'] ?? 0),
         'gusts' => $gusts,
@@ -52,6 +54,9 @@ return static function (array $meteo, DateTimeImmutable $now): array {
     $daily = $meteo['daily'];
     $days = [];
     foreach ([1, 2] as $i) {
+        if (! isset($daily['time'][$i], $daily['weather_code'][$i], $daily['temperature_2m_min'][$i], $daily['temperature_2m_max'][$i])) {
+            continue;
+        }
         $code = (int) $daily['weather_code'][$i];
         $days[] = [
             'label' => (new DateTimeImmutable($daily['time'][$i], $tz))->format('D'),
@@ -81,9 +86,9 @@ return static function (array $meteo, DateTimeImmutable $now): array {
         if ($at <= $endOfToday) {
             $rainChanceToday = max($rainChanceToday, $round($hourly['precipitation_probability'][$i] ?? 0));
         }
-        $rank = $dangerRank((int) $hourly['weather_code'][$i]);
+        $rank = $rankByCode[(int) $hourly['weather_code'][$i]] ?? null;
         if ($at <= $windowEnd && $rank !== null && ($danger === null || $rank < $danger['rank'])) {
-            $danger = ['rank' => $rank, 'word' => array_keys($dangers)[$rank], 'at' => $at->format('H:i')];
+            $danger = ['rank' => $rank, 'word' => $dangerWords[$rank], 'at' => $at->format('H:i')];
         }
     }
 

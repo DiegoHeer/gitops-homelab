@@ -7,11 +7,14 @@ set -euo pipefail
 #
 #   apply.sh test              run the recipe's PHP tests
 #
-# Talks to the server's Docker over DOCKER_HOST=ssh://$SERVER_SSH_ALIAS, like
-# scripts/doco.sh.
+# Talks to the server's Docker over DOCKER_HOST=ssh://$SERVER_SSH_ALIAS unless
+# already running on the server itself, like scripts/doco.sh.
 
+SERVER_HOSTNAME="${SERVER_HOSTNAME:-home}"
 SERVER_SSH_ALIAS="${SERVER_SSH_ALIAS:-server}"
-export DOCKER_HOST="${DOCKER_HOST:-ssh://$SERVER_SSH_ALIAS}"
+if [ -z "${DOCKER_HOST:-}" ] && [ "$(hostname)" != "$SERVER_HOSTNAME" ]; then
+    export DOCKER_HOST="ssh://$SERVER_SSH_ALIAS"
+fi
 CONTAINER="larapaper"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RECIPE_DIR="$SCRIPT_DIR/weather-calendar"

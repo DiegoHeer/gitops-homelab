@@ -91,5 +91,20 @@ $empty['hourly'] = ['time' => [], 'temperature_2m' => [], 'weather_code' => [], 
 $result = $weather($empty, $now);
 check('weather_empty_hourly', $result['ok'] === true && $result['tempLine'] === null && $result['danger'] === null, json_encode($result['tempLine']));
 
+$result = $weather($meteo(['wind_speed_10m' => 28.6]), $now);
+check('weather_beaufort_not_rounded_up', $result['now']['bft'] === 4, json_encode($result['now']));
+
+$shortDaily = $meteo();
+foreach ($shortDaily['daily'] as $key => $values) {
+    $shortDaily['daily'][$key] = array_slice($values, 0, 2);
+}
+$result = $weather($shortDaily, $now);
+check('weather_missing_day_rows', $result['ok'] === true && count($result['days']) === 1 && $result['days'][0]['label'] === 'Fri', json_encode($result['days']));
+
+$lateRain = $meteo();
+$lateRain['hourly']['precipitation_probability'][24] = 90; // Fri 00:00 Amsterdam
+$result = $weather($lateRain, new DateTimeImmutable('2026-10-29 07:30', new DateTimeZone('UTC')));
+check('weather_utc_now_uses_amsterdam_day', $result['tempLine']['rainChanceToday'] === 40 && $result['tempLine']['points'][0]['at'] === '08:00', json_encode($result['tempLine']['rainChanceToday']));
+
 $result = $weather(['error' => 'Failed to fetch data'], $now);
 check('weather_failed_source', $result['ok'] === false, json_encode($result));

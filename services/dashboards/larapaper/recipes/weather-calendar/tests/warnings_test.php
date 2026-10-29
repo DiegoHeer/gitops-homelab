@@ -54,5 +54,12 @@ check('warnings_missing_onset_uses_effective', ($result['active']['from'] ?? nul
 $result = $warnings($feed($noOnset), $now);
 check('warnings_no_start_time_skipped', $result['ok'] === true && $result['active'] === null, json_encode($result));
 
+$result = $warnings($feed(array_merge($entry('Zuid-Holland', 'Severe', '2026-10-29T13:00:00+00:00', '2026-10-29T21:00:00+00:00'), ['areaDesc' => ['Zeeland', 'Zuid-Holland']])), $now);
+check('warnings_multi_area', ($result['active']['level'] ?? null) === 'ORANGE', json_encode($result));
+
+$utcAfterMidnight = new DateTimeImmutable('2026-10-29 23:30', new DateTimeZone('UTC')); // 00:30 Fri in Amsterdam
+$result = $warnings($feed($entry('Zuid-Holland', 'Severe', '2026-10-30T09:00:00+00:00', '2026-10-30T15:00:00+00:00')), $utcAfterMidnight);
+check('warnings_utc_now_uses_amsterdam_day', ($result['active']['from'] ?? null) === '10:00', json_encode($result['active']));
+
 $result = $warnings(['error' => 'Failed to fetch data'], $now);
 check('warnings_failed_source', $result['ok'] === false && $result['active'] === null, json_encode($result));

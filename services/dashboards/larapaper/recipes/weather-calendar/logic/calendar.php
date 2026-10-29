@@ -8,6 +8,7 @@ return static function (array $ical, DateTimeImmutable $now, int $limit = 8): ar
         return ['ok' => false, 'groups' => []];
     }
 
+    $now = $now->setTimezone($tz);
     $today = $now->format('Y-m-d');
     // All-day events arrive as midnight in the server timezone, so their date text is the day.
     $localDay = static fn (string $atom): DateTimeImmutable => new DateTimeImmutable(substr($atom, 0, 10), $tz);
@@ -19,8 +20,11 @@ return static function (array $ical, DateTimeImmutable $now, int $limit = 8): ar
         }
         $allDay = (bool) ($event['all_day'] ?? false);
         $start = $allDay ? $localDay($event['DTSTART']) : (new DateTimeImmutable($event['DTSTART']))->setTimezone($tz);
-        $endText = $event['DTEND'] ?? $event['DTSTART'];
-        $end = $allDay ? $localDay($endText) : (new DateTimeImmutable($endText))->setTimezone($tz);
+        $end = match (true) {
+            ! isset($event['DTEND']) => $allDay ? $start->modify('+1 day') : $start,
+            $allDay => $localDay($event['DTEND']),
+            default => (new DateTimeImmutable($event['DTEND']))->setTimezone($tz),
+        };
         if ($end <= $now) {
             continue;
         }
