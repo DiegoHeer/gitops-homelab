@@ -50,6 +50,8 @@ molecule/           # Ansible role testing (one scenario per role)
 
 The DocoCD container itself lives at `bootstrap/gitops/` (not under `services/`) because DocoCD can't redeploy its own container — that stack is Ansible-managed.
 
+The TRMNL screen is a LaraPaper recipe stored in LaraPaper's database, so DocoCD doesn't deploy it either: its source lives in `services/dashboards/larapaper/recipes/` and is applied with `services/dashboards/larapaper/recipes/apply.sh setup`.
+
 ---
 
 ## How deploys work
