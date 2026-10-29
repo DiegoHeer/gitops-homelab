@@ -82,5 +82,12 @@ check(
 $result = $calendar(['ical' => [$event('Holiday', '2026-10-30', '2026-10-31', allDay: true)]], $now);
 check('calendar_next_up_only_all_day', $titles($result['groups'][0]) === ['Holiday'] && $result['groups'][0]['label'] === 'Next Up · Fri 30 Oct', json_encode($result['groups']));
 
+$result = $calendar(['ical' => [array_diff_key($event('Holiday', '2026-10-29', '2026-10-30', allDay: true), ['DTEND' => true])]], $now);
+check('calendar_all_day_without_end', ($result['groups'][0]['events'][0]['title'] ?? null) === 'Holiday', json_encode($result['groups']));
+
+$utcAfterMidnight = new DateTimeImmutable('2026-10-29 23:30', new DateTimeZone('UTC')); // 00:30 Fri in Amsterdam
+$result = $calendar(['ical' => [$event('Ajudar Lidia', '2026-10-30 14:00', '2026-10-30 22:00')]], $utcAfterMidnight);
+check('calendar_utc_now_uses_amsterdam_day', $result['groups'][0]['label'] === 'Next Up', json_encode($result['groups']));
+
 $result = $calendar(['error' => 'Failed to fetch data'], $now);
 check('calendar_failed_source', $result['ok'] === false && $result['groups'] === [], json_encode($result));

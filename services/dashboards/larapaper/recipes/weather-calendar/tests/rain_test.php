@@ -63,6 +63,17 @@ check(
 $result = $rain($fiveMinute(array_merge([[0.2, 0]], array_fill(0, 33, DRY))), $hourly($dryHours), $now);
 check('rain_value_zero_precip_positive', $result['dry'] === false, json_encode($result['headline']));
 
+$result = $rain(['forecasts' => []], ['error' => 'Failed to fetch data'], $now);
+check('rain_no_points_is_no_data', $result['ok'] === false && $result['headline'] === 'No rain data', json_encode($result['headline']));
+
+// At 08:30 the 08:25 slot has ended: its rain must not count as "now".
+$endedSlot = ['forecasts' => $series('2026-10-29 08:25', 5, array_merge([LIGHT], array_fill(0, 34, DRY)))];
+$result = $rain($endedSlot, $hourly($dryHours), $now);
+check('rain_ended_slot_ignored', $result['dry'] === true && $result['bars'][0]['at'] === '08:30', json_encode([$result['headline'], $result['bars'][0] ?? null]));
+
+$result = $rain($endedSlot, $hourly($dryHours), amsterdam('2026-10-29 08:28'));
+check('rain_current_slot_kept', $result['headline'] === 'Light rain now', json_encode($result['headline']));
+
 $result = $rain(['error' => 'Failed to fetch data'], $hourly($dryHours), $now);
 check('rain_failed_source', $result['ok'] === false && $result['headline'] === 'No rain data', json_encode($result['headline'] ?? null));
 
