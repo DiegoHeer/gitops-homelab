@@ -92,7 +92,7 @@ return static function (array $meteo, DateTimeImmutable $now): array {
         }
     }
 
-    $danger = $danger === null ? null : ['word' => $danger['word'], 'at' => $danger['at']];
+    $danger = $danger === null ? null : ['word' => $danger['word'], 'at' => $danger['at'], 'isNow' => $danger['at'] === $hourStart->format('H:i')];
     if ($points === []) {
         return ['ok' => true, 'now' => $nowRow, 'days' => $days, 'danger' => $danger, 'tempLine' => null];
     }
