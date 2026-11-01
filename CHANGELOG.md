@@ -3,6 +3,77 @@
 All notable changes to this homelab are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning uses CalVer (`YYYY.MM.N`).
+## [2026.11.0] - 2026-10-29
+
+### Added
+
+- Services|Add: added glance homelab page with releases widget for 12 self-hosted apps
+- Ansible|Add: install Tailscale and enable tailscaled in system role
+- Ansible|Add: start DocoCD stack from docker_host role
+- Config|Add: ADR 0035 server-only Ansible, DocoCD started by Ansible, restores via Zerobyte
+- Ansible|Add: restored restore role and workflow, molecule on ubuntu 26.04
+- Ansible|Add: docker_host daemon config extras, molecule checks log rotation, mount order and apprise health
+- Infrastructure|Add: ADR 0036 for Herald superseding ADR 0020
+- Services|Add: linkding bookmark manager with Authelia OIDC login
+- Config|Add: included homarr MCP server
+- Config|Add: included syncing-homarr skill with board helper script
+- Services|Add: included ha-mcp in read-only mode for Home Assistant MCP access
+- Config|Add: registered home-assistant MCP server on the read-only endpoint
+- Services|Add: included larapaper as TRMNL BYOS server
+- Services|Add: added TRMNL recipe test harness and rain logic
+- Services|Add: added TRMNL recipe weather logic
+- Services|Add: added TRMNL recipe KNMI warnings logic
+- Services|Add: added TRMNL recipe calendar logic
+- Services|Add: added TRMNL weather + calendar layout and fixture renders
+- Services|Add: added TRMNL recipe setup with calendar SOPS secret
+- Config|Add: recorded ADR 0039 and the TRMNL apply step in the README
+
+### Changed
+
+- Config|Update: regenerate CHANGELOG for 2026.10.0
+- Services|Migrate: moved glance config into git with read-only mount
+- Ansible|Update: bumped haxorof.docker_ce to 6.2.2 for ubuntu 26.04 support
+- Ansible|Update: run molecule on ubuntu 26.04
+- Ansible|Refactor: removed unused ordered-mount support from docker_host
+- Config|Update: docs reflect slimmed Ansible roles
+- Config|Update: ADR 0035 keeps the restore role, ADR 0015 accepted again
+- Config|Update: docs list the restore role again
+- Ansible|Update: molecule Tailscale source matches the live file
+- Ansible|Update: molecule runs on ubuntu 26.04 and 24.04
+- Config|Update: ADR 0035 covers deploy race, Apprise swap and dropped settings
+- Config|Update: getting-started adds the tailscale up step
+- Services|Refactor: home assistant dongles use stable by-id paths
+- Services|Migrate: replaced deleted traefik-cloudflare-companion image with nfrastack/herald
+- Config|Update: listed linkding in the README services table
+- Services|Update: rotated linkding OIDC client secret and added it to tools secrets
+- Config|Update: referenced syncing-homarr skill in CLAUDE.md
+- Config|Update: held mysql on 8.4 LTS and mariadb on 12.x LTS in Renovate
+- Services|Update: gave beszel-agent D-Bus access for systemd service monitoring
+- Services|Update: enabled ha-mcp write tools
+- Config|Update: pointed home-assistant MCP at the full endpoint
+- Services|Update: disabled larapaper registration after account setup
+
+### Fixed
+
+- Services|Fix: repaired broken glance weather, market symbols and dead feeds
+- Services|Fix: showed one video per row on phones in glance videos widget
+- Services|Fix: showed two videos per row on phones via screen-width rule in glance
+- Ansible|Fix: Tailscale keyring refreshes and apt cache is reused
+- Config|Fix: addressed review comments on syncing-homarr script
+- Config|Fix: closed gaps found by syncing-homarr skill tests
+- Config|Fix: removed committed pycache and ignored __pycache__
+- Services|Fix: removed public nextcloud router until PHP is patched for php2shell
+- Services|Fix: restored public nextcloud router now that the image ships PHP 8.5.12
+- Services|Fix: addressed TRMNL recipe logic review comments
+- Services|Fix: addressed TRMNL screen review comments
+
+### Removed
+
+- Ansible|Remove: removed restore role and workflow (migration uses plain copy)
+- Ansible|Remove: removed projects role (workstation setup, not server)
+- Ansible|Remove: dropped linuxbrew, tmux, oh-my-posh, flatpak and snapd from system role
+- Config|Remove: dropped stale terraform and tests entries from gitignore
+
 ## [2026.10.0] - 2026-09-29
 
 ### Added
