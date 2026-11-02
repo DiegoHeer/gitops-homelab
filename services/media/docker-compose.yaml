@@ -26,7 +26,7 @@ services:
 
   seerr:
     container_name: seerr
-    image: ghcr.io/seerr-team/seerr:v3.5.0
+    image: ghcr.io/seerr-team/seerr:v3.5.1
     init: true
     restart: unless-stopped
     labels:
@@ -107,7 +107,7 @@ services:
 
   qbittorrent:
     container_name: qbittorrent
-    image: lscr.io/linuxserver/qbittorrent:5.2.4
+    image: lscr.io/linuxserver/qbittorrent:5.3.0
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
@@ -135,7 +135,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:2.6.5
+    image: linuxserver/prowlarr:2.7.0
     restart: unless-stopped
     network_mode: service:gluetun
     depends_on:
@@ -242,7 +242,7 @@ services:
 
   audiobookshelf:
     container_name: audiobookshelf
-    image: ghcr.io/advplyr/audiobookshelf:2.37.1
+    image: ghcr.io/advplyr/audiobookshelf:2.37.2
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
