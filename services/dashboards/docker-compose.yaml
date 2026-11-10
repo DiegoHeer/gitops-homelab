@@ -2,7 +2,7 @@ services:
   homarr:
     container_name: homarr
     restart: unless-stopped
-    image: ghcr.io/homarr-labs/homarr:v2.6.0
+    image: ghcr.io/homarr-labs/homarr:v2.12.0
     env_file: secrets.enc.env
     volumes:
       - /home/diego/services_data/dashboards/homarr/appdata:/appdata
@@ -21,7 +21,7 @@ services:
 
   glance:
     container_name: glance
-    image: glanceapp/glance:v0.8.7
+    image: glanceapp/glance:v0.8.8
     restart: unless-stopped
     entrypoint: ["/app/glance", "--config", "/app/config/glance.yaml"]
     volumes:
@@ -42,7 +42,7 @@ services:
 
   larapaper:
     container_name: larapaper
-    image: ghcr.io/usetrmnl/larapaper:0.45.1
+    image: ghcr.io/usetrmnl/larapaper:0.46.0
     restart: unless-stopped
     env_file: secrets.enc.env
     environment:
