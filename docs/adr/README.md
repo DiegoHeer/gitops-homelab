@@ -46,6 +46,7 @@ All initial ADRs are `Accepted` as of 2026-04-18.
 | [0037](0037-ha-mcp-read-only-for-ai-clients.md) | ha-mcp in read-only mode for AI clients | Superseded by 0038 |
 | [0038](0038-ha-mcp-write-tools-enabled.md) | ha-mcp write tools enabled for AI clients | Accepted |
 | [0039](0039-trmnl-screen-as-one-larapaper-recipe.md) | TRMNL screen as one LaraPaper recipe, applied by script | Accepted |
+| [0040](0040-rustfs-single-disk-mode.md) | RustFS runs in single-disk mode on the OS SSD | Accepted |
 
 ## Adding a new ADR
 
