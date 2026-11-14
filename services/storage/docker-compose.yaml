@@ -1,33 +1,4 @@
 services:
-  filebrowser:
-    container_name: filebrowser
-    image: gtstef/filebrowser:2.0.2-stable
-    restart: unless-stopped
-    environment:
-      TZ: "Europe/Amsterdam"
-      FILEBROWSER_CONFIG: "data/config.yaml"
-    volumes:
-      - /media/hd1:/hd1
-      - /media/hd2:/hd2
-      - /home/diego:/user_home
-      - /home/diego/services_data/storage/filebrowser/data:/home/filebrowser/data
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.filebrowser.rule=Host(`filebrowser.local.dynabase.nl`)"
-      - "traefik.http.routers.filebrowser.entrypoints=https"
-      - "traefik.http.routers.filebrowser.tls=true"
-      - "traefik.http.services.filebrowser.loadbalancer.server.port=80"
-    deploy:
-      resources:
-        limits:
-          memory: 200M
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:80/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
   nextcloud:
     image: linuxserver/nextcloud:35.0.2
     container_name: nextcloud
