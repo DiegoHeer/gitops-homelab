@@ -114,6 +114,10 @@ services:
         target: /app/logs
         bind:
           create_host_path: false
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     healthcheck:
       test:
         [
