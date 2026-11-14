@@ -60,7 +60,7 @@ services:
 
   rustfs:
     container_name: rustfs
-    image: rustfs/rustfs:1.0.0-alpha.94
+    image: rustfs/rustfs:1.0.5
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
