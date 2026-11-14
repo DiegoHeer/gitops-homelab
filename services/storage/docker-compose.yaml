@@ -92,6 +92,8 @@ services:
       - RUSTFS_IDENTITY_OPENID_ENABLE=on
       # Full discovery URL — RustFS does not append .well-known itself.
       - RUSTFS_IDENTITY_OPENID_CONFIG_URL=https://auth.dynabase.nl/.well-known/openid-configuration
+      # auth.dynabase.nl resolves to a LAN IP; 1.0.x blocks private IdP origins unless allowlisted.
+      - RUSTFS_OUTBOUND_ALLOW_ORIGINS=https://auth.dynabase.nl
       - RUSTFS_IDENTITY_OPENID_CLIENT_ID=rustfs
       - RUSTFS_IDENTITY_OPENID_SCOPES=openid,profile,email
       - RUSTFS_IDENTITY_OPENID_REDIRECT_URI=https://rustfs-console.dynabase.nl/rustfs/admin/v3/oidc/callback/default
