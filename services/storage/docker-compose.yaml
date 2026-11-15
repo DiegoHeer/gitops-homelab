@@ -111,7 +111,7 @@ services:
           create_host_path: false
       - type: bind
         source: /home/diego/services_data/storage/rustfs/logs
-        target: /app/logs
+        target: /logs
         bind:
           create_host_path: false
     deploy:
