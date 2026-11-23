@@ -1,7 +1,7 @@
 services:
   homeassistant:
     container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:2026.10.4
+    image: ghcr.io/home-assistant/home-assistant:2026.11.2
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/home_assistant/homeassistant/config:/config
@@ -47,7 +47,7 @@ services:
 
   mosquitto:
     container_name: mosquitto
-    image: eclipse-mosquitto:2.1.2-alpine
+    image: eclipse-mosquitto:2.1.4-alpine
     restart: unless-stopped
     volumes:
       - /home/diego/services_data/home_assistant/mosquitto/log:/mosquitto/log
