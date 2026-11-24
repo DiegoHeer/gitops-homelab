@@ -18,7 +18,7 @@ services:
 
   bentopdf:
     container_name: bentopdf
-    image: ghcr.io/alam00000/bentopdf:2.8.11
+    image: ghcr.io/alam00000/bentopdf:2.8.12
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -35,7 +35,7 @@ services:
 
   docuseal:
     container_name: docuseal
-    image: docuseal/docuseal:3.3.6
+    image: docuseal/docuseal:3.4.0
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -59,7 +59,7 @@ services:
 
   tandoor:
     container_name: tandoor
-    image: vabene1111/recipes:2.7.2
+    image: vabene1111/recipes:2.7.6
     restart: unless-stopped
     env_file: secrets.enc.env
     labels:
@@ -99,7 +99,7 @@ services:
   tandoor_postgres:
     container_name: tandoor_postgres
     restart: unless-stopped
-    image: postgres:16.15-alpine
+    image: postgres:16.16-alpine
     env_file: secrets.enc.env
     volumes:
       - /home/diego/services_data/tools/tandoor/postgresql:/var/lib/postgresql/data
